@@ -1,9 +1,13 @@
 {
-  "name": "AURA",
+  "name": "mobile",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
+    "build": "expo export -p web",
     "dev": "expo start -c",
+    "start": "expo start -c",
+    "lint": "echo 'No lint configured'",
+    "test": "echo 'No tests'",
     "android": "expo start -c --android",
     "ios": "expo start -c --ios",
     "web": "expo start -c --web",

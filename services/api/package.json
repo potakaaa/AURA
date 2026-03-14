@@ -2,9 +2,11 @@
   "name": "api",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "lint": "echo 'No lint configured'",
+    "test": "echo 'No tests'"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.11",
