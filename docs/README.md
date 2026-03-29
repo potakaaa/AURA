@@ -46,3 +46,4 @@ pnpm lint
 - [MVP Issues Registry](issues/AURA_Issues_Registry.md)
 - [Development Setup](AURA/06_development/dev_setup.md)
 - [API Design](AURA/06_development/api_design.md)
+- [CI/CD Pipeline](AURA/06_development/ci_cd_pipeline.md)
