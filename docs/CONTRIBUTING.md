@@ -85,6 +85,23 @@ pnpm dev:api
 pnpm test
 ```
 
+## Local Hook Policy (CI-aligned)
+
+This repo uses local git hooks via `.pre-commit-config.yaml` to mirror CI check families:
+
+- `pre-commit` stage: `pnpm turbo run lint`
+- `pre-push` stage:
+  - `pnpm turbo run test`
+  - `pnpm turbo run build`
+  - `pnpm --filter mobile lint`
+  - `pnpm --filter mobile test`
+
+Install hook stages once per clone:
+
+```bash
+pre-commit install --hook-type pre-commit --hook-type pre-push
+```
+
 ## CI Expectations
 
 Pull requests are expected to pass CI checks for:
