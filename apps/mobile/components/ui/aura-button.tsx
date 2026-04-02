@@ -25,6 +25,12 @@ const AURA_TEXT_STYLES: Record<AuraButtonVariant, string> = {
   tertiary: 'text-foreground',
 };
 
+const BASE_BUTTON_VARIANT: Record<AuraButtonVariant, NonNullable<ButtonProps['variant']>> = {
+  primary: 'default',
+  secondary: 'secondary',
+  tertiary: 'ghost',
+};
+
 export function AuraButton({
   auraVariant = 'primary',
   icon,
@@ -35,7 +41,7 @@ export function AuraButton({
   return (
     <Button
       {...props}
-      variant="default"
+      variant={BASE_BUTTON_VARIANT[auraVariant]}
       className={cn(
         'h-11 rounded-[20px] px-5',
         AURA_VARIANT_STYLES[auraVariant],
