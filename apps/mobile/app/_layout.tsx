@@ -25,14 +25,28 @@ export default function RootLayout() {
     let isMounted = true;
 
     async function hydrateThemePreference() {
-      const storedPreference = await loadStoredColorScheme();
-      if (!isMounted) {
-        return;
-      }
+      try {
+        const storedPreference = await loadStoredColorScheme();
+        if (!isMounted) {
+          return;
+        }
 
-      setColorScheme(storedPreference as AppColorScheme);
-      setIsReady(true);
-      await SplashScreen.hideAsync();
+        setColorScheme(storedPreference as AppColorScheme);
+      } catch {
+        if (isMounted) {
+          setColorScheme('light');
+        }
+      } finally {
+        if (isMounted) {
+          setIsReady(true);
+        }
+
+        try {
+          await SplashScreen.hideAsync();
+        } catch {
+          // Avoid blocking render if splash hide fails.
+        }
+      }
     }
 
     void hydrateThemePreference();

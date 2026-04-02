@@ -28,11 +28,7 @@ export function AuraCard({
     <Card className={cn('rounded-[24px] py-4', TONE_STYLES[tone], className)} {...props}>
       {title || description ? (
         <CardHeader>
-          {title ? (
-            <CardTitle>
-              <Text variant="title">{title}</Text>
-            </CardTitle>
-          ) : null}
+          {title ? <CardTitle className="text-xl tracking-tight">{title}</CardTitle> : null}
           {description ? <CardDescription>{description}</CardDescription> : null}
         </CardHeader>
       ) : null}

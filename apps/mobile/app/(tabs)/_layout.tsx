@@ -6,7 +6,7 @@ import { useColorScheme } from 'nativewind';
 
 export default function TabsLayout() {
   const { colorScheme } = useColorScheme();
-  const scheme = colorScheme ?? 'dark';
+  const scheme = colorScheme ?? 'light';
 
   return (
     <Tabs

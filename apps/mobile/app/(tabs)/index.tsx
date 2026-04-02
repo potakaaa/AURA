@@ -11,7 +11,12 @@ export default function HomeScreen() {
   return (
     <AuraScreen>
       <View className="flex-1 bg-background">
-        <AuraTopBar title="AURA" actionLabel="Preview" actionIcon={Sparkles} />
+        <AuraTopBar
+          title="AURA"
+          actionLabel="Preview"
+          actionIcon={Sparkles}
+          onActionPress={() => router.push('/(tabs)/preview')}
+        />
         <View className="flex-1 gap-4 px-5 pb-6 pt-3">
           <AuraCard
             tone="high"
