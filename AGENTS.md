@@ -25,6 +25,7 @@ AURA/
 ```
 
 **Key docs to reference:**
+
 - `docs/issues/AURA_Issues_Registry.md` — MVP roadmap, issues, acceptance criteria
 - `docs/AURA/aura-context.md` — Product vision, architecture, strategy
 - `docs/AURA/06_development/` — Dev setup, coding guidelines, API design
@@ -34,21 +35,24 @@ AURA/
 ## Conventions
 
 ### Pull Requests
+
 - **Base branch:** `development` (always)
 - **Title:** Follow [Conventional Commits](https://www.conventionalcommits.org/) (e.g. `feat:`, `fix:`, `chore:`)
 - **Assignee:** `potakaaa`
 
 ### Commits & Pre-commit
+
 - Run pre-commit scripts before committing
 - Never bypass linters; fix issues to pass checks
 
 ### Code Quality
+
 - Follow existing linter rules (ESLint, Prettier, etc.)
 - Keep rules under 500 lines where applicable
 
 ---
 
-## Development Workflow
+## Development Workfloww
 
 - **Mobile dev:** `pnpm dev:mobile` or `pnpm --filter mobile start`
 - **API dev:** `pnpm dev:api` or `pnpm --filter api dev`
