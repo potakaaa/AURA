@@ -15,30 +15,30 @@ const textVariants = cva(
     variants: {
       variant: {
         default: '',
-        display: cn('text-5xl font-bold tracking-tight', Platform.select({ web: 'text-balance' })),
-        headline: cn('text-3xl font-semibold tracking-tight', Platform.select({ web: 'text-balance' })),
-        title: 'text-xl font-semibold tracking-tight',
-        body: 'text-base leading-6',
-        label: 'text-sm font-medium tracking-tight',
+        display: cn('text-5xl font-extrabold tracking-tight', Platform.select({ web: 'text-balance' })),
+        headline: cn('text-3xl font-bold tracking-tight', Platform.select({ web: 'text-balance' })),
+        title: 'text-xl font-bold tracking-tight',
+        body: 'text-base font-medium leading-6',
+        label: 'text-sm font-semibold tracking-tight',
         h1: cn(
           'text-center text-4xl font-extrabold tracking-tight',
           Platform.select({ web: 'scroll-m-20 text-balance' })
         ),
         h2: cn(
-          'border-border border-b pb-2 text-3xl font-semibold tracking-tight',
+          'border-border border-b pb-2 text-3xl font-bold tracking-tight',
           Platform.select({ web: 'scroll-m-20 first:mt-0' })
         ),
-        h3: cn('text-2xl font-semibold tracking-tight', Platform.select({ web: 'scroll-m-20' })),
-        h4: cn('text-xl font-semibold tracking-tight', Platform.select({ web: 'scroll-m-20' })),
-        p: 'mt-3 leading-7 sm:mt-6',
+        h3: cn('text-2xl font-bold tracking-tight', Platform.select({ web: 'scroll-m-20' })),
+        h4: cn('text-xl font-bold tracking-tight', Platform.select({ web: 'scroll-m-20' })),
+        p: 'mt-3 font-medium leading-7 sm:mt-6',
         blockquote: 'mt-4 border-l-2 pl-3 italic sm:mt-6 sm:pl-6',
         code: cn(
-          'bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold'
+          'bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-bold'
         ),
-        lead: 'text-muted-foreground text-xl',
-        large: 'text-lg font-semibold',
-        small: 'text-sm font-medium leading-none',
-        muted: 'text-muted-foreground text-sm',
+        lead: 'text-muted-foreground text-xl font-medium',
+        large: 'text-lg font-bold',
+        small: 'text-sm font-semibold leading-none',
+        muted: 'text-muted-foreground text-sm font-medium',
       },
     },
     defaultVariants: {
@@ -75,10 +75,31 @@ const ARIA_LEVEL: Partial<Record<TextVariant, string>> = {
 
 const TextClassContext = React.createContext<string | undefined>(undefined);
 
+const FONT_FAMILY_BY_VARIANT: Record<TextVariant, string> = {
+  default: 'Manrope_500Medium',
+  display: 'Manrope_800ExtraBold',
+  headline: 'Manrope_700Bold',
+  title: 'Manrope_700Bold',
+  body: 'Manrope_500Medium',
+  label: 'Manrope_600SemiBold',
+  h1: 'Manrope_800ExtraBold',
+  h2: 'Manrope_700Bold',
+  h3: 'Manrope_700Bold',
+  h4: 'Manrope_700Bold',
+  p: 'Manrope_500Medium',
+  blockquote: 'Manrope_500Medium',
+  code: 'Manrope_700Bold',
+  lead: 'Manrope_500Medium',
+  large: 'Manrope_700Bold',
+  small: 'Manrope_600SemiBold',
+  muted: 'Manrope_500Medium',
+};
+
 function Text({
   className,
   asChild = false,
   variant = 'default',
+  style,
   ...props
 }: React.ComponentProps<typeof RNText> &
   TextVariantProps & {
@@ -86,11 +107,14 @@ function Text({
   }) {
   const textClass = React.useContext(TextClassContext);
   const Component = asChild ? Slot.Text : RNText;
+  const resolvedVariant = (variant ?? 'default') as TextVariant;
+
   return (
     <Component
-      className={cn(textVariants({ variant }), textClass, className)}
-      role={variant ? ROLE[variant] : undefined}
-      aria-level={variant ? ARIA_LEVEL[variant] : undefined}
+      className={cn(textVariants({ variant: resolvedVariant }), textClass, className)}
+      style={[{ fontFamily: FONT_FAMILY_BY_VARIANT[resolvedVariant] }, style]}
+      role={ROLE[resolvedVariant]}
+      aria-level={ARIA_LEVEL[resolvedVariant]}
       {...props}
     />
   );

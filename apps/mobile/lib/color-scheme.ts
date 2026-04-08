@@ -10,7 +10,7 @@ export async function loadStoredColorScheme(): Promise<AppColorScheme> {
     return value;
   }
 
-  return 'system';
+  return 'dark';
 }
 
 export async function persistColorScheme(value: AppColorScheme): Promise<void> {
