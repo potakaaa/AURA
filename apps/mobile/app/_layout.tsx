@@ -1,9 +1,17 @@
 import '@/global.css';
 
+import {
+  Manrope_400Regular,
+  Manrope_500Medium,
+  Manrope_600SemiBold,
+  Manrope_700Bold,
+  Manrope_800ExtraBold,
+} from '@expo-google-fonts/manrope';
 import { loadStoredColorScheme, type AppColorScheme } from '@/lib/color-scheme';
 import { NAV_THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
+import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -20,6 +28,13 @@ export {
 export default function RootLayout() {
   const { colorScheme, setColorScheme } = useColorScheme();
   const [isReady, setIsReady] = useState(false);
+  const [fontsLoaded, fontsError] = useFonts({
+    Manrope_400Regular,
+    Manrope_500Medium,
+    Manrope_600SemiBold,
+    Manrope_700Bold,
+    Manrope_800ExtraBold,
+  });
 
   useEffect(() => {
     let isMounted = true;
@@ -34,17 +49,11 @@ export default function RootLayout() {
         setColorScheme(storedPreference as AppColorScheme);
       } catch {
         if (isMounted) {
-          setColorScheme('light');
+          setColorScheme('dark');
         }
       } finally {
         if (isMounted) {
           setIsReady(true);
-        }
-
-        try {
-          await SplashScreen.hideAsync();
-        } catch {
-          // Avoid blocking render if splash hide fails.
         }
       }
     }
@@ -56,13 +65,31 @@ export default function RootLayout() {
     };
   }, [setColorScheme]);
 
-  if (!isReady) {
+  useEffect(() => {
+    if (!isReady || (!fontsLoaded && !fontsError)) {
+      return;
+    }
+
+    async function hideSplash() {
+      try {
+        await SplashScreen.hideAsync();
+      } catch {
+        // Avoid blocking render if splash hide fails.
+      }
+    }
+
+    void hideSplash();
+  }, [fontsError, fontsLoaded, isReady]);
+
+  if (!isReady || (!fontsLoaded && !fontsError)) {
     return null;
   }
 
+  const resolvedColorScheme = colorScheme ?? 'dark';
+
   return (
-    <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+    <ThemeProvider value={NAV_THEME[resolvedColorScheme]}>
+      <StatusBar style={resolvedColorScheme === 'dark' ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           animation: 'fade',
