@@ -15,7 +15,7 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: THEME[scheme].primary,
         tabBarInactiveTintColor: THEME[scheme].mutedForeground,
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 12, fontFamily: 'Manrope_700Bold', fontWeight: '700' },
         tabBarStyle: {
           backgroundColor: THEME[scheme].card,
           borderTopWidth: 0,
