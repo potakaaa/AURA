@@ -36,6 +36,31 @@ cd AURA
 pnpm install
 ```
 
+## Install Local Git Hooks (CI-aligned)
+
+Install `pre-commit` (choose one):
+
+```bash
+pipx install pre-commit
+```
+
+```bash
+pip install pre-commit
+```
+
+Register both hook stages:
+
+```bash
+pre-commit install --hook-type pre-commit --hook-type pre-push
+```
+
+Run hooks manually any time:
+
+```bash
+pre-commit run --all-files
+pre-commit run --hook-stage pre-push --all-files
+```
+
 ## Run Backend Locally
 
 From repository root (uses root script):
