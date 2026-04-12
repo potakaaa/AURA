@@ -4,7 +4,7 @@ This guide covers local setup for the AURA monorepo (API + Expo mobile app).
 
 ## Prerequisites
 
-1. Node.js 20.x (matches `.nvmrc` = `20`)
+1. Node.js 22.x (matches `.nvmrc` = `22`; required for `node:sqlite` in the API)
 2. pnpm 10.x (repo uses `pnpm@10.32.1`)
 3. JDK 17+ (required by Android tooling/emulator workflows)
 4. Android Studio (latest stable)
