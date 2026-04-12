@@ -1,6 +1,9 @@
 {
   "name": "api",
   "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
@@ -14,7 +17,7 @@
     "hono": "^4.12.7"
   },
   "devDependencies": {
-    "@types/node": "^20.11.17",
+    "@types/node": "^22.15.3",
     "tsx": "^4.7.1",
     "typescript": "^5.8.3",
     "vitest": "^4.1.2"
