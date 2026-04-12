@@ -14,20 +14,32 @@ export type GoogleUserInfo = {
   picture?: string
 }
 
-export type AuthSession = {
-  sessionId: string
-  googleSub: string
+export type User = {
+  id: string
   email: string | null
   name: string | null
   picture: string | null
-  accessToken: string
-  previousAccessToken: string | null
-  refreshToken: string
-  scope: string | null
-  tokenType: string
-  accessTokenExpiresAt: number
   createdAt: number
+  lastLoginAt: number
+}
+
+export type AuthSession = {
+  id: string
+  userId: string
+  accessToken: string
+  refreshToken: string
+  expiresAt: number
+  createdAt: number
+  tokenType: string
+  scope: string | null
+  previousAccessToken: string | null
   updatedAt: number
+}
+
+export type AuthenticatedContext = {
+  userId: string
+  sessionId: string
+  accessToken: string
 }
 
 export type AuthResult = {
@@ -37,12 +49,7 @@ export type AuthResult = {
   expiresIn: number
   scope: string | null
   tokenType: string
-  user: {
-    sub: string
-    email: string | null
-    name: string | null
-    picture: string | null
-  }
+  user: User
 }
 
 export type RefreshResult = {
