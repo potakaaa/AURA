@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { getAuthService } from '../auth/index.js'
+import { parseBearerToken } from '../auth/middleware.js'
 import { ApiError } from '../errors.js'
 
 export const authRoutes = new Hono()
@@ -60,4 +61,12 @@ authRoutes.post('/token', async (c) => {
     },
     200
   )
+})
+
+authRoutes.post('/logout', async (c) => {
+  const authService = getAuthService()
+  const accessToken = parseBearerToken(c.req.header('authorization'))
+  await authService.logoutByAccessToken(accessToken)
+
+  return c.body(null, 204)
 })
