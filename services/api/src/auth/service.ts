@@ -1,6 +1,5 @@
-import { randomUUID } from 'node:crypto'
 import type { AuthConfig } from './config.js'
-import type { AuthResult, AuthSession, RefreshResult } from './types.js'
+import type { AuthResult, AuthSession, RefreshResult, User } from './types.js'
 import { ApiError } from '../errors.js'
 import { GoogleOAuthClient } from './google-client.js'
 import { AuthSessionStore } from './session-store.js'
@@ -44,40 +43,36 @@ export class AuthService {
 
     const user = await this.client.fetchUserInfo(tokens.access_token)
     const expiresIn = Math.max(tokens.expires_in, 1)
-    const accessTokenExpiresAt = Date.now() + expiresIn * 1000
+    const expiresAt = Date.now() + expiresIn * 1000
+    const persistedUser = await this.store.findOrCreateUser({
+      sub: user.sub,
+      email: user.email,
+      name: user.name,
+      picture: user.picture
+    })
 
-    const session = await this.store.upsertSession({
-      sessionId: randomUUID(),
-      googleSub: user.sub,
-      email: user.email ?? null,
-      name: user.name ?? null,
-      picture: user.picture ?? null,
+    const session = await this.store.createSession({
+      userId: persistedUser.id,
       accessToken: tokens.access_token,
-      previousAccessToken: null,
       refreshToken: tokens.refresh_token,
       scope: tokens.scope ?? this.config.googleScopes,
       tokenType: tokens.token_type,
-      accessTokenExpiresAt
+      expiresAt
     })
 
     return {
-      sessionId: session.sessionId,
+      sessionId: session.id,
       accessToken: session.accessToken,
       refreshToken: session.refreshToken,
       expiresIn,
       scope: session.scope,
       tokenType: session.tokenType,
-      user: {
-        sub: session.googleSub,
-        email: session.email,
-        name: session.name,
-        picture: session.picture
-      }
+      user: persistedUser
     }
   }
 
   async refreshAccessToken(input: RefreshInput): Promise<RefreshResult> {
-    const session = await this.store.findByRefreshToken(input.refreshToken)
+    const session = await this.store.findSessionByRefreshToken(input.refreshToken)
     if (!session) {
       throw new ApiError(401, 'INVALID_REFRESH_TOKEN', 'Refresh token is invalid or revoked', false)
     }
@@ -94,11 +89,11 @@ export class AuthService {
       refreshToken: refreshed.refresh_token ?? session.refreshToken,
       scope: refreshed.scope ?? session.scope,
       tokenType: refreshed.token_type,
-      accessTokenExpiresAt: Date.now() + expiresIn * 1000
+      expiresAt: Date.now() + expiresIn * 1000
     })
 
     return {
-      sessionId: updatedSession.sessionId,
+      sessionId: updatedSession.id,
       accessToken: updatedSession.accessToken,
       expiresIn,
       scope: updatedSession.scope,
@@ -107,13 +102,13 @@ export class AuthService {
   }
 
   async validateOrRefreshAccessToken(accessToken: string): Promise<AuthSession> {
-    const session = await this.store.findByAccessToken(accessToken)
+    const session = await this.store.findSessionByAccessToken(accessToken)
     if (!session) {
       throw new ApiError(401, 'INVALID_ACCESS_TOKEN', 'Access token is invalid or revoked', false)
     }
 
     const now = Date.now()
-    const expiresSoon = now + this.config.accessTokenExpirySkewMs >= session.accessTokenExpiresAt
+    const expiresSoon = now + this.config.accessTokenExpirySkewMs >= session.expiresAt
     if (!expiresSoon) {
       return session
     }
@@ -130,7 +125,25 @@ export class AuthService {
       refreshToken: refreshed.refresh_token ?? session.refreshToken,
       scope: refreshed.scope ?? session.scope,
       tokenType: refreshed.token_type,
-      accessTokenExpiresAt: now + expiresIn * 1000
+      expiresAt: now + expiresIn * 1000
     })
+  }
+
+  async logoutByAccessToken(accessToken: string): Promise<void> {
+    const session = await this.store.findSessionByAccessToken(accessToken)
+    if (!session) {
+      throw new ApiError(401, 'INVALID_ACCESS_TOKEN', 'Access token is invalid or revoked', false)
+    }
+
+    await this.store.deleteSessionById(session.id)
+  }
+
+  async getUserById(userId: string): Promise<User> {
+    const user = await this.store.findUserById(userId)
+    if (!user) {
+      throw new ApiError(404, 'USER_NOT_FOUND', 'Authenticated user was not found', false)
+    }
+
+    return user
   }
 }
