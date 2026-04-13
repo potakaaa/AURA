@@ -1,11 +1,11 @@
 import type { MiddlewareHandler } from 'hono'
 import { ApiError } from '../errors.js'
 import type { AuthService } from './service.js'
-import type { AuthSession } from './types.js'
+import type { AuthenticatedContext } from './types.js'
 
-const AUTH_CONTEXT_KEY = 'authSession'
+const AUTH_CONTEXT_KEY = 'authContext'
 
-function parseBearerToken(authorizationHeader: string | undefined): string {
+export function parseBearerToken(authorizationHeader: string | undefined): string {
   if (!authorizationHeader) {
     throw new ApiError(401, 'UNAUTHORIZED', 'Missing Authorization header', false)
   }
@@ -22,7 +22,12 @@ export function createAuthMiddleware(authService: AuthService): MiddlewareHandle
   return async (c, next) => {
     const bearerToken = parseBearerToken(c.req.header('authorization'))
     const session = await authService.validateOrRefreshAccessToken(bearerToken)
-    c.set(AUTH_CONTEXT_KEY, session)
+    const context: AuthenticatedContext = {
+      userId: session.userId,
+      sessionId: session.id,
+      accessToken: session.accessToken
+    }
+    c.set(AUTH_CONTEXT_KEY, context)
 
     if (session.accessToken !== bearerToken) {
       c.header('x-refreshed-access-token', session.accessToken)
@@ -32,11 +37,15 @@ export function createAuthMiddleware(authService: AuthService): MiddlewareHandle
   }
 }
 
-export function getAuthSession(c: { get: (key: string) => unknown }): AuthSession {
-  const session = c.get(AUTH_CONTEXT_KEY)
-  if (!session) {
+export function getAuthContext(c: { get: (key: string) => unknown }): AuthenticatedContext {
+  const authContext = c.get(AUTH_CONTEXT_KEY)
+  if (!authContext) {
     throw new ApiError(401, 'UNAUTHORIZED', 'Missing authenticated session', false)
   }
 
-  return session as AuthSession
+  return authContext as AuthenticatedContext
+}
+
+export function getAuthenticatedUserId(c: { get: (key: string) => unknown }): string {
+  return getAuthContext(c).userId
 }
