@@ -1,0 +1,34 @@
+{
+  "name": "calendar_conflict_check",
+  "input": {
+    "userMessage": "Can I fit a 45-minute meeting with Sam tomorrow afternoon?"
+  },
+  "expectedBehavior": {
+    "tool": "read_calendar",
+    "reason": "Scheduling feasibility requires current calendar availability."
+  },
+  "expectedOutput": {
+    "format": "action_plan",
+    "goal": "Find available 45-minute slot with Sam tomorrow afternoon",
+    "steps": [
+      {
+        "id": "1",
+        "title": "Read tomorrow afternoon events",
+        "status": "ready"
+      },
+      {
+        "id": "2",
+        "title": "Identify open 45-minute windows",
+        "status": "pending"
+      },
+      {
+        "id": "3",
+        "title": "Propose top 2 slots for confirmation",
+        "status": "pending"
+      }
+    ],
+    "risks": ["Calendar timezone mismatch may shift availability windows."],
+    "requiresConfirmation": false
+  }
+}
+
