@@ -10,6 +10,6 @@
     "rootDir": ".",
     "composite": false
   },
-  "include": ["*.ts", "prompts/**/*", "context/**/*"],
+  "include": ["*.ts", "prompts/**/*", "context/**/*", "test/**/*"],
   "exclude": ["node_modules", "dist"]
 }

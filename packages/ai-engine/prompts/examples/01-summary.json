@@ -1,0 +1,23 @@
+{
+  "name": "summary_of_unread_emails",
+  "input": {
+    "userMessage": "Summarize my unread emails from today in 5 bullets."
+  },
+  "expectedBehavior": {
+    "tool": "read_email",
+    "reason": "Needs user-specific live inbox data before summarization."
+  },
+  "expectedOutput": {
+    "format": "summary",
+    "topic": "Unread emails (today)",
+    "bullets": [
+      "Finance requested Q2 budget confirmation by 5 PM.",
+      "Alex moved product sync to 3:30 PM tomorrow.",
+      "HR shared updated leave policy draft for review.",
+      "Two vendor invoices are pending approval.",
+      "Support escalated one customer incident needing response."
+    ],
+    "confidence": "high"
+  }
+}
+
