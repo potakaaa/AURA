@@ -1,0 +1,213 @@
+{
+  "provider": "Android built-in STT",
+  "model": "system-default",
+  "rows": [
+    {
+      "id": "utt-001",
+      "environment": "quiet",
+      "reference": "set a reminder for tomorrow at nine am",
+      "hypothesis": "set a reminder for tomorrow at nine am",
+      "latencyMs": 480,
+      "wer": 0
+    },
+    {
+      "id": "utt-002",
+      "environment": "quiet",
+      "reference": "what is on my calendar this afternoon",
+      "hypothesis": "what is on my calendar this afternoon",
+      "latencyMs": 510,
+      "wer": 0
+    },
+    {
+      "id": "utt-003",
+      "environment": "quiet",
+      "reference": "send a message to alex saying i will be late",
+      "hypothesis": "send a message to alex saying i will be",
+      "latencyMs": 530,
+      "wer": 0.1
+    },
+    {
+      "id": "utt-004",
+      "environment": "quiet",
+      "reference": "start focus mode for twenty five minutes",
+      "hypothesis": "start focus mode for twenty five minutes",
+      "latencyMs": 540,
+      "wer": 0
+    },
+    {
+      "id": "utt-005",
+      "environment": "quiet",
+      "reference": "mute notifications for one hour",
+      "hypothesis": "mute notifications for one hour",
+      "latencyMs": 505,
+      "wer": 0
+    },
+    {
+      "id": "utt-006",
+      "environment": "quiet",
+      "reference": "play my deep work playlist",
+      "hypothesis": "play my deep work uh",
+      "latencyMs": 550,
+      "wer": 0.2
+    },
+    {
+      "id": "utt-007",
+      "environment": "quiet",
+      "reference": "turn on dark mode",
+      "hypothesis": "turn on mode",
+      "latencyMs": 520,
+      "wer": 0.25
+    },
+    {
+      "id": "utt-008",
+      "environment": "quiet",
+      "reference": "what is the weather like today",
+      "hypothesis": "uh the weather like today",
+      "latencyMs": 560,
+      "wer": 0.3333333333333333
+    },
+    {
+      "id": "utt-009",
+      "environment": "quiet",
+      "reference": "schedule lunch with mia on friday",
+      "hypothesis": "schedule lunch with mia on friday",
+      "latencyMs": 570,
+      "wer": 0
+    },
+    {
+      "id": "utt-010",
+      "environment": "quiet",
+      "reference": "open my task list",
+      "hypothesis": "open my task list",
+      "latencyMs": 500,
+      "wer": 0
+    },
+    {
+      "id": "utt-011",
+      "environment": "quiet",
+      "reference": "read my latest email",
+      "hypothesis": "read my latest email",
+      "latencyMs": 530,
+      "wer": 0
+    },
+    {
+      "id": "utt-012",
+      "environment": "quiet",
+      "reference": "set an alarm for six thirty",
+      "hypothesis": "set an alarm for six thirty",
+      "latencyMs": 600,
+      "wer": 0
+    },
+    {
+      "id": "utt-013",
+      "environment": "noisy",
+      "reference": "call john on speaker",
+      "hypothesis": "call john on speaker",
+      "latencyMs": 680,
+      "wer": 0
+    },
+    {
+      "id": "utt-014",
+      "environment": "noisy",
+      "reference": "add buy groceries to my todo list",
+      "hypothesis": "add buy groceries uh list",
+      "latencyMs": 720,
+      "wer": 0.42857142857142855
+    },
+    {
+      "id": "utt-015",
+      "environment": "noisy",
+      "reference": "start a ten minute timer",
+      "hypothesis": "start uh timer",
+      "latencyMs": 760,
+      "wer": 0.6
+    },
+    {
+      "id": "utt-016",
+      "environment": "noisy",
+      "reference": "navigate to the nearest gas station",
+      "hypothesis": "uh the nearest gas station",
+      "latencyMs": 820,
+      "wer": 0.3333333333333333
+    },
+    {
+      "id": "utt-017",
+      "environment": "noisy",
+      "reference": "what are my unread messages",
+      "hypothesis": "uh are my unread messages",
+      "latencyMs": 830,
+      "wer": 0.2
+    },
+    {
+      "id": "utt-018",
+      "environment": "noisy",
+      "reference": "lower the volume to forty percent",
+      "hypothesis": "lower the volume to forty percent",
+      "latencyMs": 870,
+      "wer": 0
+    },
+    {
+      "id": "utt-019",
+      "environment": "noisy",
+      "reference": "pause the music",
+      "hypothesis": "pause the music",
+      "latencyMs": 900,
+      "wer": 0
+    },
+    {
+      "id": "utt-020",
+      "environment": "noisy",
+      "reference": "resume playback",
+      "hypothesis": "resume playback",
+      "latencyMs": 920,
+      "wer": 0
+    },
+    {
+      "id": "utt-021",
+      "environment": "noisy",
+      "reference": "remind me to drink water every hour",
+      "hypothesis": "remind me to drink uh",
+      "latencyMs": 940,
+      "wer": 0.42857142857142855
+    },
+    {
+      "id": "utt-022",
+      "environment": "noisy",
+      "reference": "reply to samantha i am on my way",
+      "hypothesis": "reply to uh uh my way",
+      "latencyMs": 960,
+      "wer": 0.5
+    },
+    {
+      "id": "utt-023",
+      "environment": "noisy",
+      "reference": "clear completed tasks",
+      "hypothesis": "clear uh",
+      "latencyMs": 970,
+      "wer": 0.6666666666666666
+    },
+    {
+      "id": "utt-024",
+      "environment": "noisy",
+      "reference": "what time is my next meeting",
+      "hypothesis": "uh uh is my next meeting",
+      "latencyMs": 980,
+      "wer": 0.3333333333333333
+    }
+  ],
+  "summary": {
+    "id": "android-builtin",
+    "provider": "Android built-in STT",
+    "model": "system-default",
+    "onDevice": false,
+    "modelSizeMb": null,
+    "batteryDrainPctPerHour": 3.6,
+    "metrics": {
+      "wer": 0.182,
+      "werQuiet": 0.074,
+      "werNoisy": 0.291,
+      "latencyP50Ms": 600,
+      "latencyP95Ms": 970
+    }
+  }
+}
