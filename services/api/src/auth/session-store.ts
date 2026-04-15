@@ -3,6 +3,7 @@ import { mkdir } from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
 import { DatabaseSync } from 'node:sqlite'
 import type { AuthSession, GoogleUserInfo, User } from './types.js'
+import { ApiError } from '../errors.js'
 
 type UpsertSessionInput = Omit<AuthSession, 'createdAt' | 'updatedAt'>
 type CreateSessionInput = Omit<AuthSession, 'id' | 'createdAt' | 'updatedAt' | 'previousAccessToken'>
@@ -23,11 +24,15 @@ type SessionRow = {
 
 type UserRow = {
   user_id: string
+  google_sub: string
   email: string | null
   name: string | null
   picture: string | null
+  notifications_enabled: number | null
   created_at: number
+  updated_at: number | null
   last_login_at: number
+  deleted_at: number | null
 }
 
 type LegacySessionSeedRow = {
@@ -69,19 +74,32 @@ export class AuthSessionStore {
         email: input.email ?? null,
         name: input.name ?? null,
         picture: input.picture ?? null,
+        notificationsEnabled: true,
         createdAt: now,
-        lastLoginAt: now
+        updatedAt: now,
+        lastLoginAt: now,
+        deletedAt: null
       }
-      this.insertUser(db, {
-        userId: user.id,
-        googleSub: input.sub,
-        email: user.email,
-        name: user.name,
-        picture: user.picture,
-        createdAt: user.createdAt,
-        lastLoginAt: user.lastLoginAt
-      })
+      this.insertUser(
+        db,
+        {
+          userId: user.id,
+          googleSub: input.sub,
+          email: user.email,
+          name: user.name,
+          picture: user.picture,
+          notificationsEnabled: user.notificationsEnabled,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+          lastLoginAt: user.lastLoginAt
+        },
+        input.email ?? null
+      )
       return user
+    }
+
+    if (existing.deleted_at !== null) {
+      throw new ApiError(403, 'USER_DELETED', 'User account has been deleted', false)
     }
 
     const updatedEmail = input.email ?? existing.email
@@ -94,25 +112,31 @@ export class AuthSessionStore {
         email = ?,
         name = ?,
         picture = ?,
+        updated_at = ?,
         last_login_at = ?
       WHERE google_sub = ?
       `
     )
-    update.run(updatedEmail, updatedName, updatedPicture, now, input.sub)
+    this.runWithDuplicateEmailGuard(
+      () => update.run(updatedEmail, updatedName, updatedPicture, now, now, input.sub),
+      updatedEmail
+    )
 
-    return {
-      id: existing.user_id,
-      email: updatedEmail,
-      name: updatedName,
-      picture: updatedPicture,
-      createdAt: existing.created_at,
-      lastLoginAt: now
+    const refreshed = db
+      .prepare('SELECT * FROM users WHERE google_sub = ? LIMIT 1')
+      .get(input.sub) as UserRow | undefined
+    if (!refreshed) {
+      throw new ApiError(404, 'USER_NOT_FOUND', 'Authenticated user was not found', false)
     }
+
+    return this.mapUserRow(refreshed)
   }
 
   async findUserById(userId: string): Promise<User | null> {
     const db = await this.getDb()
-    const statement = db.prepare('SELECT * FROM users WHERE user_id = ? LIMIT 1')
+    const statement = db.prepare(
+      'SELECT * FROM users WHERE user_id = ? AND deleted_at IS NULL LIMIT 1'
+    )
     const row = statement.get(userId) as UserRow | undefined
     return row ? this.mapUserRow(row) : null
   }
@@ -215,6 +239,68 @@ export class AuthSessionStore {
     statement.run(sessionId)
   }
 
+  async deleteSessionByAccessToken(accessToken: string): Promise<void> {
+    const db = await this.getDb()
+    const statement = db.prepare(
+      `
+      DELETE FROM auth_sessions
+      WHERE access_token = ? OR previous_access_token = ?
+      `
+    )
+    statement.run(accessToken, accessToken)
+  }
+
+  async updateUserProfile(input: {
+    userId: string
+    name: string
+    notificationsEnabled: boolean
+  }): Promise<User> {
+    const db = await this.getDb()
+    const now = Date.now()
+    const update = db.prepare(
+      `
+      UPDATE users
+      SET
+        name = ?,
+        notifications_enabled = ?,
+        updated_at = ?
+      WHERE user_id = ? AND deleted_at IS NULL
+      `
+    )
+    update.run(input.name, input.notificationsEnabled ? 1 : 0, now, input.userId)
+    const user = await this.findUserById(input.userId)
+    if (!user) {
+      throw new ApiError(404, 'USER_NOT_FOUND', 'Authenticated user was not found', false)
+    }
+
+    return user
+  }
+
+  async softDeleteUserAndSessions(userId: string): Promise<void> {
+    const db = await this.getDb()
+    const now = Date.now()
+    const update = db.prepare(
+      `
+      UPDATE users
+      SET
+        deleted_at = COALESCE(deleted_at, ?),
+        updated_at = ?
+      WHERE user_id = ?
+      `
+    )
+    update.run(now, now, userId)
+
+    const deleteSessions = db.prepare('DELETE FROM auth_sessions WHERE user_id = ?')
+    deleteSessions.run(userId)
+  }
+
+  async purgeExpiredSessions(now = Date.now()): Promise<number> {
+    const db = await this.getDb()
+    const statement = db.prepare('DELETE FROM auth_sessions WHERE expires_at <= ?')
+    const result = statement.run(now) as { changes?: number } | undefined
+    return Number(result?.changes ?? 0)
+  }
+
   private async getDb(): Promise<DatabaseSync> {
     if (!this.dbPromise) {
       this.dbPromise = this.initialize()
@@ -235,8 +321,11 @@ export class AuthSessionStore {
         email TEXT,
         name TEXT,
         picture TEXT,
+        notifications_enabled INTEGER NOT NULL DEFAULT 1,
         created_at INTEGER NOT NULL,
-        last_login_at INTEGER NOT NULL
+        updated_at INTEGER NOT NULL,
+        last_login_at INTEGER NOT NULL,
+        deleted_at INTEGER
       );
       CREATE TABLE IF NOT EXISTS auth_sessions (
         session_id TEXT PRIMARY KEY,
@@ -259,10 +348,34 @@ export class AuthSessionStore {
       ON auth_sessions(user_id);
     `)
 
+    this.ensureUserColumns(db)
     this.ensureAuthSessionColumns(db)
     this.migrateLegacySessions(db)
+    db.exec(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique
+      ON users(email)
+      WHERE email IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS idx_users_deleted_at
+      ON users(deleted_at);
+      CREATE INDEX IF NOT EXISTS idx_auth_sessions_expires_at
+      ON auth_sessions(expires_at);
+    `)
 
     return db
+  }
+
+  private ensureUserColumns(db: DatabaseSync): void {
+    const columns = this.getTableColumns(db, 'users')
+    if (!columns.has('notifications_enabled')) {
+      db.exec('ALTER TABLE users ADD COLUMN notifications_enabled INTEGER NOT NULL DEFAULT 1;')
+    }
+    if (!columns.has('updated_at')) {
+      db.exec('ALTER TABLE users ADD COLUMN updated_at INTEGER;')
+      db.exec('UPDATE users SET updated_at = created_at WHERE updated_at IS NULL;')
+    }
+    if (!columns.has('deleted_at')) {
+      db.exec('ALTER TABLE users ADD COLUMN deleted_at INTEGER;')
+    }
   }
 
   private ensureAuthSessionColumns(db: DatabaseSync): void {
@@ -310,15 +423,21 @@ export class AuthSessionStore {
         .get(user.google_sub) as { user_id: string } | undefined
       if (!existing) {
         const createdAt = Date.now()
-        this.insertUser(db, {
-          userId: randomUUID(),
-          googleSub: user.google_sub,
-          email: user.email,
-          name: user.name,
-          picture: user.picture,
-          createdAt,
-          lastLoginAt: createdAt
-        })
+        this.insertUser(
+          db,
+          {
+            userId: randomUUID(),
+            googleSub: user.google_sub,
+            email: user.email,
+            name: user.name,
+            picture: user.picture,
+            notificationsEnabled: true,
+            createdAt,
+            updatedAt: createdAt,
+            lastLoginAt: createdAt
+          },
+          user.email
+        )
       }
     }
 
@@ -412,9 +531,12 @@ export class AuthSessionStore {
       email: string | null
       name: string | null
       picture: string | null
+      notificationsEnabled: boolean
       createdAt: number
+      updatedAt: number
       lastLoginAt: number
-    }
+    },
+    duplicateEmailValue: string | null
   ): void {
     const statement = db.prepare(
       `
@@ -424,19 +546,27 @@ export class AuthSessionStore {
         email,
         name,
         picture,
+        notifications_enabled,
         created_at,
+        updated_at,
         last_login_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `
     )
-    statement.run(
-      user.userId,
-      user.googleSub,
-      user.email,
-      user.name,
-      user.picture,
-      user.createdAt,
-      user.lastLoginAt
+    this.runWithDuplicateEmailGuard(
+      () =>
+        statement.run(
+          user.userId,
+          user.googleSub,
+          user.email,
+          user.name,
+          user.picture,
+          user.notificationsEnabled ? 1 : 0,
+          user.createdAt,
+          user.updatedAt,
+          user.lastLoginAt
+        ),
+      duplicateEmailValue
     )
   }
 
@@ -461,8 +591,41 @@ export class AuthSessionStore {
       email: row.email,
       name: row.name,
       picture: row.picture,
+      notificationsEnabled: row.notifications_enabled !== 0,
       createdAt: row.created_at,
-      lastLoginAt: row.last_login_at
+      updatedAt: row.updated_at ?? row.created_at,
+      lastLoginAt: row.last_login_at,
+      deletedAt: row.deleted_at
     }
+  }
+
+  private runWithDuplicateEmailGuard(
+    operation: () => void,
+    duplicateEmailValue: string | null
+  ): void {
+    try {
+      operation()
+    } catch (error) {
+      if (this.isEmailConstraintError(error) && duplicateEmailValue) {
+        throw new ApiError(409, 'DUPLICATE_EMAIL', 'Email is already in use', false)
+      }
+      throw error
+    }
+  }
+
+  private isEmailConstraintError(error: unknown): boolean {
+    const message =
+      typeof error === 'object' && error !== null && 'message' in error
+        ? String((error as { message: unknown }).message)
+        : ''
+    const code =
+      typeof error === 'object' && error !== null && 'code' in error
+        ? String((error as { code: unknown }).code)
+        : ''
+    return (
+      message.includes('UNIQUE constraint failed: users.email')
+      || message.includes('idx_users_email_unique')
+      || code === 'SQLITE_CONSTRAINT_UNIQUE'
+    )
   }
 }
