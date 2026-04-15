@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AURA | Privacy &amp; Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#21262d",
+                    "surface-container-highest": "#21262d",
+                    "on-surface": "#e1e6ef",
+                    "primary-fixed-dim": "#d09eff",
+                    "background": "#0c0e12",
+                    "surface-bright": "#272d34",
+                    "error-dim": "#c8475d",
+                    "tertiary-fixed-dim": "#ff84a9",
+                    "surface-container-low": "#101418",
+                    "on-primary-container": "#000000",
+                    "outline-variant": "#434850",
+                    "primary-fixed": "#dab0ff",
+                    "error-container": "#8a1632",
+                    "tertiary": "#ffb1c5",
+                    "secondary": "#4cd6fe",
+                    "secondary-fixed": "#b6ebff",
+                    "on-surface-variant": "#a7abb4",
+                    "tertiary-dim": "#e30071",
+                    "primary": "#c180ff",
+                    "outline": "#71767e",
+                    "secondary-container": "#002a35",
+                    "on-background": "#e1e6ef",
+                    "on-tertiary-container": "#710035",
+                    "surface": "#0c0e12",
+                    "on-primary-fixed-variant": "#6700af",
+                    "on-secondary-fixed": "#004656",
+                    "primary-container": "#a94efe",
+                    "on-secondary-fixed-variant": "#00647b",
+                    "surface-tint": "#c180ff",
+                    "error": "#fd6f85",
+                    "surface-container-high": "#1c2026",
+                    "on-primary-fixed": "#3d006c",
+                    "on-error-container": "#ff97a3",
+                    "primary-dim": "#9e42f2",
+                    "on-tertiary-fixed-variant": "#81003e",
+                    "on-tertiary": "#82003e",
+                    "on-secondary": "#004657",
+                    "secondary-dim": "#37c8ef",
+                    "surface-container": "#161a1f",
+                    "secondary-fixed-dim": "#88e0ff",
+                    "surface-dim": "#0c0e12",
+                    "on-tertiary-fixed": "#48001f",
+                    "inverse-primary": "#8722db",
+                    "tertiary-fixed": "#ff9bb7",
+                    "surface-container-lowest": "#000000",
+                    "on-primary": "#33005b",
+                    "on-error": "#490013",
+                    "inverse-surface": "#f8f9fe",
+                    "inverse-on-surface": "#535559",
+                    "tertiary-container": "#ff9bb7",
+                    "on-secondary-container": "#00b2d9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0c0e12;
+            color: #e1e6ef;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(33, 38, 45, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl flex justify-between items-center px-6 h-20 w-full">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border border-white/5">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="close up portrait of a young man with futuristic glowing lighting on skin professional photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmxCnXQS4QcQyYFWxHWqE41LxJ47bhO7cRg4PIo7I-wRHitLFH_CyG7kFoYlIqFS2v9uEVgetNfFw3uucnBeUV1rygw-RCcjnxtpaG3tc8AoTtgfMbJmsyDxzkxfnUHgEcnyZjL1UCkf6xgE0j4Z0nTlpUEqmljJ6VbY2DxTCUl60UaUxWRq_roA-FoUFVnAGSGbDVBc53sWv9Um6XLY_x2PK2VcdI1X4CIhcbSX2FngwjSsJh9YOpTYdu_held4rDAb-IVezphg"/>
+</div>
+<span class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400 font-headline tracking-tight">AURA</span>
+</div>
+<button class="text-slate-400 hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-[28px]">settings</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-28 px-6 max-w-4xl mx-auto space-y-12">
+<!-- Profile Header -->
+<section class="flex flex-col md:flex-row items-start md:items-end gap-8">
+<div class="relative">
+<div class="w-32 h-32 rounded-xl overflow-hidden ring-4 ring-purple-500/20">
+<img class="w-full h-full object-cover" data-alt="minimalist studio portrait of a young male with neutral expression in low key cool lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoJzjgwjZ1VY4NlFAPOJkGMHXQjDvMIbTIUZt4-bhVKseX-BFeOLJ-QhPkFG1VRkd_7uF_IFVnsxjSEuJ-jY5eCFSXiAQXq7t5yKRA2jLEHV6HMpscAw4K5npZcvdle2Dt7CtxiX2RZTgUETtUJGoSPtM-3UdCryYkpeIE5Rrw-E2maXoAJBQw8bobFjsbw4RJCPS_PvzGBabmK4CSaRxhtjQe5zT2dhG29KQbBgVr2xuvSMSkfG0JkrMr6mu8FvI14I37WkNpQA"/>
+</div>
+<div class="absolute -bottom-2 -right-2 bg-primary text-on-primary p-2 rounded-full shadow-lg">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span>
+</div>
+</div>
+<div class="space-y-1">
+<h2 class="text-4xl font-headline font-extrabold tracking-tight text-on-surface">Synthesized User</h2>
+<p class="text-on-surface-variant font-medium">Aura Level: Prime • Status: Online</p>
+<div class="pt-2 flex gap-3">
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-xs font-semibold text-secondary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+                        Neural Sync Active
+                    </span>
+</div>
+</div>
+</section>
+<!-- Bento Grid Settings -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Voice Model Selection -->
+<div class="md:col-span-2 bg-surface-container-low rounded-lg p-8 flex flex-col justify-between space-y-6">
+<div>
+<h3 class="text-xl font-headline font-bold text-on-surface mb-2">Voice Synthesis</h3>
+<p class="text-on-surface-variant text-sm">Choose the auditory persona for your assistant's neural output.</p>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<button class="flex flex-col items-center gap-3 p-4 rounded-lg bg-primary-container/20 border border-primary/20 transition-all">
+<span class="material-symbols-outlined text-primary" data-icon="record_voice_over" style="font-variation-settings: 'FILL' 1;">record_voice_over</span>
+<span class="text-xs font-bold tracking-widest uppercase">Elysian</span>
+</button>
+<button class="flex flex-col items-center gap-3 p-4 rounded-lg bg-surface-container hover:bg-surface-bright transition-all">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="graphic_eq">graphic_eq</span>
+<span class="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Vortex</span>
+</button>
+<button class="flex flex-col items-center gap-3 p-4 rounded-lg bg-surface-container hover:bg-surface-bright transition-all">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="waves">waves</span>
+<span class="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Aeon</span>
+</button>
+<button class="flex flex-col items-center gap-3 p-4 rounded-lg bg-surface-container hover:bg-surface-bright transition-all">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="settings_input_component">settings_input_component</span>
+<span class="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Custom</span>
+</button>
+</div>
+</div>
+<!-- Security Stat Card -->
+<div class="bg-gradient-to-br from-purple-900/20 to-slate-900 rounded-lg p-8 flex flex-col justify-between border border-white/5">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="verified_user">verified_user</span>
+<div>
+<h3 class="text-2xl font-headline font-black text-on-surface">98.2%</h3>
+<p class="text-xs uppercase tracking-tighter text-on-surface-variant">Privacy Integrity Score</p>
+</div>
+</div>
+<!-- Transparency Log -->
+<div class="md:col-span-3 bg-surface-container-low rounded-lg overflow-hidden">
+<div class="p-8 border-b border-white/5 flex justify-between items-center">
+<div>
+<h3 class="text-xl font-headline font-bold text-on-surface">Transparency Logs</h3>
+<p class="text-on-surface-variant text-sm">Real-time trace of AURA's data interaction.</p>
+</div>
+<button class="text-secondary text-sm font-bold tracking-wide hover:underline transition-all">Export Report</button>
+</div>
+<div class="divide-y divide-white/5">
+<div class="px-8 py-4 flex items-center justify-between hover:bg-surface-container-highest/30 transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-sm" data-icon="calendar_month">calendar_month</span>
+</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">AURA accessed Calendar</p>
+<p class="text-xs text-on-surface-variant">Permission: Scheduling intent detection</p>
+</div>
+</div>
+<span class="text-[10px] uppercase font-bold text-outline">2m ago</span>
+</div>
+<div class="px-8 py-4 flex items-center justify-between hover:bg-surface-container-highest/30 transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Location Geo-Sync</p>
+<p class="text-xs text-on-surface-variant">Permission: Contextual morning briefing</p>
+</div>
+</div>
+<span class="text-[10px] uppercase font-bold text-outline">1h ago</span>
+</div>
+<div class="px-8 py-4 flex items-center justify-between hover:bg-surface-container-highest/30 transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-sm" data-icon="mail">mail</span>
+</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Inbound Analysis</p>
+<p class="text-xs text-on-surface-variant">Permission: Gmail integration filter</p>
+</div>
+</div>
+<span class="text-[10px] uppercase font-bold text-outline">4h ago</span>
+</div>
+</div>
+</div>
+<!-- Danger Zone -->
+<div class="md:col-span-3 bg-error-container/10 rounded-lg p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-error-container/20">
+<div class="text-center md:text-left">
+<h3 class="text-xl font-headline font-bold text-error">Memory Liquidation</h3>
+<p class="text-on-surface-variant text-sm">Permanently erase all neural history and learned patterns. This cannot be undone.</p>
+</div>
+<button class="bg-error text-on-error px-8 py-3 rounded-full font-bold text-sm tracking-widest uppercase hover:opacity-90 transition-opacity">
+                    Delete History
+                </button>
+</div>
+</section>
+</main>
+<!-- Navigation Shell Logic -->
+<nav class="fixed bottom-0 left-0 w-full h-20 flex justify-around items-center px-4 pb-4 bg-[#171a1e]/80 backdrop-blur-2xl rounded-t-[2.5rem] z-50 shadow-[0_-10px_40px_-10px_rgba(142,45,226,0.15)] border-t border-white/5">
+<a class="flex flex-col items-center justify-center text-[#a9abb0] opacity-50 hover:text-[#00B4DB] transition-colors duration-300 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">visibility</span>
+<span class="font-manrope text-[10px] uppercase tracking-[0.05em] font-medium">Insight</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#a9abb0] opacity-50 hover:text-[#00B4DB] transition-colors duration-300 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">diversity_3</span>
+<span class="font-manrope text-[10px] uppercase tracking-[0.05em] font-medium">Connect</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#a9abb0] opacity-50 hover:text-[#00B4DB] transition-colors duration-300 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-manrope text-[10px] uppercase tracking-[0.05em] font-medium">Aura</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#8E2DE2] drop-shadow-[0_0_8px_rgba(142,45,226,0.5)] active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span class="font-manrope text-[10px] uppercase tracking-[0.05em] font-medium">Vault</span>
+</a>
+</nav>
+</body></html>

@@ -1,0 +1,299 @@
+<html class="dark" lang="en"><head></head><body class="bg-surface-dim selection:bg-primary/30">```html
+
+
+
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aura AI - Permission Request Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#f8f9fe",
+                        "primary-dim": "#9e42f2",
+                        "on-primary-fixed": "#000000",
+                        "inverse-on-surface": "#535559",
+                        "on-secondary": "#004657",
+                        "secondary": "#4cd6fe",
+                        "surface-container-lowest": "#000000",
+                        "on-error": "#490013",
+                        "on-tertiary-container": "#000000",
+                        "error-container": "#a70138",
+                        "background": "#0c0e12",
+                        "error-dim": "#d73357",
+                        "surface-container-highest": "#22262b",
+                        "on-error-container": "#ffb2b9",
+                        "tertiary": "#ff6a9c",
+                        "primary": "#cc97ff",
+                        "on-surface-variant": "#a9abb0",
+                        "primary-fixed-dim": "#b970ff",
+                        "on-tertiary": "#47001f",
+                        "on-primary-container": "#360061",
+                        "secondary-container": "#00677f",
+                        "primary-fixed": "#c384ff",
+                        "secondary-fixed": "#7edeff",
+                        "inverse-primary": "#8722db",
+                        "on-tertiary-fixed": "#380017",
+                        "on-primary": "#47007b",
+                        "surface-bright": "#282c32",
+                        "surface": "#0c0e12",
+                        "tertiary-fixed-dim": "#ff75a1",
+                        "primary-container": "#c384ff",
+                        "on-surface": "#f8f9fe",
+                        "surface-dim": "#0c0e12",
+                        "outline-variant": "#46484c",
+                        "outline": "#73757a",
+                        "secondary-fixed-dim": "#48d3fb",
+                        "secondary-dim": "#37c8ef",
+                        "tertiary-fixed": "#ff8eaf",
+                        "error": "#ff6e84",
+                        "on-secondary-container": "#eefaff",
+                        "tertiary-dim": "#e30071",
+                        "surface-container-low": "#111417",
+                        "surface-tint": "#cc97ff",
+                        "surface-container-high": "#1c2025",
+                        "on-background": "#f8f9fe",
+                        "on-primary-fixed-variant": "#440076",
+                        "on-tertiary-fixed-variant": "#760038",
+                        "surface-variant": "#22262b",
+                        "tertiary-container": "#ff0580",
+                        "on-secondary-fixed-variant": "#00586d",
+                        "on-secondary-fixed": "#003a48",
+                        "surface-container": "#171a1e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #05070A;
+            color: #f8f9fe;
+            font-family: 'Manrope', sans-serif;
+        }
+        .glass-card {
+            background: rgba(23, 26, 30, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .intelligence-orb {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(142,45,226,0.15) 0%, rgba(0,180,219,0.05) 50%, transparent 70%);
+            filter: blur(80px);
+            z-index: -1;
+            top: -200px;
+            right: -200px;
+        }
+        .intelligence-orb-bottom {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,0,128,0.1) 0%, rgba(142,45,226,0.05) 50%, transparent 70%);
+            filter: blur(80px);
+            z-index: -1;
+            bottom: -150px;
+            left: -150px;
+        }
+        .custom-toggle:checked + .toggle-dot {
+            transform: translateX(100%);
+            background-color: #8E2DE2;
+            box-shadow: 0 0 10px rgba(142,45,226,0.8);
+        }
+        .custom-toggle:checked ~ .toggle-bg {
+            background-color: rgba(142,45,226,0.2);
+            border-color: rgba(142,45,226,0.4);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<div class="intelligence-orb"></div>
+<div class="intelligence-orb-bottom"></div>
+<!-- Top Navigation Anchor (Updated to match Action Confirmation Hub style) -->
+<header class="bg-slate-950/60 backdrop-blur-xl fixed top-0 w-full z-50 flex justify-between items-center px-6 h-20 shadow-[0_0_40px_-15px_rgba(142,45,226,0.15)]">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border border-white/5">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="Modern high-resolution close-up portrait of a stylish person with soft atmospheric studio lighting and deep shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhtNyNhvBKJnFn6njzOK8ZtbitrIAan5eUDF-ejYyaRPKWVbUPyq5pjOz0f_G4r88AeEsKM1OJpe1W21f9owB255IGO_mCARR9nhDiDEzDtEw5tDyBbYVz7KdPutxhAeoC-cJ9vz76SbMwNgwWpTu5tJzmqS1IxF1f6Hsq-IuqTvDFL3nkhon-gTzPWOAgn__rTP1AvY9rgE0xmpvwbd6XqqmagfrP10YxHvU3--6pHB120Tz8B3EK3UrFs674uaP9WT2UBfkk3A"/>
+</div>
+<span class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400 font-headline tracking-tight">AURA</span>
+</div>
+<button class="text-slate-400 hover:opacity-80 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[28px]">settings</span>
+</button>
+</header>
+<main class="pt-28 pb-32 px-6 max-w-2xl mx-auto min-h-screen">
+<!-- Hero Section -->
+<section class="mb-12">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span class="text-[10px] uppercase tracking-[0.1em] font-bold text-primary">Privacy First Architecture</span>
+</div>
+<h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface mb-4 leading-tight">
+                Grant Access to <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-tertiary">Intelligence</span>
+</h1>
+<p class="text-on-surface-variant text-lg font-light leading-relaxed">
+                To serve as your ambient oracle, Aura requires specific access layers. All data is end-to-end encrypted and processed locally when possible.
+            </p>
+</section>
+<!-- Permissions Grid -->
+<div class="space-y-4">
+<!-- Voice Recognition -->
+<div class="glass-card p-6 rounded-lg border border-white/5 group hover:border-primary/20 transition-all duration-500">
+<div class="flex items-start justify-between gap-4">
+<div class="flex gap-4">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-2xl">mic</span>
+</div>
+<div>
+<h3 class="text-lg font-bold text-on-surface mb-1">Voice Recognition</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Allows Aura to identify your unique vocal profile for hands-free interactions and secure authentication.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer mt-1">
+<input checked="" class="sr-only peer custom-toggle" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest border border-white/10 rounded-full transition-all peer-checked:bg-primary/20 toggle-bg"></div>
+<div class="absolute left-1 top-1 w-4 h-4 bg-on-surface-variant rounded-full transition-all toggle-dot"></div>
+</label>
+</div>
+</div>
+<!-- Calendar Sync -->
+<div class="glass-card p-6 rounded-lg border border-white/5 group hover:border-secondary/20 transition-all duration-500">
+<div class="flex items-start justify-between gap-4">
+<div class="flex gap-4">
+<div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-2xl">calendar_month</span>
+</div>
+<div>
+<h3 class="text-lg font-bold text-on-surface mb-1">Calendar Sync</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Predictive scheduling and context-aware reminders based on your meetings, travel, and personal events.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer mt-1">
+<input checked="" class="sr-only peer custom-toggle" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest border border-white/10 rounded-full transition-all peer-checked:bg-secondary/20 toggle-bg"></div>
+<div class="absolute left-1 top-1 w-4 h-4 bg-on-surface-variant rounded-full transition-all toggle-dot"></div>
+</label>
+</div>
+</div>
+<!-- Communication Flow -->
+<div class="glass-card p-6 rounded-lg border border-white/5 group hover:border-tertiary/20 transition-all duration-500">
+<div class="flex items-start justify-between gap-4">
+<div class="flex gap-4">
+<div class="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary shrink-0">
+<span class="material-symbols-outlined text-2xl">alternate_email</span>
+</div>
+<div>
+<h3 class="text-lg font-bold text-on-surface mb-1">Communication Flow</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Deep integration with Gmail and Messages to draft responses, summarize threads, and surface urgent tasks.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer mt-1">
+<input class="sr-only peer custom-toggle" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest border border-white/10 rounded-full transition-all toggle-bg"></div>
+<div class="absolute left-1 top-1 w-4 h-4 bg-on-surface-variant rounded-full transition-all toggle-dot"></div>
+</label>
+</div>
+</div>
+<!-- Neural Memory -->
+<div class="glass-card p-6 rounded-lg border border-white/5 group hover:border-primary/20 transition-all duration-500">
+<div class="flex items-start justify-between gap-4">
+<div class="flex gap-4">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-2xl">neurology</span>
+</div>
+<div>
+<h3 class="text-lg font-bold text-on-surface mb-1">Neural Memory</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Indexes your cloud documents (Docs/Notion) to create a searchable semantic knowledge base for complex queries.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer mt-1">
+<input checked="" class="sr-only peer custom-toggle" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest border border-white/10 rounded-full transition-all peer-checked:bg-primary/20 toggle-bg"></div>
+<div class="absolute left-1 top-1 w-4 h-4 bg-on-surface-variant rounded-full transition-all toggle-dot"></div>
+</label>
+</div>
+</div>
+<!-- Push Awareness -->
+<div class="glass-card p-6 rounded-lg border border-white/5 group hover:border-secondary/20 transition-all duration-500">
+<div class="flex items-start justify-between gap-4">
+<div class="flex gap-4">
+<div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-2xl">notifications_active</span>
+</div>
+<div>
+<h3 class="text-lg font-bold text-on-surface mb-1">Push Awareness</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Critical alerts and atmospheric nudges that bypass standard focus modes when urgency is detected.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer mt-1">
+<input checked="" class="sr-only peer custom-toggle" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest border border-white/10 rounded-full transition-all peer-checked:bg-secondary/20 toggle-bg"></div>
+<div class="absolute left-1 top-1 w-4 h-4 bg-on-surface-variant rounded-full transition-all toggle-dot"></div>
+</label>
+</div>
+</div>
+</div>
+<!-- Privacy Policy Footnote -->
+<div class="mt-12 text-center">
+<p class="text-on-surface-variant text-xs tracking-wide uppercase opacity-60 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">lock</span>
+                Your data never leaves the Aura Neural Network
+            </p>
+<p class="text-on-surface-variant/40 text-[10px] mt-4 max-w-xs mx-auto leading-relaxed">
+                By initializing, you agree to our Ambient Intelligence Data Protocol and Privacy Safeguards.
+            </p>
+</div>
+<!-- Initialize Button -->
+<div class="fixed bottom-24 left-0 w-full px-6 flex justify-center z-40 pointer-events-none">
+<button class="pointer-events-auto group relative w-full max-w-md py-5 px-8 rounded-full bg-primary text-on-primary font-bold text-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_30px_rgba(142,45,226,0.4)] active:scale-95">
+<span class="relative z-10 flex items-center justify-center gap-3">
+                    Initialize System Sync
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">bolt</span>
+</span>
+<div class="absolute inset-0 bg-gradient-to-r from-primary via-primary-dim to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+</button>
+</div>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 w-full h-20 flex justify-around items-center px-4 pb-4 bg-[#171a1e]/80 backdrop-blur-2xl rounded-t-[2.5rem] z-50 border-t border-white/5 shadow-[0_-10px_40px_-10px_rgba(142,45,226,0.15)]">
+<a class="flex flex-col items-center justify-center text-[#a9abb0] opacity-50 hover:text-[#00B4DB] transition-colors duration-300 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">visibility</span>
+<span class="font-manrope text-[10px] uppercase tracking-[0.05em] font-medium">Insight</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#a9abb0] opacity-50 hover:text-[#00B4DB] transition-colors duration-300 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">diversity_3</span>
+<span class="font-manrope text-[10px] uppercase tracking-[0.05em] font-medium">Connect</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#8E2DE2] drop-shadow-[0_0_8px_rgba(142,45,226,0.5)] active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-manrope text-[10px] uppercase tracking-[0.05em] font-medium">Aura</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#a9abb0] opacity-50 hover:text-[#00B4DB] transition-colors duration-300 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-manrope text-[10px] uppercase tracking-[0.05em] font-medium">Vault</span>
+</a>
+</nav>
+```</body></html>
