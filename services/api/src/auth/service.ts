@@ -14,6 +14,11 @@ type RefreshInput = {
   refreshToken: string
 }
 
+type UpdateProfileInput = {
+  name: string
+  notificationsEnabled: boolean
+}
+
 export class AuthService {
   private readonly config: AuthConfig
   private readonly client: GoogleOAuthClient
@@ -77,6 +82,12 @@ export class AuthService {
       throw new ApiError(401, 'INVALID_REFRESH_TOKEN', 'Refresh token is invalid or revoked', false)
     }
 
+    const user = await this.store.findUserById(session.userId)
+    if (!user) {
+      await this.store.deleteSessionById(session.id)
+      throw new ApiError(401, 'INVALID_REFRESH_TOKEN', 'Refresh token is invalid or revoked', false)
+    }
+
     const refreshed = await this.client.refreshAccessToken({
       refreshToken: session.refreshToken
     })
@@ -107,6 +118,12 @@ export class AuthService {
       throw new ApiError(401, 'INVALID_ACCESS_TOKEN', 'Access token is invalid or revoked', false)
     }
 
+    const user = await this.store.findUserById(session.userId)
+    if (!user) {
+      await this.store.deleteSessionById(session.id)
+      throw new ApiError(401, 'INVALID_ACCESS_TOKEN', 'Access token is invalid or revoked', false)
+    }
+
     const now = Date.now()
     const expiresSoon = now + this.config.accessTokenExpirySkewMs >= session.expiresAt
     if (!expiresSoon) {
@@ -130,12 +147,7 @@ export class AuthService {
   }
 
   async logoutByAccessToken(accessToken: string): Promise<void> {
-    const session = await this.store.findSessionByAccessToken(accessToken)
-    if (!session) {
-      throw new ApiError(401, 'INVALID_ACCESS_TOKEN', 'Access token is invalid or revoked', false)
-    }
-
-    await this.store.deleteSessionById(session.id)
+    await this.store.deleteSessionByAccessToken(accessToken)
   }
 
   async getUserById(userId: string): Promise<User> {
@@ -145,5 +157,21 @@ export class AuthService {
     }
 
     return user
+  }
+
+  async updateUserProfile(userId: string, input: UpdateProfileInput): Promise<User> {
+    return this.store.updateUserProfile({
+      userId,
+      name: input.name,
+      notificationsEnabled: input.notificationsEnabled
+    })
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    await this.store.softDeleteUserAndSessions(userId)
+  }
+
+  async purgeExpiredSessions(now = Date.now()): Promise<number> {
+    return this.store.purgeExpiredSessions(now)
   }
 }

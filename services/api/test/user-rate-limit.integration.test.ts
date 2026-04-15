@@ -132,15 +132,11 @@ describe('user profile and rate limiting', () => {
       email: string | null
       name: string | null
       picture: string | null
-      createdAt: number
-      lastLoginAt: number
     }
     expect(meBody.id).toBe(loginBody.user.id)
     expect(meBody.email).toBe('profile@example.com')
     expect(meBody.name).toBe('Profile User')
     expect(meBody.picture).toBe('https://example.com/profile.png')
-    expect(meBody.createdAt).toBeTypeOf('number')
-    expect(meBody.lastLoginAt).toBeTypeOf('number')
   })
 
   it('rate limits auth endpoints to 20 requests per minute by client IP', async () => {

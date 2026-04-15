@@ -19,8 +19,11 @@ export type User = {
   email: string | null
   name: string | null
   picture: string | null
+  notificationsEnabled: boolean
   createdAt: number
+  updatedAt: number
   lastLoginAt: number
+  deletedAt: number | null
 }
 
 export type AuthSession = {

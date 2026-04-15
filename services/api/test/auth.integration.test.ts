@@ -241,6 +241,14 @@ describe('Google OAuth auth endpoints', () => {
     })
     expect(logoutResponse.status).toBe(204)
 
+    const secondLogoutResponse = await app.request('/auth/logout', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${loginBody.accessToken}`
+      }
+    })
+    expect(secondLogoutResponse.status).toBe(204)
+
     const protectedResponse = await app.request('/user/me', {
       method: 'GET',
       headers: {

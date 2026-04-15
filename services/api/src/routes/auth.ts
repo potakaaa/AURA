@@ -1,20 +1,17 @@
 import { Hono } from 'hono'
 import { getAuthService } from '../auth/index.js'
 import { parseBearerToken } from '../auth/middleware.js'
-import { ApiError } from '../errors.js'
+import {
+  authGoogleBodySchema,
+  authLogoutHeadersSchema,
+  authTokenBodySchema,
+  parseOrThrow
+} from './schemas.js'
 
 export const authRoutes = new Hono()
 
 authRoutes.post('/google', async (c) => {
-  const body = (await c.req.json()) as {
-    code?: string
-    redirectUri?: string
-    codeVerifier?: string
-  }
-
-  if (!body.code) {
-    throw new ApiError(400, 'INVALID_REQUEST', 'Field "code" is required', false)
-  }
+  const body = parseOrThrow(authGoogleBodySchema, await c.req.json())
 
   const authService = getAuthService()
   const authResult = await authService.authenticateWithGoogle({
@@ -38,13 +35,7 @@ authRoutes.post('/google', async (c) => {
 })
 
 authRoutes.post('/token', async (c) => {
-  const body = (await c.req.json()) as {
-    refreshToken?: string
-  }
-
-  if (!body.refreshToken) {
-    throw new ApiError(400, 'INVALID_REQUEST', 'Field "refreshToken" is required', false)
-  }
+  const body = parseOrThrow(authTokenBodySchema, await c.req.json())
 
   const authService = getAuthService()
   const refreshed = await authService.refreshAccessToken({
@@ -65,8 +56,28 @@ authRoutes.post('/token', async (c) => {
 
 authRoutes.post('/logout', async (c) => {
   const authService = getAuthService()
-  const accessToken = parseBearerToken(c.req.header('authorization'))
+  const { authorization } = parseOrThrow(authLogoutHeadersSchema, {
+    authorization: c.req.header('authorization')
+  })
+  const accessToken = parseBearerToken(authorization)
   await authService.logoutByAccessToken(accessToken)
 
   return c.body(null, 204)
+})
+
+authRoutes.post('/sessions/cleanup', async (c) => {
+  const authService = getAuthService()
+  const { authorization } = parseOrThrow(authLogoutHeadersSchema, {
+    authorization: c.req.header('authorization')
+  })
+  const accessToken = parseBearerToken(authorization)
+  await authService.validateOrRefreshAccessToken(accessToken)
+  const purgedSessions = await authService.purgeExpiredSessions()
+
+  return c.json(
+    {
+      purgedSessions
+    },
+    200
+  )
 })
