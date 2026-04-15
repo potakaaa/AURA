@@ -28,7 +28,34 @@ This will start the Expo Dev Server. Open the app in:
 - **Android**: press `a` to launch in the Android emulator
 - **Web**: press `w` to run in a browser
 
-You can also scan the QR code using the [Expo Go](https://expo.dev/go) app on your device. This project fully supports running in Expo Go for quick testing on physical devices.
+You can scan the QR code in a custom development client built with EAS. Expo Go cannot load SQLCipher-enabled `expo-sqlite` builds.
+
+To create a development client for encrypted local database support:
+
+```bash
+pnpm dlx eas build --profile development --platform ios
+# or
+pnpm dlx eas build --profile development --platform android
+```
+
+## Encrypted local database
+
+- Database module: `src/db/`
+- SQLCipher key storage: `src/utils/crypto.ts` using `expo-secure-store`
+- Schema/migrations: `src/db/schema.sql` and `src/db/migrations/`
+- Repository layer: `src/db/repositories/`
+
+### Dev-only unencrypted mode
+
+Set `EXPO_PUBLIC_DB_UNENCRYPTED=true` only in development builds to disable SQLCipher for debugging.
+
+### Security verification checklist
+
+1. Build and install a dev client (`eas build --profile development`).
+2. Start the app once to initialize `aura.db` and persist the key in SecureStore.
+3. Pull the `.db` file from the app sandbox and try opening it with plain SQLite: reads should fail without key.
+4. Relaunch the app and confirm previously written rows still decrypt (SecureStore persistence across restarts).
+5. Clear SecureStore (or reinstall app), then relaunch: app should fail fast with a clear local DB/key initialization error.
 
 ## Adding components
 

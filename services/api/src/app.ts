@@ -1,105 +1,29 @@
 import { Hono } from 'hono'
-import { cors } from 'hono/cors'
-import type { StatusCode } from 'hono/utils/http-status'
-
-type ErrorPayload = {
-  code: string
-  message: string
-  retryable: boolean
-}
-
-class ApiError extends Error {
-  readonly status: StatusCode
-  readonly code: string
-  readonly retryable: boolean
-
-  constructor(status: StatusCode, code: string, message: string, retryable = false) {
-    super(message)
-    this.status = status
-    this.code = code
-    this.retryable = retryable
-  }
-}
-
-function getAllowedOrigins(): string[] {
-  const rawOrigins = process.env.CORS_ORIGINS ?? ''
-  return rawOrigins
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean)
-}
+import { ApiError, type ErrorPayload } from './errors.js'
+import { createCorsMiddleware } from './middleware/cors.js'
+import { validateJsonBodyMiddleware } from './middleware/json-body.js'
+import { createRateLimitMiddleware, getClientIp } from './middleware/rate-limit.js'
+import { authRoutes } from './routes/auth.js'
+import { healthRoutes } from './routes/health.js'
+import { protectedRoutes } from './routes/protected.js'
+import { userRoutes } from './routes/user.js'
 
 export const app = new Hono()
-
-app.use(
-  '*',
-  cors({
-    origin: (origin) => {
-      const isProduction = (process.env.NODE_ENV ?? 'development') === 'production'
-      const allowedOrigins = getAllowedOrigins()
-
-      if (!isProduction) {
-        return '*'
-      }
-
-      return origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0] ?? ''
-    },
-    allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization']
-  })
-)
-
-app.use('*', async (c, next) => {
-  const method = c.req.method.toUpperCase()
-  const contentType = c.req.header('content-type') ?? ''
-
-  if (
-    ['POST', 'PUT', 'PATCH'].includes(method) &&
-    contentType.includes('application/json')
-  ) {
-    try {
-      await c.req.raw.clone().json()
-    } catch {
-      throw new ApiError(400, 'INVALID_JSON', 'Malformed JSON request body', false)
-    }
-  }
-
-  await next()
+const authRateLimitMiddleware = createRateLimitMiddleware({
+  limit: 20,
+  windowMs: 60_000,
+  errorCode: 'RATE_LIMITED',
+  errorMessage: 'Rate limit exceeded for auth endpoints',
+  keyGenerator: (c) => `auth-ip:${getClientIp(c)}`
 })
 
-app.get('/health', (c) => {
-  return c.json({
-    status: 'ok',
-    version: process.env.APP_VERSION ?? '0.1.0',
-    timestamp: new Date().toISOString()
-  })
-})
-
-app.post('/auth/google', (c) => {
-  return c.json(
-    {
-      error: {
-        code: 'NOT_IMPLEMENTED',
-        message: 'Google auth endpoint is not implemented yet',
-        retryable: false
-      }
-    },
-    501
-  )
-})
-
-app.post('/auth/token', (c) => {
-  return c.json(
-    {
-      error: {
-        code: 'NOT_IMPLEMENTED',
-        message: 'Token refresh endpoint is not implemented yet',
-        retryable: false
-      }
-    },
-    501
-  )
-})
+app.use('*', createCorsMiddleware())
+app.use('*', validateJsonBodyMiddleware)
+app.use('/auth/*', authRateLimitMiddleware)
+app.route('/', healthRoutes)
+app.route('/auth', authRoutes)
+app.route('/protected', protectedRoutes)
+app.route('/user', userRoutes)
 
 app.notFound((c) => {
   return c.json(

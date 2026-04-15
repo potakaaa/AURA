@@ -1,60 +1,84 @@
 import { DarkTheme, DefaultTheme, type Theme } from '@react-navigation/native';
- 
+
+const LIGHT_TOKENS = {
+  background: '220 32% 97%',
+  foreground: '224 42% 10%',
+  card: '220 40% 99%',
+  cardForeground: '224 42% 10%',
+  popover: '220 40% 99%',
+  popoverForeground: '224 42% 10%',
+  primary: '272 75% 53%',
+  primaryForeground: '220 38% 98%',
+  secondary: '193 100% 42%',
+  secondaryForeground: '220 35% 10%',
+  tertiary: '330 100% 50%',
+  tertiaryForeground: '220 38% 98%',
+  muted: '221 28% 92%',
+  mutedForeground: '220 18% 34%',
+  accent: '272 52% 90%',
+  accentForeground: '224 42% 10%',
+  destructive: '334 96% 47%',
+  destructiveForeground: '220 38% 98%',
+  border: '220 22% 84%',
+  input: '220 22% 84%',
+  ring: '272 75% 53%',
+  radius: '1.25rem',
+  chart1: '272 75% 53%',
+  chart2: '193 100% 42%',
+  chart3: '330 100% 50%',
+  chart4: '220 45% 30%',
+  chart5: '220 34% 58%',
+} as const;
+
+const DARK_TOKENS = {
+  background: '220 20% 6%',
+  foreground: '220 30% 94%',
+  card: '220 24% 9%',
+  cardForeground: '220 30% 94%',
+  popover: '220 24% 9%',
+  popoverForeground: '220 30% 94%',
+  primary: '272 78% 64%',
+  primaryForeground: '220 35% 8%',
+  secondary: '193 100% 53%',
+  secondaryForeground: '220 35% 8%',
+  tertiary: '330 100% 60%',
+  tertiaryForeground: '220 35% 8%',
+  muted: '220 22% 15%',
+  mutedForeground: '220 16% 74%',
+  accent: '220 22% 15%',
+  accentForeground: '220 30% 94%',
+  destructive: '334 97% 58%',
+  destructiveForeground: '220 35% 8%',
+  border: '220 18% 20%',
+  input: '220 18% 20%',
+  ring: '272 78% 64%',
+  radius: '1.25rem',
+  chart1: '272 78% 64%',
+  chart2: '193 100% 53%',
+  chart3: '330 100% 60%',
+  chart4: '220 40% 72%',
+  chart5: '220 30% 46%',
+} as const;
+
+function asHsl(tokens: Record<string, string>) {
+  return Object.fromEntries(
+    Object.entries(tokens).map(([key, value]) => [key, key === 'radius' ? value : `hsl(${value})`])
+  ) as Record<string, string>;
+}
+
 export const THEME = {
-  light: {
-    background: 'hsl(0 0% 100%)',
-    foreground: 'hsl(0 0% 3.9%)',
-    card: 'hsl(0 0% 100%)',
-    cardForeground: 'hsl(0 0% 3.9%)',
-    popover: 'hsl(0 0% 100%)',
-    popoverForeground: 'hsl(0 0% 3.9%)',
-    primary: 'hsl(0 0% 9%)',
-    primaryForeground: 'hsl(0 0% 98%)',
-    secondary: 'hsl(0 0% 96.1%)',
-    secondaryForeground: 'hsl(0 0% 9%)',
-    muted: 'hsl(0 0% 96.1%)',
-    mutedForeground: 'hsl(0 0% 45.1%)',
-    accent: 'hsl(0 0% 96.1%)',
-    accentForeground: 'hsl(0 0% 9%)',
-    destructive: 'hsl(0 84.2% 60.2%)',
-    border: 'hsl(0 0% 89.8%)',
-    input: 'hsl(0 0% 89.8%)',
-    ring: 'hsl(0 0% 63%)',
-    radius: '0.625rem',
-    chart1: 'hsl(12 76% 61%)',
-    chart2: 'hsl(173 58% 39%)',
-    chart3: 'hsl(197 37% 24%)',
-    chart4: 'hsl(43 74% 66%)',
-    chart5: 'hsl(27 87% 67%)',
-  },
-  dark: {
-    background: 'hsl(0 0% 3.9%)',
-    foreground: 'hsl(0 0% 98%)',
-    card: 'hsl(0 0% 3.9%)',
-    cardForeground: 'hsl(0 0% 98%)',
-    popover: 'hsl(0 0% 3.9%)',
-    popoverForeground: 'hsl(0 0% 98%)',
-    primary: 'hsl(0 0% 98%)',
-    primaryForeground: 'hsl(0 0% 9%)',
-    secondary: 'hsl(0 0% 14.9%)',
-    secondaryForeground: 'hsl(0 0% 98%)',
-    muted: 'hsl(0 0% 14.9%)',
-    mutedForeground: 'hsl(0 0% 63.9%)',
-    accent: 'hsl(0 0% 14.9%)',
-    accentForeground: 'hsl(0 0% 98%)',
-    destructive: 'hsl(0 70.9% 59.4%)',
-    border: 'hsl(0 0% 14.9%)',
-    input: 'hsl(0 0% 14.9%)',
-    ring: 'hsl(300 0% 45%)',
-    radius: '0.625rem',
-    chart1: 'hsl(220 70% 50%)',
-    chart2: 'hsl(160 60% 45%)',
-    chart3: 'hsl(30 80% 55%)',
-    chart4: 'hsl(280 65% 60%)',
-    chart5: 'hsl(340 75% 55%)',
-  },
+  light: asHsl(LIGHT_TOKENS),
+  dark: asHsl(DARK_TOKENS),
 };
- 
+
+export const TYPOGRAPHY = {
+  display: 'text-5xl font-bold tracking-tight',
+  headline: 'text-3xl font-semibold tracking-tight',
+  title: 'text-xl font-semibold tracking-tight',
+  body: 'text-base leading-6',
+  label: 'text-sm font-medium tracking-tight',
+} as const;
+
 export const NAV_THEME: Record<'light' | 'dark', Theme> = {
   light: {
     ...DefaultTheme,
