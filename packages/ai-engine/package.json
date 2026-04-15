@@ -16,7 +16,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "lint": "echo 'No lint configured'",
-    "test": "echo 'No tests'"
+    "test": "pnpm run build && node --test dist/test/**/*.test.js"
   },
   "devDependencies": {
     "typescript": "^5.8.3"

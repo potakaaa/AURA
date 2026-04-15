@@ -1,0 +1,19 @@
+{
+  "name": "create_event_requires_confirmation",
+  "input": {
+    "userMessage": "Book project retro on Friday from 4 to 5 PM with the engineering team."
+  },
+  "expectedBehavior": {
+    "tool": "create_event",
+    "reason": "Write action must present a preview and ask for explicit approval."
+  },
+  "expectedOutput": {
+    "format": "confirmation",
+    "action": "Create calendar event",
+    "preview": "Title: Project Retro; Time: Friday 4:00 PM-5:00 PM; Attendees: engineering team; Timezone: user default",
+    "expiresInMinutes": 5,
+    "confirmLabel": "Create event",
+    "cancelLabel": "Cancel"
+  }
+}
+
