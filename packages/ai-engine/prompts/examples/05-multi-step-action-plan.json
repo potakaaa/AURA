@@ -1,0 +1,40 @@
+{
+  "name": "weekly_planning_multi_step",
+  "input": {
+    "userMessage": "Plan my week: summarize key emails, find the latest roadmap in Drive, then propose meeting slots."
+  },
+  "expectedBehavior": {
+    "tools": ["read_email", "search_drive", "read_calendar"],
+    "reason": "Cross-tool task requiring staged execution and synthesized planning."
+  },
+  "expectedOutput": {
+    "format": "action_plan",
+    "goal": "Prepare a weekly plan from inbox, drive docs, and schedule",
+    "steps": [
+      {
+        "id": "1",
+        "title": "Read important unread emails and extract priorities",
+        "status": "ready",
+        "rationale": "Email signals urgent work and dependencies."
+      },
+      {
+        "id": "2",
+        "title": "Search Drive for the latest roadmap document",
+        "status": "pending",
+        "rationale": "Roadmap context guides what meetings are needed."
+      },
+      {
+        "id": "3",
+        "title": "Check calendar and propose 3 feasible meeting slots",
+        "status": "pending",
+        "rationale": "Scheduling should fit existing commitments."
+      }
+    ],
+    "risks": [
+      "Document search may return multiple similarly named files.",
+      "Calendar availability can change before confirmation."
+    ],
+    "requiresConfirmation": false
+  }
+}
+

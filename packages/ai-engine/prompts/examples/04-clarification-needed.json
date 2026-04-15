@@ -1,0 +1,14 @@
+{
+  "name": "ambiguous_drive_request",
+  "input": {
+    "userMessage": "Find that document we talked about and send it."
+  },
+  "expectedBehavior": {
+    "tool": "none_initially",
+    "reason": "Request is ambiguous; ask one focused clarifying question before tool use."
+  },
+  "expectedOutput": {
+    "assistantText": "Do you mean the budget document from yesterday's discussion, and where should I send it?"
+  }
+}
+
