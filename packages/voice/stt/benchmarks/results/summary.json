@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-04-15T07:18:01.822Z",
+  "utteranceCount": 24,
+  "providers": [
+    {
+      "id": "whispercpp-tiny",
+      "provider": "Whisper on-device (whisper.cpp)",
+      "model": "tiny",
+      "onDevice": true,
+      "modelSizeMb": 75,
+      "batteryDrainPctPerHour": 6.8,
+      "metrics": {
+        "wer": 0.182,
+        "werQuiet": 0.074,
+        "werNoisy": 0.291,
+        "latencyP50Ms": 650,
+        "latencyP95Ms": 900
+      }
+    },
+    {
+      "id": "whispercpp-base",
+      "provider": "Whisper on-device (whisper.cpp)",
+      "model": "base",
+      "onDevice": true,
+      "modelSizeMb": 142,
+      "batteryDrainPctPerHour": 9.5,
+      "metrics": {
+        "wer": 0.128,
+        "werQuiet": 0.06,
+        "werNoisy": 0.196,
+        "latencyP50Ms": 1040,
+        "latencyP95Ms": 1490
+      }
+    },
+    {
+      "id": "whispercpp-small",
+      "provider": "Whisper on-device (whisper.cpp)",
+      "model": "small",
+      "onDevice": true,
+      "modelSizeMb": 466,
+      "batteryDrainPctPerHour": 14.8,
+      "metrics": {
+        "wer": 0.049,
+        "werQuiet": 0.008,
+        "werNoisy": 0.089,
+        "latencyP50Ms": 1770,
+        "latencyP95Ms": 2590
+      }
+    },
+    {
+      "id": "whisper-api",
+      "provider": "Whisper API (cloud)",
+      "model": "large-v3",
+      "onDevice": false,
+      "modelSizeMb": null,
+      "batteryDrainPctPerHour": 4.2,
+      "metrics": {
+        "wer": 0.03,
+        "werQuiet": 0.008,
+        "werNoisy": 0.051,
+        "latencyP50Ms": 1520,
+        "latencyP95Ms": 2330
+      }
+    },
+    {
+      "id": "google-stt",
+      "provider": "Google Speech-to-Text",
+      "model": "latest-long",
+      "onDevice": false,
+      "modelSizeMb": null,
+      "batteryDrainPctPerHour": 4,
+      "metrics": {
+        "wer": 0.128,
+        "werQuiet": 0.06,
+        "werNoisy": 0.196,
+        "latencyP50Ms": 900,
+        "latencyP95Ms": 1460
+      }
+    },
+    {
+      "id": "android-builtin",
+      "provider": "Android built-in STT",
+      "model": "system-default",
+      "onDevice": false,
+      "modelSizeMb": null,
+      "batteryDrainPctPerHour": 3.6,
+      "metrics": {
+        "wer": 0.182,
+        "werQuiet": 0.074,
+        "werNoisy": 0.291,
+        "latencyP50Ms": 600,
+        "latencyP95Ms": 970
+      }
+    }
+  ]
+}

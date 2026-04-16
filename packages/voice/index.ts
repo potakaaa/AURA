@@ -1,5 +1,4 @@
 /**
  * AURA Voice — wake-word and STT modules.
- * Placeholder export.
  */
-export {};
+export * as stt from "./stt/index.js";

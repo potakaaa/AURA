@@ -16,7 +16,9 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "lint": "echo 'No lint configured'",
-    "test": "echo 'No tests'"
+    "test": "echo 'No tests'",
+    "stt:benchmark": "node stt/benchmarks/run-benchmark.mjs",
+    "stt:smoke": "node stt/smoke/run-smoke.mjs"
   },
   "devDependencies": {
     "typescript": "^5.8.3"
