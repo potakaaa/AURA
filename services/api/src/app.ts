@@ -4,6 +4,7 @@ import { createCorsMiddleware } from './middleware/cors.js'
 import { validateJsonBodyMiddleware } from './middleware/json-body.js'
 import { createRateLimitMiddleware, getClientIp } from './middleware/rate-limit.js'
 import { authRoutes } from './routes/auth.js'
+import { aiRoutes } from './routes/ai.js'
 import { healthRoutes } from './routes/health.js'
 import { protectedRoutes } from './routes/protected.js'
 import { userRoutes } from './routes/user.js'
@@ -22,6 +23,7 @@ app.use('*', validateJsonBodyMiddleware)
 app.use('/auth/*', authRateLimitMiddleware)
 app.route('/', healthRoutes)
 app.route('/auth', authRoutes)
+app.route('/ai', aiRoutes)
 app.route('/protected', protectedRoutes)
 app.route('/user', userRoutes)
 
