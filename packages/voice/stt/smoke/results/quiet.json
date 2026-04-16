@@ -1,0 +1,9 @@
+{
+  "environment": "quiet",
+  "provider": "Whisper on-device (whisper.cpp)",
+  "model": "base",
+  "utteranceCount": 12,
+  "wer": 0.06,
+  "threshold": 0.12,
+  "pass": true
+}
