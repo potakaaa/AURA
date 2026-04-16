@@ -11,6 +11,7 @@ export type AuthConfig = {
   googleScopes: string
   authDbPath: string
   accessTokenExpirySkewMs: number
+  sessionCleanupIntervalMs: number
 }
 
 function requireEnv(name: string): string {
@@ -41,6 +42,7 @@ export function getAuthConfig(): AuthConfig {
       ?? 'https://openidconnect.googleapis.com/v1/userinfo',
     googleScopes: process.env.GOOGLE_OAUTH_SCOPES?.trim() ?? MINIMAL_SCOPES.join(' '),
     authDbPath: process.env.AUTH_DB_PATH?.trim() ?? './.data/auth.db',
-    accessTokenExpirySkewMs: Number(process.env.AUTH_ACCESS_TOKEN_EXPIRY_SKEW_MS ?? '30000')
+    accessTokenExpirySkewMs: Number(process.env.AUTH_ACCESS_TOKEN_EXPIRY_SKEW_MS ?? '30000'),
+    sessionCleanupIntervalMs: Number(process.env.AUTH_SESSION_CLEANUP_INTERVAL_MS ?? '300000')
   }
 }

@@ -1,0 +1,213 @@
+{
+  "provider": "Whisper API (cloud)",
+  "model": "large-v3",
+  "rows": [
+    {
+      "id": "utt-001",
+      "environment": "quiet",
+      "reference": "set a reminder for tomorrow at nine am",
+      "hypothesis": "set a reminder for tomorrow at nine am",
+      "latencyMs": 1310,
+      "wer": 0
+    },
+    {
+      "id": "utt-002",
+      "environment": "quiet",
+      "reference": "what is on my calendar this afternoon",
+      "hypothesis": "what is on my calendar this afternoon",
+      "latencyMs": 1380,
+      "wer": 0
+    },
+    {
+      "id": "utt-003",
+      "environment": "quiet",
+      "reference": "send a message to alex saying i will be late",
+      "hypothesis": "send a message to alex saying i will be uh",
+      "latencyMs": 1420,
+      "wer": 0.1
+    },
+    {
+      "id": "utt-004",
+      "environment": "quiet",
+      "reference": "start focus mode for twenty five minutes",
+      "hypothesis": "start focus mode for twenty five minutes",
+      "latencyMs": 1490,
+      "wer": 0
+    },
+    {
+      "id": "utt-005",
+      "environment": "quiet",
+      "reference": "mute notifications for one hour",
+      "hypothesis": "mute notifications for one hour",
+      "latencyMs": 1360,
+      "wer": 0
+    },
+    {
+      "id": "utt-006",
+      "environment": "quiet",
+      "reference": "play my deep work playlist",
+      "hypothesis": "play my deep work playlist",
+      "latencyMs": 1470,
+      "wer": 0
+    },
+    {
+      "id": "utt-007",
+      "environment": "quiet",
+      "reference": "turn on dark mode",
+      "hypothesis": "turn on dark mode",
+      "latencyMs": 1400,
+      "wer": 0
+    },
+    {
+      "id": "utt-008",
+      "environment": "quiet",
+      "reference": "what is the weather like today",
+      "hypothesis": "what is the weather like today",
+      "latencyMs": 1450,
+      "wer": 0
+    },
+    {
+      "id": "utt-009",
+      "environment": "quiet",
+      "reference": "schedule lunch with mia on friday",
+      "hypothesis": "schedule lunch with mia on friday",
+      "latencyMs": 1460,
+      "wer": 0
+    },
+    {
+      "id": "utt-010",
+      "environment": "quiet",
+      "reference": "open my task list",
+      "hypothesis": "open my task list",
+      "latencyMs": 1420,
+      "wer": 0
+    },
+    {
+      "id": "utt-011",
+      "environment": "quiet",
+      "reference": "read my latest email",
+      "hypothesis": "read my latest email",
+      "latencyMs": 1490,
+      "wer": 0
+    },
+    {
+      "id": "utt-012",
+      "environment": "quiet",
+      "reference": "set an alarm for six thirty",
+      "hypothesis": "set an alarm for six thirty",
+      "latencyMs": 1520,
+      "wer": 0
+    },
+    {
+      "id": "utt-013",
+      "environment": "noisy",
+      "reference": "call john on speaker",
+      "hypothesis": "call john on speaker",
+      "latencyMs": 1700,
+      "wer": 0
+    },
+    {
+      "id": "utt-014",
+      "environment": "noisy",
+      "reference": "add buy groceries to my todo list",
+      "hypothesis": "add buy groceries uh my todo list",
+      "latencyMs": 1810,
+      "wer": 0.14285714285714285
+    },
+    {
+      "id": "utt-015",
+      "environment": "noisy",
+      "reference": "start a ten minute timer",
+      "hypothesis": "start ten minute timer",
+      "latencyMs": 1760,
+      "wer": 0.2
+    },
+    {
+      "id": "utt-016",
+      "environment": "noisy",
+      "reference": "navigate to the nearest gas station",
+      "hypothesis": "navigate to the nearest gas station",
+      "latencyMs": 1830,
+      "wer": 0
+    },
+    {
+      "id": "utt-017",
+      "environment": "noisy",
+      "reference": "what are my unread messages",
+      "hypothesis": "what are my unread messages",
+      "latencyMs": 1880,
+      "wer": 0
+    },
+    {
+      "id": "utt-018",
+      "environment": "noisy",
+      "reference": "lower the volume to forty percent",
+      "hypothesis": "lower the volume to forty percent",
+      "latencyMs": 1960,
+      "wer": 0
+    },
+    {
+      "id": "utt-019",
+      "environment": "noisy",
+      "reference": "pause the music",
+      "hypothesis": "pause the music",
+      "latencyMs": 2010,
+      "wer": 0
+    },
+    {
+      "id": "utt-020",
+      "environment": "noisy",
+      "reference": "resume playback",
+      "hypothesis": "resume playback",
+      "latencyMs": 2080,
+      "wer": 0
+    },
+    {
+      "id": "utt-021",
+      "environment": "noisy",
+      "reference": "remind me to drink water every hour",
+      "hypothesis": "remind me to drink every hour",
+      "latencyMs": 2140,
+      "wer": 0.14285714285714285
+    },
+    {
+      "id": "utt-022",
+      "environment": "noisy",
+      "reference": "reply to samantha i am on my way",
+      "hypothesis": "reply to i am on my way",
+      "latencyMs": 2210,
+      "wer": 0.125
+    },
+    {
+      "id": "utt-023",
+      "environment": "noisy",
+      "reference": "clear completed tasks",
+      "hypothesis": "clear completed tasks",
+      "latencyMs": 2330,
+      "wer": 0
+    },
+    {
+      "id": "utt-024",
+      "environment": "noisy",
+      "reference": "what time is my next meeting",
+      "hypothesis": "what time is my next meeting",
+      "latencyMs": 2420,
+      "wer": 0
+    }
+  ],
+  "summary": {
+    "id": "whisper-api",
+    "provider": "Whisper API (cloud)",
+    "model": "large-v3",
+    "onDevice": false,
+    "modelSizeMb": null,
+    "batteryDrainPctPerHour": 4.2,
+    "metrics": {
+      "wer": 0.03,
+      "werQuiet": 0.008,
+      "werNoisy": 0.051,
+      "latencyP50Ms": 1520,
+      "latencyP95Ms": 2330
+    }
+  }
+}

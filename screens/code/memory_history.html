@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AURA Memory - History</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-bright": "#272d34",
+            "inverse-surface": "#f8f9fe",
+            "surface": "#0c0e12",
+            "on-primary-container": "#000000",
+            "on-tertiary-container": "#710035",
+            "on-secondary-fixed": "#004656",
+            "primary-fixed": "#dab0ff",
+            "on-primary-fixed-variant": "#6700af",
+            "secondary-container": "#002a35",
+            "on-error-container": "#ff97a3",
+            "secondary-fixed-dim": "#88e0ff",
+            "outline-variant": "#434850",
+            "on-primary": "#33005b",
+            "error-dim": "#c8475d",
+            "tertiary-fixed-dim": "#ff84a9",
+            "primary-dim": "#9e42f2",
+            "on-secondary-fixed-variant": "#00647b",
+            "tertiary-container": "#ff9bb7",
+            "on-secondary-container": "#00b2d9",
+            "error-container": "#8a1632",
+            "surface-container-high": "#1c2026",
+            "surface-container-low": "#101418",
+            "tertiary-dim": "#e30071",
+            "on-secondary": "#004657",
+            "surface-dim": "#0c0e12",
+            "on-background": "#e1e6ef",
+            "primary": "#c180ff",
+            "on-error": "#490013",
+            "surface-variant": "#21262d",
+            "inverse-primary": "#8722db",
+            "surface-container-highest": "#21262d",
+            "tertiary": "#ffb1c5",
+            "primary-container": "#a94efe",
+            "on-tertiary-fixed": "#48001f",
+            "secondary": "#4cd6fe",
+            "secondary-dim": "#37c8ef",
+            "on-tertiary-fixed-variant": "#81003e",
+            "secondary-fixed": "#b6ebff",
+            "on-tertiary": "#82003e",
+            "tertiary-fixed": "#ff9bb7",
+            "surface-container-lowest": "#000000",
+            "surface-container": "#161a1f",
+            "outline": "#71767e",
+            "on-surface-variant": "#a7abb4",
+            "on-primary-fixed": "#3d006c",
+            "primary-fixed-dim": "#d09eff",
+            "on-surface": "#e1e6ef",
+            "surface-tint": "#c180ff",
+            "error": "#fd6f85",
+            "background": "#0c0e12",
+            "inverse-on-surface": "#535559"
+          },
+          fontFamily: {
+            "headline": ["Manrope"],
+            "body": ["Inter"],
+            "label": ["Inter"]
+          },
+          borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+<style>
+    .glass-card {
+      background: rgba(33, 38, 45, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .aura-glow {
+      filter: blur(80px);
+      opacity: 0.15;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30 min-h-screen">
+<!-- Background Decorative Glows -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary aura-glow rounded-full"></div>
+<div class="absolute bottom-[20%] right-[-5%] w-[40%] h-[40%] bg-secondary aura-glow rounded-full"></div>
+<div class="absolute top-[30%] right-[10%] w-[30%] h-[30%] bg-tertiary aura-glow rounded-full"></div>
+</div>
+<!-- Updated TopAppBar based on COMPONENTS_73 and SCREEN_52 -->
+<header class="bg-slate-950/60 backdrop-blur-xl fixed top-0 w-full z-50 flex justify-between items-center px-6 h-20">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border border-white/5">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="minimalist 3d avatar of a professional woman with glasses in a soft purple and blue studio lighting environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhqZIkFCKs3CNOrj4Yfg23-2h31iZoU1YbXz16iKcQdizhlfiT4bw6HzrSLWn9XdgKAfBRWrIctQxG9y5ubQH4bdVckqg0pj6-f1IJlYbkpqVfFw1h-bWR9cUzlSvmaUuSJTaU2tr3jukDswAnzEAmak8Squp34sm9zVmtPIM9FVhc7Xuj7K_7p1lyvyl4slTRTbw25hN7eaKw5gM3MiyY4vYiQzIoS5evmJyQw9V4wYNIDSzPS9-I9VaW3KU592CI2HR5K4OPew"/>
+</div>
+<span class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400 font-headline tracking-tighter">AURA</span>
+</div>
+<button class="text-slate-400 hover:opacity-80 transition-opacity active:scale-95 duration-300">
+<span class="material-symbols-outlined text-[28px]">settings</span>
+</button>
+</header>
+<main class="relative pt-24 pb-32 px-6 max-w-3xl mx-auto">
+<!-- Search Bar Section -->
+<section class="mb-10">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">filter_list</span>
+<input class="w-full h-14 pl-12 pr-4 bg-surface-container-low border-none rounded-2xl text-on-surface placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-primary/20 transition-all font-body" placeholder="Search memories, tasks, or insights..." type="text"/>
+</div>
+</section>
+<!-- Timeline Content -->
+<div class="space-y-12">
+<!-- Group: Today -->
+<section>
+<div class="flex items-center gap-4 mb-6">
+<h2 class="font-headline font-bold text-xl tracking-tight text-on-surface">Today</h2>
+<div class="h-[1px] flex-grow bg-gradient-to-r from-outline-variant/30 to-transparent"></div>
+</div>
+<div class="space-y-4">
+<!-- History Item 1 -->
+<div class="glass-card p-5 rounded-lg border border-white/5 flex flex-col gap-4 group hover:bg-surface-container-highest transition-all duration-300 cursor-pointer">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-lg leading-tight text-on-surface">Review of Q4 Design Sprint</h3>
+<p class="text-sm text-secondary font-medium mt-1">Calendar Invite Sent</p>
+</div>
+</div>
+<span class="text-xs font-label text-on-surface-variant/60 tabular-nums">10:42 AM</span>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded bg-[#1a73e8] p-1 flex items-center justify-center">
+<img alt="Google Calendar" class="w-full h-full" data-alt="google calendar app icon logo with colorful blue red yellow and green lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVyQSraj0y_6mjWuoTJeCVEelr0F5dtzliHGCC4_a7zzJLckXr3r66WlPt3g-rU2H4kun_v53lA0-nWOXLdejvw1tVY0vmqYr-7NBDW9GqqTtrlxcPSbjjenF7Exgb47vn6mE83KclXopCo-9Ly9j1uuo3NAWGuVHUY7lzW8OlfpT4J1aCemZmh4Bf_GushQ6kOfmpI7W_FbvZWEJwttmewQoayWMO9NjWAdOxdJgnGK2QZE-2AFKu_zdSP0kwqZ3e_Si7kEjIwg"/>
+</div>
+<span class="text-xs text-on-surface-variant font-label">Google Calendar Integration</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- History Item 2 -->
+<div class="glass-card p-5 rounded-lg border border-white/5 flex flex-col gap-4 group hover:bg-surface-container-highest transition-all duration-300 cursor-pointer">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">mail</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-lg leading-tight text-on-surface">Follow-up: Marketing Strategy</h3>
+<p class="text-sm text-primary font-medium mt-1">Draft Created &amp; Saved</p>
+</div>
+</div>
+<span class="text-xs font-label text-on-surface-variant/60 tabular-nums">09:15 AM</span>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded bg-white p-1 flex items-center justify-center">
+<img alt="Gmail" class="w-full h-full" data-alt="gmail app icon logo showing a stylized red and white envelope M shape" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAD4jeG0TIuPmc2CAk-jc77DqtF5CoELBxohF0roHza-S0zR3xHkqfKZHsBDxC9lhxkuEwEZeXGSIEZpDnq7TVcb6ESMJHSJCC8kFhJR5kzwzHGGq6S9ZQAXzVbu6AC_tSc8Mz_4ScWlEVUuVOI8EjLWRNVBVZwDdYBoCula3oVCsQRVEZexVIro-G0ss0ogpgPu6e7Z1g4RPtsxBG6hoa8y56uwGzmLlJkySa6clkyoddwRIoiQslud2f_wT6b-Xybfc1OyBmbpw"/>
+</div>
+<span class="text-xs text-on-surface-variant font-label">Gmail Integration</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Group: Yesterday -->
+<section>
+<div class="flex items-center gap-4 mb-6">
+<h2 class="font-headline font-bold text-xl tracking-tight text-on-surface-variant">Yesterday</h2>
+<div class="h-[1px] flex-grow bg-gradient-to-r from-outline-variant/20 to-transparent"></div>
+</div>
+<div class="space-y-4">
+<!-- History Item 3 -->
+<div class="glass-card p-5 rounded-lg border border-white/5 flex flex-col gap-4 group hover:bg-surface-container-highest transition-all duration-300 cursor-pointer">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">description</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-lg leading-tight text-on-surface">Financial Report Analysis</h3>
+<p class="text-sm text-tertiary font-medium mt-1">Insights Extracted</p>
+</div>
+</div>
+<span class="text-xs font-label text-on-surface-variant/60 tabular-nums">Yesterday, 4:50 PM</span>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded bg-[#4285f4] p-1 flex items-center justify-center">
+<img alt="Google Docs" class="w-full h-full" data-alt="google docs blue paper icon logo with white lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDe-rLZKbPGGjkjN2EihAR3G3R9_UeTH6fwV4IkISVYknWVeMUEaWnZk1g30wnWaYZdijcIIVQF4p1H1y-Stv_1bVCd9GeE1JjD81C2QSAa-9U39NfvNQ2lqRWNNiFj1M-uQbh_PQNh6w1jXPchA-wxXL94fkjj7VL6Ogf5XgwAWa0y6SbwOqYUndVjtcUhrZ7pzOeNP0GtrFisbAYNCX-FW4Pqb70jbeJ_z9olF0A4I8ELRHswjcn3NvuK2srghmdwUWThWUxkQA"/>
+</div>
+<span class="text-xs text-on-surface-variant font-label">Drive Integration</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- History Item 4 -->
+<div class="glass-card p-5 rounded-lg border border-white/5 flex flex-col gap-4 group hover:bg-surface-container-highest transition-all duration-300 cursor-pointer opacity-80">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-outline-variant/20 flex items-center justify-center text-outline">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-lg leading-tight text-on-surface">Weekly Grocery List</h3>
+<p class="text-sm text-on-surface-variant font-medium mt-1">To-do List Updated</p>
+</div>
+</div>
+<span class="text-xs font-label text-on-surface-variant/60 tabular-nums">Yesterday, 1:20 PM</span>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded bg-[#5bb15f] p-1 flex items-center justify-center">
+<img alt="Google Keep" class="w-full h-full" data-alt="google keep yellow lightbulb icon logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7kCU0gLkSsffigjhO7HBjhwQKj8oNcdd2ao0PieyWetrWATkxDpCFY41o2Kji-oJOd5CemhBSjTrLFotToz3DAH8e8ZSgsn8316m3xvFSRzkTLr91fCwxbBDooM9-emY1jg764Q6TvH2VctP70BffBMonAXsgbZTmELyZjfoAJI8E_shTMUqPBnwz9IYfkpz3mOkE01AQqbkrnG8A3NiLWrwwNHmKt4qhoYPRG4O4niA59NHahG-uv45FV7K9lPZCE-XahsndQQ"/>
+</div>
+<span class="text-xs text-on-surface-variant font-label">Keep Integration</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full h-20 flex justify-around items-center px-4 pb-4 bg-[#171a1e]/80 backdrop-blur-2xl rounded-t-[2.5rem] z-50 shadow-[0_-10px_40px_-10px_rgba(142,45,226,0.15)] border-t border-white/5">
+<a class="flex flex-col items-center justify-center text-[#a9abb0] opacity-50 hover:text-[#00B4DB] transition-colors duration-300 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">visibility</span>
+<span class="font-manrope text-[10px] uppercase tracking-[0.05em] font-medium">Insight</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#a9abb0] opacity-50 hover:text-[#00B4DB] transition-colors duration-300 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">diversity_3</span>
+<span class="font-manrope text-[10px] uppercase tracking-[0.05em] font-medium">Connect</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#8E2DE2] drop-shadow-[0_0_8px_rgba(142,45,226,0.5)] active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-manrope text-[10px] uppercase tracking-[0.05em] font-medium">Aura</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#a9abb0] opacity-50 hover:text-[#00B4DB] transition-colors duration-300 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-manrope text-[10px] uppercase tracking-[0.05em] font-medium">Vault</span>
+</a>
+</nav>
+</body></html>
