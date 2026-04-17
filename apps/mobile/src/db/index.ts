@@ -24,6 +24,7 @@ type SQLiteLike = {
 type Logger = Pick<Console, 'info' | 'error' | 'warn'>;
 
 let database: QueryExecutor | null = null;
+let initializationPromise: Promise<QueryExecutor> | null = null;
 
 function escapeSqlString(value: string): string {
   return value.replaceAll("'", "''");
@@ -64,47 +65,78 @@ export type InitDatabaseOptions = {
 
 export async function initDatabase(options: InitDatabaseOptions = {}): Promise<QueryExecutor> {
   if (database) {
+    console.info('[agent][H3] Returning cached database instance');
     return database;
   }
-
-  const logger = options.logger ?? console;
-  const sqliteModule = options.sqliteModule ?? (await import('expo-sqlite'));
-  const dbName = options.dbName ?? DEFAULT_DB_NAME;
-  const useUnencryptedDb = options.useUnencryptedDb ?? false;
-
-  try {
-    logger.info(`[db] Opening database ${dbName}`);
-    const sqliteDb = await sqliteModule.openDatabaseAsync(dbName);
-    const executor = new ExpoSqliteExecutor(sqliteDb);
-
-    if (useUnencryptedDb) {
-      logger.warn('[db] SQLCipher disabled in dev-only mode.');
-    } else {
-      const keyProvider = options.keyProvider ?? getOrCreateDbKey;
-      const key = await keyProvider();
-      if (!key) {
-        throw new DbKeyError('Missing SQLCipher key before database initialization.');
-      }
-      await executor.exec(`PRAGMA key = '${escapeSqlString(key)}';`);
-    }
-
-    await executor.exec('PRAGMA foreign_keys = ON;');
-    await executor.getFirst<{ table_count: number }>(
-      'SELECT COUNT(*) as table_count FROM sqlite_master;'
-    );
-
-    logger.info('[db] Running migration runner');
-    await runMigrations(executor, logger);
-    logger.info('[db] Database initialized');
-
-    database = executor;
-    return executor;
-  } catch (error) {
-    throw new DatabaseInitializationError(
-      'Failed to initialize encrypted database. This can happen after SecureStore reset or DB corruption.',
-      { cause: error }
-    );
+  if (initializationPromise) {
+    console.info('[agent][H1] Waiting for in-flight database initialization');
+    return initializationPromise;
   }
+
+  initializationPromise = (async () => {
+    try {
+      const logger = options.logger ?? console;
+      const sqliteModule = options.sqliteModule ?? (await import('expo-sqlite'));
+      const dbName = options.dbName ?? DEFAULT_DB_NAME;
+      const useUnencryptedDb = options.useUnencryptedDb ?? false;
+      logger.info(`[db] Opening database ${dbName}`);
+      // #region agent log
+      fetch('http://127.0.0.1:7302/ingest/54b210d0-7789-4279-b43b-22f94e2db37e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'3e67de'},body:JSON.stringify({sessionId:'3e67de',runId:'android-white-screen',hypothesisId:'H1',location:'src/db/index.ts:77',message:'initDatabase start',data:{dbName,useUnencryptedDb},timestamp:Date.now()})}).catch(() => {});
+      // #endregion
+      const sqliteDb = await sqliteModule.openDatabaseAsync(dbName);
+      logger.info('[agent][H1] openDatabaseAsync resolved');
+      const executor = new ExpoSqliteExecutor(sqliteDb);
+
+      if (useUnencryptedDb) {
+        logger.warn('[db] SQLCipher disabled in dev-only mode.');
+      } else {
+        const keyProvider = options.keyProvider ?? getOrCreateDbKey;
+        // #region agent log
+        fetch('http://127.0.0.1:7302/ingest/54b210d0-7789-4279-b43b-22f94e2db37e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'3e67de'},body:JSON.stringify({sessionId:'3e67de',runId:'android-white-screen',hypothesisId:'H1_H2',location:'src/db/index.ts:86',message:'About to read SQLCipher key',data:{provider:'secure-store'},timestamp:Date.now()})}).catch(() => {});
+        // #endregion
+        const key = await keyProvider();
+        logger.info('[agent][H1] keyProvider resolved');
+        // #region agent log
+        fetch('http://127.0.0.1:7302/ingest/54b210d0-7789-4279-b43b-22f94e2db37e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'3e67de'},body:JSON.stringify({sessionId:'3e67de',runId:'android-white-screen',hypothesisId:'H1_H2',location:'src/db/index.ts:89',message:'SQLCipher key resolved',data:{hasKey:Boolean(key)},timestamp:Date.now()})}).catch(() => {});
+        // #endregion
+        if (!key) {
+          throw new DbKeyError('Missing SQLCipher key before database initialization.');
+        }
+        // #region agent log
+        fetch('http://127.0.0.1:7302/ingest/54b210d0-7789-4279-b43b-22f94e2db37e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'3e67de'},body:JSON.stringify({sessionId:'3e67de',runId:'android-white-screen',hypothesisId:'H2',location:'src/db/index.ts:93',message:'Applying SQLCipher key pragma',data:{keyLength:key.length},timestamp:Date.now()})}).catch(() => {});
+        // #endregion
+        await executor.exec(`PRAGMA key = '${escapeSqlString(key)}';`);
+        logger.info('[agent][H2] PRAGMA key applied');
+        // #region agent log
+        fetch('http://127.0.0.1:7302/ingest/54b210d0-7789-4279-b43b-22f94e2db37e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'3e67de'},body:JSON.stringify({sessionId:'3e67de',runId:'android-white-screen',hypothesisId:'H2',location:'src/db/index.ts:95',message:'SQLCipher key pragma applied',data:{ok:true},timestamp:Date.now()})}).catch(() => {});
+        // #endregion
+      }
+
+      await executor.exec('PRAGMA foreign_keys = ON;');
+      logger.info('[agent][H2] PRAGMA foreign_keys applied');
+      await executor.getFirst<{ table_count: number }>(
+        'SELECT COUNT(*) as table_count FROM sqlite_master;'
+      );
+      logger.info('[agent][H2] sqlite_master probe succeeded');
+
+      logger.info('[db] Running migration runner');
+      await runMigrations(executor, logger);
+      logger.info('[db] Database initialized');
+
+      database = executor;
+      return executor;
+    } catch (error) {
+      logger.error('[agent][H1] initDatabase failed', error);
+      throw new DatabaseInitializationError(
+        'Failed to initialize encrypted database. This can happen after SecureStore reset or DB corruption.',
+        { cause: error }
+      );
+    } finally {
+      initializationPromise = null;
+    }
+  })();
+
+  return initializationPromise;
 }
 
 export function getDatabase(): QueryExecutor {
@@ -118,4 +150,5 @@ export function getDatabase(): QueryExecutor {
 
 export function resetDatabaseForTests(): void {
   database = null;
+  initializationPromise = null;
 }
