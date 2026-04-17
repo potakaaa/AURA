@@ -1,6 +1,13 @@
 repos:
   - repo: local
     hooks:
+      - id: no-hardcoded-colors-mobile
+        name: No hardcoded colors (mobile)
+        entry: node scripts/check-no-hardcoded-colors.mjs
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
       - id: turbo-lint
         name: Turbo lint (CI parity)
         entry: pnpm turbo run lint

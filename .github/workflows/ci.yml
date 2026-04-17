@@ -49,6 +49,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: No hardcoded colors (mobile)
+        run: node scripts/check-no-hardcoded-colors.mjs
+
       - name: Lint all packages
         run: pnpm turbo run lint
 
@@ -144,6 +147,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: No hardcoded colors (mobile)
+        run: node scripts/check-no-hardcoded-colors.mjs
 
       - name: Expo/mobile lint script
         run: pnpm --filter mobile lint

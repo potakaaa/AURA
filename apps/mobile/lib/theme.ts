@@ -28,6 +28,17 @@ const LIGHT_TOKENS = {
   chart3: '330 100% 50%',
   chart4: '220 45% 30%',
   chart5: '220 34% 58%',
+  onSurface: '224 42% 10%',
+  onSurfaceVariant: '220 18% 34%',
+  surfaceDim: '220 32% 97%',
+  surfaceContainer: '220 32% 95%',
+  surfaceContainerHigh: '220 24% 89%',
+  onPrimaryFixed: '0 0% 0%',
+  secondaryContainer: '193 100% 28%',
+  tertiaryContainer: '330 100% 48%',
+  inversePrimary: '272 75% 53%',
+  gradientAuraStart: '258 90% 72%',
+  gradientAuraEnd: '330 81% 60%',
 } as const;
 
 const DARK_TOKENS = {
@@ -58,6 +69,17 @@ const DARK_TOKENS = {
   chart3: '330 100% 60%',
   chart4: '220 40% 72%',
   chart5: '220 30% 46%',
+  onSurface: '220 30% 94%',
+  onSurfaceVariant: '220 8% 68%',
+  surfaceDim: '220 20% 6%',
+  surfaceContainer: '220 16% 11%',
+  surfaceContainerHigh: '220 14% 16%',
+  onPrimaryFixed: '0 0% 0%',
+  secondaryContainer: '193 100% 25%',
+  tertiaryContainer: '330 100% 51%',
+  inversePrimary: '272 73% 50%',
+  gradientAuraStart: '272 78% 64%',
+  gradientAuraEnd: '330 100% 60%',
 } as const;
 
 function asHsl(tokens: Record<string, string>) {
