@@ -34,6 +34,17 @@
     --chart-3: 330 100% 50%;
     --chart-4: 220 45% 30%;
     --chart-5: 220 34% 58%;
+    --on-surface: 224 42% 10%;
+    --on-surface-variant: 220 18% 34%;
+    --surface-dim: 220 32% 97%;
+    --surface-container: 220 32% 95%;
+    --surface-container-high: 220 24% 89%;
+    --on-primary-fixed: 0 0% 0%;
+    --secondary-container: 193 100% 28%;
+    --tertiary-container: 330 100% 48%;
+    --inverse-primary: 272 75% 53%;
+    --gradient-aura-start: 258 90% 72%;
+    --gradient-aura-end: 330 81% 60%;
   }
 
   .dark:root {
@@ -66,5 +77,16 @@
     --chart-3: 330 100% 60%;
     --chart-4: 220 40% 72%;
     --chart-5: 220 30% 46%;
+    --on-surface: 220 30% 94%;
+    --on-surface-variant: 220 8% 68%;
+    --surface-dim: 220 20% 6%;
+    --surface-container: 220 16% 11%;
+    --surface-container-high: 220 14% 16%;
+    --on-primary-fixed: 0 0% 0%;
+    --secondary-container: 193 100% 25%;
+    --tertiary-container: 330 100% 51%;
+    --inverse-primary: 272 73% 50%;
+    --gradient-aura-start: 272 78% 64%;
+    --gradient-aura-end: 330 100% 60%;
   }
 }
