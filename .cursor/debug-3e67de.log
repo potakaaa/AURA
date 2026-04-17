@@ -1,0 +1,1 @@
+{"sessionId":"3e67de","runId":"android-white-screen","hypothesisId":"H1","location":"src/db/index.ts:77","message":"initDatabase start","data":{"dbName":"aura.db","useUnencryptedDb":false},"timestamp":1776408704185}

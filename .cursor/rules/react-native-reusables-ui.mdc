@@ -1,0 +1,29 @@
+---
+description: Prefer React Native Reusables for UI; check registry and pause for CLI add before custom components
+globs: apps/mobile/**/*.tsx
+alwaysApply: false
+---
+
+# UI components — React Native Reusables first
+
+This app uses [React Native Reusables](https://reactnativereusables.com). Primitives and shadcn-style blocks live under `apps/mobile/components/ui/` (see `apps/mobile/README.md`).
+
+## Before adding or building a UI primitive
+
+1. **Check the repo** — List or search `apps/mobile/components/ui/` for an existing component (e.g. `button`, `input`, `dialog`).
+2. **Assume reusables by default** — If something equivalent exists in Reusables, **compose or wrap it** in `components/ui/` (e.g. `aura-*.tsx` patterns) instead of reimplementing from scratch.
+3. **If Reusables offers it but it is not in the repo** — **Do not** paste or hand-roll the registry implementation in chat. **Stop and ask the user** to add it locally first, then continue:
+   ```bash
+   npx @react-native-reusables/cli@latest add <component-name>
+   ```
+   (Interactive pick: run `add` with no names, or use `--all` only when they explicitly want everything.)
+4. **After they run the CLI** — Ask whether they want to use the stock Reusables component as-is, extend it (thin wrapper), or go **fully custom**. **Default recommendation: use or lightly wrap Reusables** unless they choose otherwise.
+5. **If it is not in the Reusables catalog** — Propose options and **ask** whether to build a one-off custom component or use an alternative pattern; do not assume.
+
+## Summary
+
+| Situation | Action |
+|-----------|--------|
+| Already in `components/ui/` | Import and use (or wrap). |
+| In Reusables catalog, missing locally | User runs CLI `add` first; then reusables (or thin wrapper) unless they opt out. |
+| Not in Reusables | Ask: custom vs alternative; no silent custom build. |
