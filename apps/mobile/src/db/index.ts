@@ -73,12 +73,13 @@ export async function initDatabase(options: InitDatabaseOptions = {}): Promise<Q
     return initializationPromise;
   }
 
+  const logger = options.logger ?? console;
+  const sqliteModule = options.sqliteModule ?? (await import('expo-sqlite'));
+  const dbName = options.dbName ?? DEFAULT_DB_NAME;
+  const useUnencryptedDb = options.useUnencryptedDb ?? false;
+
   initializationPromise = (async () => {
     try {
-      const logger = options.logger ?? console;
-      const sqliteModule = options.sqliteModule ?? (await import('expo-sqlite'));
-      const dbName = options.dbName ?? DEFAULT_DB_NAME;
-      const useUnencryptedDb = options.useUnencryptedDb ?? false;
       logger.info(`[db] Opening database ${dbName}`);
       // #region agent log
       fetch('http://127.0.0.1:7302/ingest/54b210d0-7789-4279-b43b-22f94e2db37e',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'3e67de'},body:JSON.stringify({sessionId:'3e67de',runId:'android-white-screen',hypothesisId:'H1',location:'src/db/index.ts:77',message:'initDatabase start',data:{dbName,useUnencryptedDb},timestamp:Date.now()})}).catch(() => {});
@@ -126,7 +127,7 @@ export async function initDatabase(options: InitDatabaseOptions = {}): Promise<Q
       database = executor;
       return executor;
     } catch (error) {
-      logger.error('[agent][H1] initDatabase failed', error);
+      (options.logger ?? console).error('[agent][H1] initDatabase failed', error);
       throw new DatabaseInitializationError(
         'Failed to initialize encrypted database. This can happen after SecureStore reset or DB corruption.',
         { cause: error }
