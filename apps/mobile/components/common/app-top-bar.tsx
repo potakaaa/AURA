@@ -50,7 +50,7 @@ export function AppTopBar({
         locations={[0, 1]}
         style={styles.topSheen}
       />
-      <View className="h-20 flex-row items-center justify-between">
+      <View className="relative h-20 flex-row items-center justify-between">
         {leading ?? <View />}
         {trailing ?? <View />}
       </View>
