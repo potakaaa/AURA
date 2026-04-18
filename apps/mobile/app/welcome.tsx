@@ -13,7 +13,7 @@ import {
 } from '@/lib/raw-colors';
 import { THEME } from '@/lib/theme';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
+import { router, type Href } from 'expo-router';
 import { useRef } from 'react';
 import {
   Image,
@@ -165,11 +165,11 @@ export default function WelcomeScreen() {
         showsVerticalScrollIndicator={false}>
         <View className="gap-8">
           <View className="gap-5">
-            <View className="self-start rounded-full border border-secondary/25 bg-secondary/10 px-3.5 py-2">
+            <View className="border-secondary/25 bg-secondary/10 self-start rounded-full border px-3.5 py-2">
               <View className="flex-row items-center gap-2">
                 <Sparkles size={14} color={THEME.dark.secondary} />
                 <Text
-                  className="text-[11px] font-bold uppercase tracking-[0.22em] text-secondary"
+                  className="text-secondary text-[11px] font-bold uppercase tracking-[0.22em]"
                   style={{ fontFamily: 'Manrope_700Bold' }}>
                   Neural Synchronized Presence
                 </Text>
@@ -184,7 +184,7 @@ export default function WelcomeScreen() {
               </GradientText>
             </View>
             <Text
-              className="text-[17px] leading-[26px] text-muted-foreground"
+              className="text-muted-foreground text-[17px] leading-[26px]"
               style={{ fontFamily: 'Manrope_500Medium' }}>
               Transcend traditional interaction. Aura adapts to your cognitive patterns, evolving
               alongside your digital consciousness in an ethereal flow of insight.
@@ -192,9 +192,9 @@ export default function WelcomeScreen() {
             <View className="mt-1 flex-row flex-wrap gap-x-5 gap-y-2 border-t border-white/[0.06] pt-5">
               {['Voice-first', 'Private by design', 'On-device aware'].map((label) => (
                 <View key={label} className="flex-row items-center gap-2">
-                  <View className="h-1.5 w-1.5 rounded-full bg-primary" />
+                  <View className="bg-primary h-1.5 w-1.5 rounded-full" />
                   <Text
-                    className="text-xs font-semibold tracking-wide text-muted-foreground"
+                    className="text-muted-foreground text-xs font-semibold tracking-wide"
                     style={{ fontFamily: 'Manrope_600SemiBold' }}>
                     {label}
                   </Text>
@@ -206,12 +206,12 @@ export default function WelcomeScreen() {
           <View className="flex-col gap-3 pt-1">
             <Pressable
               accessibilityRole="button"
-              onPress={() => router.replace('/(tabs)')}
+              onPress={() => router.push('/login' as Href)}
               android_ripple={{ color: RIPPLE.onPrimary }}
               className="w-full flex-row items-center justify-center gap-1 rounded-full py-[18px] active:opacity-90"
               style={[{ backgroundColor: THEME.dark.primary }, PRIMARY_CTA_SHADOW]}>
               <Text
-                className="text-base font-bold text-primary-foreground"
+                className="text-primary-foreground text-base font-bold"
                 style={{ fontFamily: 'Manrope_700Bold' }}>
                 Get Started
               </Text>
@@ -223,7 +223,7 @@ export default function WelcomeScreen() {
               android_ripple={{ color: rgbaWhite(0.12) }}
               className="w-full items-center rounded-full border border-white/[0.14] bg-white/[0.05] py-[18px] active:opacity-90">
               <Text
-                className="text-base font-bold text-foreground"
+                className="text-foreground text-base font-bold"
                 style={{ fontFamily: 'Manrope_700Bold' }}>
                 Learn More
               </Text>
@@ -243,7 +243,7 @@ export default function WelcomeScreen() {
               end={{ x: 1, y: 1 }}
               style={StyleSheet.absoluteFillObject}
             />
-            <View className="absolute inset-[1px] overflow-hidden rounded-[31px] border border-white/[0.1] bg-card">
+            <View className="bg-card absolute inset-[1px] overflow-hidden rounded-[31px] border border-white/[0.1]">
               <Image source={HERO_IMAGE} className="h-full w-full" resizeMode="cover" />
               <LinearGradient
                 colors={[
@@ -267,7 +267,7 @@ export default function WelcomeScreen() {
                   Adaptive Oracle
                 </Text>
                 <Text
-                  className="mt-1 text-sm text-muted-foreground"
+                  className="text-muted-foreground mt-1 text-sm"
                   style={{ fontFamily: 'Manrope_500Medium' }}>
                   Real-time neural pattern mapping
                 </Text>
@@ -280,7 +280,7 @@ export default function WelcomeScreen() {
               className="relative overflow-hidden rounded-[28px] border border-white/[0.1] bg-white/[0.035] p-7"
               style={CARD_SHADOW}>
               <View className="flex-row gap-5">
-                <View className="h-14 w-14 items-center justify-center rounded-2xl border border-secondary/20 bg-secondary/10">
+                <View className="border-secondary/20 bg-secondary/10 h-14 w-14 items-center justify-center rounded-2xl border">
                   <Icon as={Network} size={26} color={THEME.dark.secondary} />
                 </View>
                 <View className="flex-1 gap-2.5">
@@ -290,7 +290,7 @@ export default function WelcomeScreen() {
                     Neural Sync
                   </Text>
                   <Text
-                    className="text-sm leading-[22px] text-muted-foreground"
+                    className="text-muted-foreground text-sm leading-[22px]"
                     style={{ fontFamily: 'Manrope_500Medium' }}>
                     Seamless integration between your device ecosystem and our distributed
                     intelligence core.
@@ -302,7 +302,7 @@ export default function WelcomeScreen() {
               className="relative overflow-hidden rounded-[28px] border border-white/[0.1] bg-white/[0.035] p-7"
               style={CARD_SHADOW}>
               <View className="flex-row gap-5">
-                <View className="h-14 w-14 items-center justify-center rounded-2xl border border-tertiary/25 bg-tertiary/10">
+                <View className="border-tertiary/25 bg-tertiary/10 h-14 w-14 items-center justify-center rounded-2xl border">
                   <Icon as={Lock} size={26} color={THEME.dark.tertiary} />
                 </View>
                 <View className="flex-1 gap-2.5">
@@ -312,7 +312,7 @@ export default function WelcomeScreen() {
                     Vault Secure
                   </Text>
                   <Text
-                    className="text-sm leading-[22px] text-muted-foreground"
+                    className="text-muted-foreground text-sm leading-[22px]"
                     style={{ fontFamily: 'Manrope_500Medium' }}>
                     Quantum-resistant encryption layers ensuring your cognitive data remains yours
                     alone.
