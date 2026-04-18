@@ -11,9 +11,17 @@ type GradientTextProps = {
   className?: string;
   /** Merged into mask + gradient text (e.g. size, letterSpacing, shadow). */
   textStyle?: TextStyle;
+  /** Wraps the MaskedView; default `self-start`. Use `self-center` in horizontal brand rows. */
+  outerClassName?: string;
 };
 
-export function GradientText({ children, variant, className, textStyle }: GradientTextProps) {
+export function GradientText({
+  children,
+  variant,
+  className,
+  textStyle,
+  outerClassName,
+}: GradientTextProps) {
   const { colorScheme } = useColorScheme();
   const scheme = colorScheme ?? 'dark';
   const t = THEME[scheme];
@@ -24,7 +32,7 @@ export function GradientText({ children, variant, className, textStyle }: Gradie
       : ([t.primary, t.secondary, t.tertiary] as const);
 
   return (
-    <View className="self-start">
+    <View className={cn('self-start', outerClassName)}>
       <MaskedView
         maskElement={
           <Text

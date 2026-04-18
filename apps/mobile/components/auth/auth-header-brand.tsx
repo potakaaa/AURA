@@ -2,23 +2,32 @@ import { AuraLogo } from '@/components/brand/aura-logo';
 import { AppTopBar } from '@/components/common';
 import { GradientText } from '@/components/welcome/gradient-text';
 import { THEME } from '@/lib/theme';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
+
+type AuthHeaderBrandProps = {
+  /** Bar fill; defaults to theme surface dim. */
+  backgroundColor?: string;
+};
 
 /**
- * App top bar: raster mark + “AURA” wordmark in one row, centered on the full bar
- * (avoids skew from `justify-between` + empty trailing slot).
+ * App top bar: raster mark + “AURA” wordmark in one row, centered on the bar.
+ * Uses `trailing={false}` so the bar is a single flex row (no empty trailing slot skew).
  */
-export function AuthHeaderBrand() {
+export function AuthHeaderBrand({
+  backgroundColor = THEME.dark.surfaceDim,
+}: AuthHeaderBrandProps) {
   return (
     <AppTopBar
-      backgroundColor={THEME.dark.surfaceDim}
+      backgroundColor={backgroundColor}
+      trailing={false}
       leading={
-        <View
-          pointerEvents="box-none"
-          style={StyleSheet.absoluteFillObject}
-          className="flex-row items-center justify-center gap-2">
+        <View className="flex-row items-center justify-center gap-2">
           <AuraLogo width={36} height={32} />
-          <GradientText variant="aura" className="text-2xl font-black tracking-tighter">
+          <GradientText
+            variant="aura"
+            className="text-2xl font-black tracking-tighter"
+            outerClassName="self-center"
+          >
             AURA
           </GradientText>
         </View>
