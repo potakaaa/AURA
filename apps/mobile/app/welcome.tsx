@@ -1,4 +1,5 @@
-import { APP_TOP_BAR_INNER_HEIGHT, AppTopBar } from '@/components/common';
+import { AuthHeaderBrand } from '@/components/auth/auth-header-brand';
+import { APP_TOP_BAR_INNER_HEIGHT } from '@/components/common';
 import { GradientText } from '@/components/welcome/gradient-text';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
@@ -27,7 +28,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
-import { ChevronRight, Lock, Network, Settings, Sparkles, User } from 'lucide-react-native';
+import { ChevronRight, Lock, Network, Sparkles } from 'lucide-react-native';
 
 const HERO_IMAGE = require('@/assets/images/welcome_onboarding_image.png');
 
@@ -132,27 +133,7 @@ export default function WelcomeScreen() {
     <View className="flex-1" style={{ backgroundColor: BG_BASE }}>
       <WelcomeRadialBackground width={width} height={height} />
 
-      <AppTopBar
-        backgroundColor={BG_BASE}
-        leading={
-          <View className="flex-row items-center gap-4">
-            <View className="h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/[0.04]">
-              <Icon as={User} size={20} className="text-on-surface-variant" />
-            </View>
-            <GradientText variant="aura" className="text-2xl font-black tracking-tighter">
-              AURA
-            </GradientText>
-          </View>
-        }
-        trailing={
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Settings"
-            className="active:opacity-80">
-            <Icon as={Settings} size={28} className="text-muted-foreground" />
-          </Pressable>
-        }
-      />
+      <AuthHeaderBrand backgroundColor={BG_BASE} />
 
       <ScrollView
         ref={scrollRef}

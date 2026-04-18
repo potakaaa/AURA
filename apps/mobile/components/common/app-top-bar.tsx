@@ -24,7 +24,10 @@ export type AppTopBarProps = {
   /** Solid bar background (opaque). */
   backgroundColor?: string;
   leading?: ReactNode;
-  trailing?: ReactNode;
+  /**
+   * Trailing slot. Pass `false` for a single centered row (e.g. auth brand) with no second column.
+   */
+  trailing?: ReactNode | false;
 } & Pick<ViewProps, 'className' | 'style'>;
 
 /**
@@ -39,6 +42,7 @@ export function AppTopBar({
   style,
 }: AppTopBarProps) {
   const insets = useSafeAreaInsets();
+  const centerOnly = trailing === false;
 
   return (
     <View
@@ -50,9 +54,19 @@ export function AppTopBar({
         locations={[0, 1]}
         style={styles.topSheen}
       />
-      <View className="relative h-20 flex-row items-center justify-between">
-        {leading ?? <View />}
-        {trailing ?? <View />}
+      <View
+        className={cn(
+          'relative h-20 flex-row items-center',
+          centerOnly ? 'justify-center' : 'justify-between'
+        )}>
+        {centerOnly ? (
+          (leading ?? <View />)
+        ) : (
+          <>
+            {leading ?? <View />}
+            {trailing ?? <View />}
+          </>
+        )}
       </View>
       <LinearGradient
         pointerEvents="none"

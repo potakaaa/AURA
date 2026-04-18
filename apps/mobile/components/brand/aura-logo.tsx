@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Image, type ImageProps, type ImageStyle, type StyleProp } from 'react-native';
 
-const LOGO = require('@/assets/images/aura_logo.png');
+const LOGO = require('@/assets/images/logo/png/aura_logo_512x512.png');
 
 export type AuraLogoProps = Omit<ImageProps, 'source'> & {
   /** Default width in logical pixels. */
@@ -10,7 +10,7 @@ export type AuraLogoProps = Omit<ImageProps, 'source'> & {
 };
 
 /**
- * Raster AURA mark from `assets/images/aura_logo.png`. Pass `style` or `width`/`height` to scale.
+ * Raster AURA mark from `assets/images/logo/png/aura_logo_512x512.png`. Pass `style` or `width`/`height` to scale.
  */
 export function AuraLogo({
   width = 36,

@@ -28,7 +28,7 @@ export default function SignupScreen() {
           <View className="mt-10 w-full items-center px-2">
             <Text
               className="w-full text-center text-sm text-muted-foreground"
-              style={{ fontFamily: 'Manrope_500Medium' }}>
+              style={{ fontFamily: 'Manrope_500Medium', textAlign: 'center' }}>
               Already have an account?{' '}
               <Text
                 accessibilityRole="link"
