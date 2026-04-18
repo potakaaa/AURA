@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AURA - Learn More</title>
+<!-- Google Fonts: Manrope -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed": "#c384ff",
+                    "tertiary-dim": "#e30071",
+                    "tertiary": "#ff6a9c",
+                    "error-dim": "#d73357",
+                    "outline": "#73757a",
+                    "inverse-primary": "#8722db",
+                    "tertiary-fixed": "#ff8eaf",
+                    "background": "#0c0e12",
+                    "surface-bright": "#282c32",
+                    "on-primary-fixed-variant": "#440076",
+                    "secondary-fixed-dim": "#48d3fb",
+                    "surface-container-highest": "#22262b",
+                    "on-primary": "#47007b",
+                    "tertiary-fixed-dim": "#ff75a1",
+                    "surface-container-high": "#1c2025",
+                    "surface": "#0c0e12",
+                    "primary-container": "#c384ff",
+                    "on-primary-fixed": "#000000",
+                    "on-primary-container": "#360061",
+                    "on-background": "#f8f9fe",
+                    "on-secondary-fixed-variant": "#00586d",
+                    "primary-dim": "#9e42f2",
+                    "on-tertiary-container": "#000000",
+                    "on-surface-variant": "#a9abb0",
+                    "on-error": "#490013",
+                    "secondary": "#4cd6fe",
+                    "on-tertiary-fixed": "#380017",
+                    "surface-variant": "#22262b",
+                    "primary": "#cc97ff",
+                    "inverse-surface": "#f8f9fe",
+                    "primary-fixed-dim": "#b970ff",
+                    "error-container": "#a70138",
+                    "inverse-on-surface": "#535559",
+                    "surface-dim": "#0c0e12",
+                    "on-tertiary-fixed-variant": "#760038",
+                    "error": "#ff6e84",
+                    "tertiary-container": "#ff0580",
+                    "secondary-fixed": "#7edeff",
+                    "surface-container": "#171a1e",
+                    "secondary-dim": "#37c8ef",
+                    "on-surface": "#f8f9fe",
+                    "on-error-container": "#ffb2b9",
+                    "surface-container-lowest": "#000000",
+                    "on-secondary-container": "#eefaff",
+                    "on-secondary": "#004657",
+                    "outline-variant": "#46484c",
+                    "surface-container-low": "#111417",
+                    "on-tertiary": "#47001f",
+                    "secondary-container": "#00677f",
+                    "on-secondary-fixed": "#003a48",
+                    "surface-tint": "#cc97ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope", "sans-serif"],
+                    "body": ["Manrope", "sans-serif"],
+                    "label": ["Manrope", "sans-serif"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for an ethereal feel */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #22262b;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #46484c;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-dim text-on-surface font-body overflow-x-hidden antialiased selection:bg-primary-dim selection:text-white relative min-h-screen">
+<!-- The "Intelligence Orb" - Ambient Background Elements -->
+<div class="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-br from-primary/10 to-transparent blur-[120px] pointer-events-none -z-10"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-tl from-secondary/10 to-transparent blur-[120px] pointer-events-none -z-10"></div>
+<!-- TopAppBar (JSON Driven) -->
+<header class="fixed top-0 w-full z-50 bg-[#05070A]/80 backdrop-blur-xl transition via surface-container-low shadow-[0_0_40px_rgba(142,45,226,0.1)] flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#8E2DE2] text-2xl" data-icon="blur_on" data-weight="fill" style="font-variation-settings: 'FILL' 1;">blur_on</span>
+<span class="font-manrope tracking-tight font-bold text-2xl tracking-tighter text-[#8E2DE2]">AURA</span>
+</div>
+<!-- Close button contextual to the "task-focused/sub-page" nature -->
+<button class="text-[#a9abb0] hover:text-[#8E2DE2] transition-colors scale-95 duration-200 tap-highlight-transparent active:scale-90 flex items-center justify-center h-10 w-10 rounded-full bg-surface-container-low/50">
+<span class="material-symbols-outlined text-xl" data-icon="close">close</span>
+</button>
+</header>
+<!-- Main Scrollable Canvas -->
+<main class="pt-32 pb-40 px-6 max-w-5xl mx-auto flex flex-col gap-24 relative z-10">
+<!-- Hero Editorial Section -->
+<section class="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container-low border border-outline-variant/15 text-primary text-xs font-label uppercase tracking-[0.05em] mb-4 shadow-[0_0_20px_rgba(204,151,255,0.05)]">
+<span class="material-symbols-outlined text-sm" data-icon="auto_awesome">auto_awesome</span>
+                The Ambient Oracle
+            </div>
+<h1 class="font-headline text-5xl md:text-7xl font-extrabold tracking-[-0.02em] leading-tight text-transparent bg-clip-text bg-gradient-to-br from-on-surface via-inverse-surface to-on-surface-variant">
+                Beyond an Interface. <br/> A Living Entity.
+            </h1>
+<p class="font-body text-lg md:text-xl text-on-surface-variant leading-relaxed max-w-2xl mt-2">
+                AURA discards the rigid grids of the past. Discover a fluid, predictive ecosystem that adapts to your cognitive patterns before you even formulate a query.
+            </p>
+</section>
+<!-- Feature 1: Neural Sync -->
+<section class="flex flex-col md:flex-row items-center gap-12 group">
+<div class="w-full md:w-1/2 relative">
+<!-- Ambient Glow behind card -->
+<div class="absolute inset-0 bg-primary/20 blur-[60px] rounded-full scale-75 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+<div class="relative w-full aspect-square rounded-[3rem] overflow-hidden border border-outline-variant/15 bg-surface-container-low p-2 shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+<img alt="Abstract visual representation of glowing purple and cyan neural pathways" class="w-full h-full object-cover rounded-[2.5rem] opacity-80 mix-blend-screen transition-transform duration-1000 group-hover:scale-105" data-alt="Abstract macro shot of glowing ethereal liquid in dark space with sharp purple and cyan refractions" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_NMOLAK-d8KgW5-X6o3unewpESm-sNx6dJQJOPqL2yV5s2TOctTl2MUa1HNEdKYjqMUxQ3_eyCa5nZTJzh7O5g-45RpylkHLHWJTVZtH_EHhX3bp37rrmT2WsPwL72r4hCMRt3fi1u7L7TJ1nN6eyVkCaGYOAmNES5a39cMdSzcaW5N-WKZ5mgx8Xny_rYS6_KKGKmzl86emR9yq0-zX-8Wt0oI07T2ZTBA51jTELjvbXtdc-YnLvcKjaK2EjtFHQi9nyGjjh8Q1J"/>
+</div>
+</div>
+<div class="w-full md:w-1/2 flex flex-col gap-6">
+<div class="w-16 h-16 rounded-full bg-surface-container-high border border-outline-variant/15 flex items-center justify-center shadow-[0_0_30px_rgba(204,151,255,0.1)]">
+<span class="material-symbols-outlined text-3xl text-primary" data-icon="psychology">psychology</span>
+</div>
+<h2 class="font-headline text-3xl md:text-4xl font-bold tracking-tight text-on-surface">Neural Sync</h2>
+<p class="font-body text-on-surface-variant text-lg leading-[1.6]">
+                    Experience real-time cognitive alignment. AURA doesn't wait for your input; it reads the contextual cues of your workflow, surfacing data, assets, and pathways exactly when your mind reaches for them.
+                </p>
+<ul class="flex flex-col gap-4 mt-2">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary mt-1 text-xl" data-icon="trip_origin">trip_origin</span>
+<span class="text-on-surface-variant">Predictive asset staging based on historical usage.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary mt-1 text-xl" data-icon="trip_origin">trip_origin</span>
+<span class="text-on-surface-variant">Zero-latency state transitions.</span>
+</li>
+</ul>
+</div>
+</section>
+<!-- Feature 2: Ambient Intelligence (Asymmetric right-aligned) -->
+<section class="flex flex-col md:flex-row-reverse items-center gap-12 group">
+<div class="w-full md:w-1/2 relative">
+<div class="absolute inset-0 bg-secondary/20 blur-[60px] rounded-full scale-75 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+<div class="relative w-full aspect-[4/3] rounded-[3rem] overflow-hidden border border-outline-variant/15 bg-surface-container-low p-2 shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+<img alt="Cybernetic conceptual visualization" class="w-full h-full object-cover rounded-[2.5rem] opacity-70 transition-transform duration-1000 group-hover:scale-105" data-alt="Dark moody visualization of a glowing cyan geometric sphere floating over a reflective black surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDl6nAAHHM9NgAuZILRz1LYNytLYpI7M7yDtKys5ZGDIIsb3qr2sdftpm04RGrIEA-2cN28hSItsKqvynxjz7cXMUelRwsIummN7Ui0-wfVPc-eFxVtfaaupmI1StGHUrhSP2mstY4F2TqakIS7etGuZMxjybSDHAfqTASj7GyshBvdMhaqQ_XIfMxj9EV6VkEKQlMnw1NmJcnYEru-sdVXSOo8o7TrjkArRIn4fTcRvTKzOfZQb75d3a9-A6WvCoy85CotZsfdXXrJ"/>
+</div>
+</div>
+<div class="w-full md:w-1/2 flex flex-col gap-6 md:pr-8">
+<div class="w-16 h-16 rounded-full bg-surface-container-high border border-outline-variant/15 flex items-center justify-center shadow-[0_0_30px_rgba(76,214,254,0.1)]">
+<span class="material-symbols-outlined text-3xl text-secondary" data-icon="all_inclusive">all_inclusive</span>
+</div>
+<h2 class="font-headline text-3xl md:text-4xl font-bold tracking-tight text-on-surface">Ambient Intelligence</h2>
+<p class="font-body text-on-surface-variant text-lg leading-[1.6]">
+                    Your digital life, proactively managed. Operating silently in the background layer (`surface-container-lowest`), AURA organizes the chaos, distilling complex datasets into ethereal, actionable insights that appear only when relevant.
+                </p>
+<div class="mt-4 p-6 rounded-2xl bg-surface-container-high border border-outline-variant/15 flex flex-col gap-2 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
+<p class="font-label text-xs uppercase tracking-[0.05em] text-secondary">System Status</p>
+<p class="text-on-surface font-headline font-bold">14 Background Processes Optimized</p>
+</div>
+</div>
+</section>
+<!-- Feature 3: Vault Secure (Bento Full Width Hybrid) -->
+<section class="flex flex-col gap-8 group">
+<div class="flex flex-col items-center text-center gap-4 max-w-2xl mx-auto">
+<div class="w-16 h-16 rounded-full bg-surface-container-high border border-outline-variant/15 flex items-center justify-center shadow-[0_0_30px_rgba(255,106,156,0.1)]">
+<span class="material-symbols-outlined text-3xl text-tertiary" data-icon="fingerprint">fingerprint</span>
+</div>
+<h2 class="font-headline text-3xl md:text-4xl font-bold tracking-tight text-on-surface">Vault Secure</h2>
+<p class="font-body text-on-surface-variant text-lg leading-[1.6]">
+                    Impenetrable. Biometrically encrypted. Your personal dataset is locked within a quantum-resistant architecture, shielded by tonal layers of security.
+                </p>
+</div>
+<div class="w-full relative h-[400px] rounded-[3rem] overflow-hidden border border-outline-variant/15 bg-surface-container-low mt-4 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-dim via-transparent to-transparent z-10 pointer-events-none"></div>
+<img alt="Abstract representation of digital security" class="w-full h-full object-cover opacity-60" data-alt="Extreme close up of intricate dark metallic microchip textures illuminated by subtle neon pink edge lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvzWAabZ1csKpwhhRQ_dJYRCE32jfpPADHeQrbwiAtlKYMbvrlvNcPiUj5-enkwnIW1V6Mra1moj717Y3cNFEmHVNey57Bu3CH8GpopqOpG1TOmKinw-e9cWt48du-xYezDeGq8Wi2TzKnfILS5lflYRN_bCd9FNn3Ncuz11wWpBmfUO8OcUjcP3-NCvmTDDApDiBV5EOJMFn4kaB4YttaguVj8dR6dClPnWq1gt4zG6JuLx-kYoA9odqPBQBkzvAJff3T_VoIK27F"/>
+<!-- Glassmorphic floating element inside the card -->
+<div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-[90%] md:w-auto min-w-[300px] p-6 rounded-[2rem] bg-surface-bright/60 backdrop-blur-3xl border border-outline-variant/20 flex items-center justify-between gap-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-tertiary/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="lock" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline font-bold text-on-surface">End-to-End Encrypted</span>
+<span class="font-label text-xs text-on-surface-variant uppercase tracking-widest">Active Status</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant animate-pulse" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Action -->
+<footer class="fixed bottom-0 w-full z-40 bg-gradient-to-t from-surface-dim via-surface-dim/90 to-transparent pb-12 pt-24 px-6 flex justify-center pointer-events-none">
+<button class="pointer-events-auto group relative px-8 py-4 rounded-full bg-primary text-on-primary font-headline font-bold text-lg tracking-wide transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-[0_0_20px_rgba(204,151,255,0.2)] hover:shadow-[0_0_40px_rgba(204,151,255,0.5)] flex items-center gap-3 overflow-hidden">
+<!-- Button inner glow -->
+<div class="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+<span class="material-symbols-outlined text-xl" data-icon="arrow_back">arrow_back</span>
+            Back to Start
+        </button>
+</footer>
+</body></html>
