@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AURA - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#47007b",
+                        "on-error-container": "#ffb2b9",
+                        "secondary-fixed-dim": "#48d3fb",
+                        "secondary-fixed": "#7edeff",
+                        "primary": "#cc97ff",
+                        "inverse-on-surface": "#535559",
+                        "outline": "#73757a",
+                        "primary-dim": "#9e42f2",
+                        "primary-fixed": "#c384ff",
+                        "on-tertiary-fixed-variant": "#760038",
+                        "surface-bright": "#282c32",
+                        "surface-container-high": "#1c2025",
+                        "on-secondary": "#004657",
+                        "primary-container": "#c384ff",
+                        "on-primary-fixed-variant": "#440076",
+                        "on-background": "#f8f9fe",
+                        "on-secondary-fixed-variant": "#00586d",
+                        "on-primary-container": "#360061",
+                        "error-container": "#a70138",
+                        "surface-container-lowest": "#000000",
+                        "surface": "#0c0e12",
+                        "surface-container-highest": "#22262b",
+                        "tertiary": "#ff6a9c",
+                        "surface-dim": "#0c0e12",
+                        "secondary-dim": "#37c8ef",
+                        "error": "#ff6e84",
+                        "on-primary-fixed": "#000000",
+                        "on-surface": "#f8f9fe",
+                        "error-dim": "#d73357",
+                        "on-surface-variant": "#a9abb0",
+                        "background": "#0c0e12",
+                        "tertiary-container": "#ff0580",
+                        "surface-container": "#171a1e",
+                        "secondary": "#4cd6fe",
+                        "surface-container-low": "#111417",
+                        "on-secondary-container": "#eefaff",
+                        "surface-tint": "#cc97ff",
+                        "inverse-surface": "#f8f9fe",
+                        "outline-variant": "#46484c",
+                        "on-tertiary": "#47001f",
+                        "surface-variant": "#22262b",
+                        "tertiary-fixed": "#ff8eaf",
+                        "on-error": "#490013",
+                        "on-tertiary-fixed": "#380017",
+                        "on-tertiary-container": "#000000",
+                        "tertiary-fixed-dim": "#ff75a1",
+                        "primary-fixed-dim": "#b970ff",
+                        "tertiary-dim": "#e30071",
+                        "on-secondary-fixed": "#003a48",
+                        "secondary-container": "#00677f",
+                        "inverse-primary": "#8722db"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        
+        /* Custom styles for glowing inputs */
+        .glass-input:focus {
+            box-shadow: 0 0 10px 2px rgba(204, 151, 255, 0.3);
+            border-color: #cc97ff !important;
+            outline: none;
+        }
+
+        /* Ambient Orb Animation Simulation (Static for this prompt) */
+        .ambient-orb {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(204,151,255,0.15) 0%, rgba(76,214,254,0.05) 50%, rgba(12,14,18,0) 70%);
+            filter: blur(40px);
+            z-index: -1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+<!-- Ambient Background Elements -->
+<div class="ambient-orb top-[-10%] left-[-10%] mix-blend-screen"></div>
+<div class="ambient-orb bottom-[-20%] right-[-10%] mix-blend-screen" style="background: radial-gradient(circle, rgba(76,214,254,0.15) 0%, rgba(204,151,255,0.05) 50%, rgba(12,14,18,0) 70%); width: 500px; height: 500px;"></div>
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full flex items-center justify-between px-8 h-20 bg-transparent z-50">
+<div class="flex items-center gap-3 text-primary transition-opacity hover:opacity-80">
+<img alt="AURA Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ADBb0ugJ3VmM5jYc26E_8vFLAq6ilxIPiFf1XMxkoX1Nqq3WVxsA7RuieDgX4t70A6OvQCUfvnNIiIOgY7n5vqce9RuZOKUhKceu5SJTC3M9di991oPAXivbb__WjYLq6eAP1uNWemeqg-nagHN4b_gcEDpU-x9AnPiLZ7tzoNvLnbAH4aqjGFH6omedZ9Vuu4yh8WeufxOVz1pgXGbDTzGwssbuvKGWNajVG0fqz8Gso7FR4sl2DVNSTHQSEaEZxtwRpBgYwiZiM2biAlM"/>
+</div>
+<div class="font-['Manrope'] tracking-tight">
+<h1 class="text-2xl font-bold tracking-[0.2em] text-primary">AURA</h1>
+</div>
+<div class="w-[30px]"></div> <!-- Spacer for center alignment -->
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-md px-6 py-12 z-10 mt-16 relative">
+<!-- Header Section -->
+<div class="text-center mb-10">
+<h2 class="font-headline text-[3.5rem] leading-tight font-extrabold tracking-[-0.02em] mb-2 text-on-surface">Welcome Back</h2>
+<p class="font-body text-on-surface-variant text-lg">Enter your details to access your sanctuary.</p>
+</div>
+<!-- Form Container -->
+<form class="space-y-6">
+<!-- Email Input -->
+<div class="relative group">
+<label class="absolute -top-3 left-6 bg-surface px-2 text-xs font-label uppercase tracking-[0.05em] text-on-surface-variant z-10 group-focus-within:text-primary transition-colors" for="email">Email Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-6 top-1/2 transform -translate-y-1/2 text-on-surface-variant">mail</span>
+<input class="glass-input w-full bg-surface-container-high border border-outline-variant/15 rounded-full py-4 pl-14 pr-6 text-on-surface placeholder-on-surface-variant/50 transition-all duration-300" id="email" placeholder="hello@aura.io" required="" type="email"/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="relative group">
+<label class="absolute -top-3 left-6 bg-surface px-2 text-xs font-label uppercase tracking-[0.05em] text-on-surface-variant z-10 group-focus-within:text-primary transition-colors" for="password">Password</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-6 top-1/2 transform -translate-y-1/2 text-on-surface-variant">lock</span>
+<input class="glass-input w-full bg-surface-container-high border border-outline-variant/15 rounded-full py-4 pl-14 pr-6 text-on-surface placeholder-on-surface-variant/50 transition-all duration-300" id="password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute right-6 top-1/2 transform -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Forgot Password Link -->
+<div class="flex justify-end">
+<a class="text-sm font-label text-secondary hover:text-secondary-fixed transition-colors" href="#">Recover Password?</a>
+</div>
+<!-- Primary CTA -->
+<button class="w-full bg-primary text-on-primary rounded-full py-4 font-bold text-lg hover:shadow-[0_0_15px_rgba(204,151,255,0.4)] transition-all duration-300 transform hover:scale-[1.02]" type="submit">
+                Sign In
+            </button>
+</form>
+<!-- Divider -->
+<div class="flex items-center my-8">
+<div class="flex-grow h-px bg-outline-variant/20"></div>
+<span class="px-4 text-xs font-label uppercase tracking-widest text-on-surface-variant">Or continue with</span>
+<div class="flex-grow h-px bg-outline-variant/20"></div>
+</div>
+<!-- Social & Biometric Login -->
+<div class="grid grid-cols-3 gap-4">
+<button class="flex items-center justify-center bg-surface-container-high border border-outline-variant/15 rounded-full py-4 hover:border-primary/50 transition-colors group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">fingerprint</span>
+</button>
+<button class="flex items-center justify-center bg-surface-container-high border border-outline-variant/15 rounded-full py-4 hover:border-primary/50 transition-colors group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">account_circle</span>
+</button>
+<button class="flex items-center justify-center bg-surface-container-high border border-outline-variant/15 rounded-full py-4 hover:border-primary/50 transition-colors group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">devices</span>
+</button>
+</div>
+<!-- Switch State -->
+<div class="mt-12 text-center">
+<p class="text-on-surface-variant text-sm font-body">
+                Don't have an account? 
+                <a class="text-primary font-bold hover:underline underline-offset-4 decoration-primary/50 transition-all" href="#">Join AURA</a>
+</p>
+</div>
+</main>
+</body></html>
