@@ -2,6 +2,7 @@ import { DatabaseInitializationError } from './errors';
 import { runMigrations } from './migrations';
 import type { QueryExecutor, RunResult, SqlParams } from './types';
 import { DbKeyError, getOrCreateDbKey } from '../utils/crypto';
+import * as SQLite from 'expo-sqlite';
 
 export { DatabaseInitializationError } from './errors';
 
@@ -74,7 +75,7 @@ export async function initDatabase(options: InitDatabaseOptions = {}): Promise<Q
   }
 
   const logger = options.logger ?? console;
-  const sqliteModule = options.sqliteModule ?? (await import('expo-sqlite'));
+  const sqliteModule = options.sqliteModule ?? SQLite;
   const dbName = options.dbName ?? DEFAULT_DB_NAME;
   const useUnencryptedDb = options.useUnencryptedDb ?? false;
 

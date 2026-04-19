@@ -1,3 +1,6 @@
+import * as Crypto from 'expo-crypto';
+import * as SecureStore from 'expo-secure-store';
+
 const DB_KEY_ALIAS = 'aura.db.encryptionKey.v1';
 const DB_KEY_BYTES = 32;
 
@@ -22,18 +25,15 @@ export interface RandomBytesProvider {
 
 export const defaultSecureStoreAdapter: SecureStoreAdapter = {
   async getItem(key: string): Promise<string | null> {
-    const SecureStore = await import('expo-secure-store');
     return SecureStore.getItemAsync(key);
   },
   async setItem(key: string, value: string): Promise<void> {
-    const SecureStore = await import('expo-secure-store');
     await SecureStore.setItemAsync(key, value);
   },
 };
 
 export const defaultRandomBytesProvider: RandomBytesProvider = {
   async getRandomBytes(byteCount: number): Promise<Uint8Array> {
-    const Crypto = await import('expo-crypto');
     return Crypto.getRandomBytesAsync(byteCount);
   },
 };

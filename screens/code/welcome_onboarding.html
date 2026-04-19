@@ -1,6 +1,6 @@
-<html class="dark" lang="en"><head></head><body class="min-h-screen flex flex-col selection:bg-primary selection:text-on-primary w-full overflow-x-hidden m-0 p-0">```html
-
-
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>AURA | Experience Intelligence Unbound</title>
@@ -107,6 +107,8 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
     </style>
+    </head>
+    <body class="min-h-screen flex flex-col selection:bg-primary selection:text-on-primary w-full overflow-x-hidden m-0 p-0">
 <div class="intelligence-orb" style="position: absolute; width: 100vw; height: 600px; background: radial-gradient(circle, rgba(142,45,226,0.3) 0%, rgba(0,180,219,0.1) 50%, transparent 70%); filter: blur(80px); z-index: -1; top: -100px; right: 0;"></div>
 <div class="intelligence-orb" style="bottom: -200px; left: -200px; background: radial-gradient(circle, rgba(255,0,128,0.15) 0%, transparent 70%);"></div>
 <header class="bg-slate-950/60 backdrop-blur-xl fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 h-20 shadow-[0_0_40px_-15px_rgba(142,45,226,0.15)]">
@@ -136,9 +138,9 @@
 <button class="w-full sm:w-auto bg-primary text-on-primary-fixed font-bold py-4 px-10 rounded-full hover:shadow-[0_0_20px_rgba(204,151,255,0.4)] transition-all active:scale-95 duration-200">
                 Get Started
             </button>
-<button class="w-full sm:w-auto glass-card text-on-surface py-4 px-10 rounded-full border border-white/10 hover:bg-white/5 transition-all active:scale-95 duration-200">
-                Learn More
-            </button>
+<a href="./learn_more.html" id="learn-more-link" class="w-full sm:w-auto glass-card text-on-surface py-4 px-10 rounded-full border border-white/10 hover:bg-white/5 transition-all active:scale-95 duration-200 text-center">
+        Learn More
+      </a>
 </div>
 </div>
 <div class="w-full flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -194,4 +196,11 @@
 </div>
 </div>
 </div>
-```</body></html>
+<script>
+  document.getElementById('learn-more-link')?.addEventListener('click', function (event) {
+    event.preventDefault();
+    window.location.href = './learn_more.html';
+  });
+</script>
+</body>
+</html>
