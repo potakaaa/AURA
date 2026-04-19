@@ -9,6 +9,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 /** Height of the inner row (`h-20`) — use with `insets.top` to offset scroll content below the bar. */
 export const APP_TOP_BAR_INNER_HEIGHT = 80;
 
+/** Total top padding for content below {@link AppTopBar} (safe area + inner row). */
+export function appTopBarOffsetTop(insetsTop: number): number {
+  return insetsTop + APP_TOP_BAR_INNER_HEIGHT;
+}
+
 const BAR_SHADOW = Platform.select({
   ios: {
     shadowColor: THEME.dark.onPrimaryFixed,

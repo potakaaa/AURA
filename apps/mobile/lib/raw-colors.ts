@@ -64,7 +64,7 @@ export function rgbaWhite(alpha: number): string {
   return `rgba(255, 255, 255, ${alpha})`;
 }
 
-type DarkRgbKey = 'primary' | 'secondary' | 'surfaceDim';
+type DarkRgbKey = 'primary' | 'secondary' | 'surfaceDim' | 'inversePrimary';
 
 function commaRgbFromTheme(key: DarkRgbKey): string {
   const rgb = parseCssColorToRgb(THEME.dark[key]);
@@ -104,4 +104,12 @@ export const WELCOME = {
 /** Android ripple tints where `android_ripple` needs a literal. */
 export const RIPPLE = {
   onPrimary: 'rgba(20, 8, 31, 0.25)',
+} as const;
+
+/** Voice Hub one-offs (orbs, session card gradient) — keep literals here for `check-no-hardcoded-colors`. */
+export const VOICE_HUB = {
+  focusSessionGradient: [`rgba(${PRIMARY_RGB},0.22)`, `rgba(${SECONDARY_RGB},0.18)`] as const,
+  orbRingOuter: `rgba(${PRIMARY_RGB},0.12)`,
+  orbRingInner: `rgba(${SECONDARY_RGB},0.08)`,
+  sessionCardBorder: rgbaWhite(0.06),
 } as const;

@@ -1,38 +1,80 @@
-import { AuraButton } from '@/components/ui/aura-button';
-import { AuraCard } from '@/components/ui/aura-card';
+import {
+  VoiceHubOrb,
+  VoiceHubQuickAction,
+  VoiceHubQuickActionsRow,
+  VoiceHubRadialBackground,
+  VoiceHubStateSection,
+  VOICE_HUB_TAB_CONTENT_INSET,
+} from '@/components/voice-hub';
+import { AuthenticatedAppTopBar, appTopBarOffsetTop } from '@/components/common';
 import { AuraScreen } from '@/components/ui/aura-screen';
-import { AuraTopBar } from '@/components/ui/aura-top-bar';
-import { Text } from '@/components/ui/text';
-import { Sparkles } from 'lucide-react-native';
-import { router } from 'expo-router';
-import { View } from 'react-native';
+import { THEME } from '@/lib/theme';
+import { GradientText } from '@/components/welcome/gradient-text';
+import { Calendar, FileText, Mail } from 'lucide-react-native';
+import { ScrollView, useWindowDimensions, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export default function HomeScreen() {
+const BG = THEME.dark.surfaceDim;
+
+export default function VoiceHubScreen() {
+  const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
+  const topPad = appTopBarOffsetTop(insets.top);
+  const bottomPad = VOICE_HUB_TAB_CONTENT_INSET + insets.bottom;
+
   return (
     <AuraScreen>
-      <View className="flex-1 bg-background">
-        <AuraTopBar
-          title="AURA"
-          actionLabel="Preview"
-          actionIcon={Sparkles}
-          onActionPress={() => router.push('/(tabs)/preview')}
-        />
-        <View className="flex-1 gap-4 px-5 pb-6 pt-3">
-          <AuraCard
-            tone="high"
-            title="Ambient Intelligence"
-            description="The foundational app shell is now themed and reusable.">
-            <Text variant="body" className="text-muted-foreground">
-              This surface is intentionally card-first and line-free to match the design system.
-            </Text>
-          </AuraCard>
+      <View className="flex-1" style={{ backgroundColor: BG }}>
+        <VoiceHubRadialBackground width={width} height={height} />
 
-          <AuraButton
-            label="Open Component Preview"
-            auraVariant="secondary"
-            onPress={() => router.push('/(tabs)/preview')}
-          />
-        </View>
+        <AuthenticatedAppTopBar backgroundColor={BG} />
+
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{
+            paddingTop: topPad,
+            paddingBottom: bottomPad,
+            paddingHorizontal: 24,
+          }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}>
+          <View className="w-full max-w-2xl gap-10 self-center">
+            <View className="items-center gap-8">
+              <VoiceHubOrb />
+
+              <View className="w-full items-center gap-6">
+                <GradientText
+                  variant="surfaceHeadline"
+                  className="text-center text-4xl font-extrabold leading-tight tracking-tight"
+                  outerClassName="self-center px-1"
+                  textStyle={{ fontFamily: 'Manrope_800ExtraBold' }}>
+                  How can I assist your focus today?
+                </GradientText>
+
+                <VoiceHubQuickActionsRow>
+                  <VoiceHubQuickAction
+                    label="Summarize emails"
+                    icon={Mail}
+                    iconClassName="text-primary"
+                  />
+                  <VoiceHubQuickAction
+                    label="Schedule my day"
+                    icon={Calendar}
+                    iconClassName="text-secondary"
+                  />
+                  <VoiceHubQuickAction
+                    label="Generate briefing"
+                    icon={FileText}
+                    iconClassName="text-tertiary"
+                  />
+                </VoiceHubQuickActionsRow>
+              </View>
+            </View>
+
+            <VoiceHubStateSection />
+            <View className="h-2" />
+          </View>
+        </ScrollView>
       </View>
     </AuraScreen>
   );
