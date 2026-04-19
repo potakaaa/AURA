@@ -1,8 +1,25 @@
-import * as Crypto from 'expo-crypto';
-import * as SecureStore from 'expo-secure-store';
-
 const DB_KEY_ALIAS = 'aura.db.encryptionKey.v1';
 const DB_KEY_BYTES = 32;
+
+type SecureStoreModule = typeof import('expo-secure-store');
+type CryptoModule = typeof import('expo-crypto');
+
+let secureStoreModule: SecureStoreModule | null = null;
+let cryptoModule: CryptoModule | null = null;
+
+function getSecureStoreModule(): SecureStoreModule {
+  if (!secureStoreModule) {
+    secureStoreModule = require('expo-secure-store') as SecureStoreModule;
+  }
+  return secureStoreModule;
+}
+
+function getCryptoModule(): CryptoModule {
+  if (!cryptoModule) {
+    cryptoModule = require('expo-crypto') as CryptoModule;
+  }
+  return cryptoModule;
+}
 
 export class DbKeyError extends Error {
   constructor(message: string, options?: { cause?: unknown }) {
@@ -25,16 +42,16 @@ export interface RandomBytesProvider {
 
 export const defaultSecureStoreAdapter: SecureStoreAdapter = {
   async getItem(key: string): Promise<string | null> {
-    return SecureStore.getItemAsync(key);
+    return getSecureStoreModule().getItemAsync(key);
   },
   async setItem(key: string, value: string): Promise<void> {
-    await SecureStore.setItemAsync(key, value);
+    await getSecureStoreModule().setItemAsync(key, value);
   },
 };
 
 export const defaultRandomBytesProvider: RandomBytesProvider = {
   async getRandomBytes(byteCount: number): Promise<Uint8Array> {
-    return Crypto.getRandomBytesAsync(byteCount);
+    return getCryptoModule().getRandomBytesAsync(byteCount);
   },
 };
 

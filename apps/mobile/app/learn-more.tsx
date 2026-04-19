@@ -1,5 +1,6 @@
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { LEARN_MORE } from '@/lib/raw-colors';
 import { THEME } from '@/lib/theme';
 import { router } from 'expo-router';
 import { ArrowLeft, CheckCircle2, Fingerprint, Infinity, Lock, Sparkles, X } from 'lucide-react-native';
@@ -10,14 +11,26 @@ const NEURAL_SYNC_IMAGE = require('@/assets/images/learn-more/neural-sync.png');
 const AMBIENT_INTELLIGENCE_IMAGE = require('@/assets/images/learn-more/ambient-intelligence.png');
 const VAULT_SECURE_IMAGE = require('@/assets/images/learn-more/vault-secure.png');
 
+const CARD_STYLE = {
+  backgroundColor: LEARN_MORE.cardBg,
+  shadowColor: LEARN_MORE.cardShadow,
+  shadowOffset: { width: 0, height: 18 },
+  shadowOpacity: 1,
+  shadowRadius: 40,
+  elevation: 12,
+} as const;
+
 export default function LearnMoreScreen() {
   return (
-    <View className="flex-1 bg-[#010208]">
-      <View className="absolute inset-0 bg-[#010208]" />
+    <View className="flex-1" style={{ backgroundColor: LEARN_MORE.pageBg }}>
+      <View className="absolute inset-0" style={{ backgroundColor: LEARN_MORE.pageBg }} />
       <View className="absolute -right-28 top-52 h-64 w-64 rounded-full bg-secondary/6 blur-[100px]" />
       <View className="absolute bottom-16 left-1/2 h-72 w-[92%] -translate-x-1/2 rounded-full bg-tertiary/5 blur-[120px]" />
 
-      <SafeAreaView edges={['top']} className="border-b border-white/5 bg-[#070b14]/90 px-4">
+      <SafeAreaView
+        edges={['top']}
+        className="border-b border-white/5 px-4"
+        style={{ backgroundColor: LEARN_MORE.headerBg }}>
         <View className="h-11 flex-row items-center justify-between">
           <View className="flex-row items-center gap-2.5">
             <Icon as={Sparkles} size={14} color={THEME.dark.primary} />
@@ -37,7 +50,9 @@ export default function LearnMoreScreen() {
         contentContainerStyle={{ paddingHorizontal: 14, paddingTop: 34, paddingBottom: 26 }}>
         <View className="gap-9">
           <View className="items-center gap-5 px-3">
-            <View className="self-center rounded-full border border-white/10 bg-[#121a2a] px-3 py-1.5">
+            <View
+              className="self-center rounded-full border border-white/10 px-3 py-1.5"
+              style={{ backgroundColor: LEARN_MORE.chipBg }}>
               <View className="flex-row items-center gap-1.5">
                 <Icon as={Sparkles} size={12} color={THEME.dark.primary} />
                 <Text className="text-primary text-[9px] font-bold uppercase tracking-[0.14em]">
@@ -57,12 +72,14 @@ export default function LearnMoreScreen() {
           </View>
 
           <View className="gap-5">
-            <View className="overflow-hidden rounded-[28px] border border-white/5 bg-[#0a0d14] shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
+            <View className="overflow-hidden rounded-[28px] border border-white/5" style={CARD_STYLE}>
               <Image source={NEURAL_SYNC_IMAGE} className="h-[260px] w-full" resizeMode="cover" />
             </View>
 
             <View className="gap-3 px-1.5">
-              <View className="h-11 w-11 items-center justify-center rounded-full bg-[#121a2a]">
+              <View
+                className="h-11 w-11 items-center justify-center rounded-full"
+                style={{ backgroundColor: LEARN_MORE.chipBg }}>
                 <Icon as={Sparkles} size={16} color={THEME.dark.primary} />
               </View>
               <Text className="text-foreground text-[41px] font-bold leading-[43px] tracking-tight">
@@ -92,7 +109,7 @@ export default function LearnMoreScreen() {
           </View>
 
           <View className="gap-5">
-            <View className="overflow-hidden rounded-[28px] border border-white/5 bg-[#0a0d14] shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
+            <View className="overflow-hidden rounded-[28px] border border-white/5" style={CARD_STYLE}>
               <Image
                 source={AMBIENT_INTELLIGENCE_IMAGE}
                 className="h-[260px] w-full"
@@ -101,7 +118,9 @@ export default function LearnMoreScreen() {
             </View>
 
             <View className="gap-3 px-1.5">
-              <View className="h-11 w-11 items-center justify-center rounded-full bg-[#121a2a]">
+              <View
+                className="h-11 w-11 items-center justify-center rounded-full"
+                style={{ backgroundColor: LEARN_MORE.chipBg }}>
                 <Icon as={Infinity} size={17} color={THEME.dark.secondary} />
               </View>
               <Text className="text-foreground text-[41px] font-bold leading-[43px] tracking-tight">
@@ -113,7 +132,9 @@ export default function LearnMoreScreen() {
                 datasets into ethereal, actionable insights that appear only when relevant.
               </Text>
 
-              <View className="rounded-xl border border-white/10 bg-[#1a2130] px-4 py-3">
+              <View
+                className="rounded-xl border border-white/10 px-4 py-3"
+                style={{ backgroundColor: LEARN_MORE.statusCardBg }}>
                 <Text className="text-secondary text-[8px] font-bold uppercase tracking-[0.15em]">
                   System Status
                 </Text>
@@ -125,7 +146,9 @@ export default function LearnMoreScreen() {
           </View>
 
           <View className="gap-4 px-1.5">
-            <View className="h-11 w-11 items-center justify-center rounded-full bg-[#121a2a]">
+            <View
+              className="h-11 w-11 items-center justify-center rounded-full"
+              style={{ backgroundColor: LEARN_MORE.chipBg }}>
               <Icon as={Fingerprint} size={16} color={THEME.dark.tertiary} />
             </View>
 
@@ -138,32 +161,36 @@ export default function LearnMoreScreen() {
               quantum-resistant architecture, shielded by tonal layers of security.
             </Text>
 
-            <View className="overflow-hidden rounded-[28px] border border-white/5 bg-[#0a0d14] shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
+            <View className="overflow-hidden rounded-[28px] border border-white/5" style={CARD_STYLE}>
               <Image source={VAULT_SECURE_IMAGE} className="h-[272px] w-full" resizeMode="cover" />
 
               <View
                 className="absolute bottom-4 left-4 right-4 rounded-2xl px-4 py-3"
-                style={{ backgroundColor: 'rgba(78, 82, 89, 0.9)' }}>
+                style={{ backgroundColor: LEARN_MORE.vaultOverlayBg }}>
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center gap-3">
                     <View
                       className="h-9 w-9 items-center justify-center rounded-md"
-                      style={{ backgroundColor: 'rgba(199, 66, 87, 0.92)' }}>
-                      <Icon as={Lock} size={13} color="#ff8ab4" />
+                      style={{ backgroundColor: LEARN_MORE.lockChipBg }}>
+                      <Icon as={Lock} size={13} color={LEARN_MORE.lockIcon} />
                     </View>
 
                     <View>
                       <Text className="text-white/95 text-[14px] font-bold leading-4">
                         End-to-End{`\n`}Encrypted
                       </Text>
-                      <Text className="mt-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#b8bec8]">
+                      <Text
+                        className="mt-1 text-[9px] font-bold uppercase tracking-[0.12em]"
+                        style={{ color: LEARN_MORE.statusText }}>
                         Active Status
                       </Text>
                     </View>
                   </View>
 
-                  <View className="h-5 w-5 items-center justify-center rounded-full bg-[#b4bbc5]">
-                    <Icon as={CheckCircle2} size={11} color="#566173" />
+                  <View
+                    className="h-5 w-5 items-center justify-center rounded-full"
+                    style={{ backgroundColor: LEARN_MORE.checkBadgeBg }}>
+                    <Icon as={CheckCircle2} size={11} color={LEARN_MORE.checkIcon} />
                   </View>
                 </View>
               </View>

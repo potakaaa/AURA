@@ -2,7 +2,6 @@ import { DatabaseInitializationError } from './errors';
 import { runMigrations } from './migrations';
 import type { QueryExecutor, RunResult, SqlParams } from './types';
 import { DbKeyError, getOrCreateDbKey } from '../utils/crypto';
-import * as SQLite from 'expo-sqlite';
 
 export { DatabaseInitializationError } from './errors';
 
@@ -21,6 +20,17 @@ type SQLiteDatabaseLike = {
 type SQLiteLike = {
   openDatabaseAsync(name: string): Promise<SQLiteDatabaseLike>;
 };
+
+type ExpoSqliteModule = typeof import('expo-sqlite');
+
+let sqliteModuleCache: ExpoSqliteModule | null = null;
+
+function getExpoSqliteModule(): SQLiteLike {
+  if (!sqliteModuleCache) {
+    sqliteModuleCache = require('expo-sqlite') as ExpoSqliteModule;
+  }
+  return sqliteModuleCache;
+}
 
 type Logger = Pick<Console, 'info' | 'error' | 'warn'>;
 
@@ -75,7 +85,7 @@ export async function initDatabase(options: InitDatabaseOptions = {}): Promise<Q
   }
 
   const logger = options.logger ?? console;
-  const sqliteModule = options.sqliteModule ?? SQLite;
+  const sqliteModule = options.sqliteModule ?? getExpoSqliteModule();
   const dbName = options.dbName ?? DEFAULT_DB_NAME;
   const useUnencryptedDb = options.useUnencryptedDb ?? false;
 
