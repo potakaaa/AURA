@@ -7,7 +7,8 @@ import { Text, View, type TextStyle } from 'react-native';
 
 type GradientTextProps = {
   children: string;
-  variant: 'aura' | 'headline';
+  /** `surfaceHeadline`: on-surface → muted (voice hub hero, matches HTML `.text-gradient`). */
+  variant: 'aura' | 'headline' | 'surfaceHeadline';
   className?: string;
   /** Merged into mask + gradient text (e.g. size, letterSpacing, shadow). */
   textStyle?: TextStyle;
@@ -29,7 +30,9 @@ export function GradientText({
   const colors =
     variant === 'aura'
       ? ([t.gradientAuraStart, t.gradientAuraEnd] as const)
-      : ([t.primary, t.secondary, t.tertiary] as const);
+      : variant === 'surfaceHeadline'
+        ? ([t.onSurface, t.onSurfaceVariant] as const)
+        : ([t.primary, t.secondary, t.tertiary] as const);
 
   return (
     <View className={cn('self-start', outerClassName)}>
@@ -41,7 +44,10 @@ export function GradientText({
             {children}
           </Text>
         }>
-        <LinearGradient colors={colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+        <LinearGradient
+          colors={colors}
+          start={{ x: 0, y: 0 }}
+          end={variant === 'surfaceHeadline' ? { x: 1, y: 1 } : { x: 1, y: 0 }}>
           <Text
             className={cn(className)}
             style={[{ fontFamily: 'Manrope_800ExtraBold', opacity: 0 }, textStyle]}>

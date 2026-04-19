@@ -1,17 +1,22 @@
+import { AuthenticatedAppTopBar, appTopBarOffsetTop } from '@/components/common';
 import { AuraCard } from '@/components/ui/aura-card';
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { AuraTextField } from '@/components/ui/aura-text-field';
-import { AuraTopBar } from '@/components/ui/aura-top-bar';
 import { Text } from '@/components/ui/text';
 import { Search } from 'lucide-react-native';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ChatScreen() {
+  const insets = useSafeAreaInsets();
+
   return (
     <AuraScreen>
       <View className="flex-1 bg-background">
-        <AuraTopBar title="Chat" />
-        <View className="flex-1 gap-4 px-5 pb-6 pt-3">
+        <AuthenticatedAppTopBar title="Chat" />
+        <View
+          className="flex-1 gap-4 px-5 pb-6"
+          style={{ paddingTop: appTopBarOffsetTop(insets.top) + 12 }}>
           <AuraTextField
             label="Search conversations"
             placeholder="Search"

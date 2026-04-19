@@ -15,8 +15,25 @@ import { Pressable, View } from 'react-native';
 const LABEL_CLASS =
   'text-[11px] font-bold uppercase tracking-[0.05em] text-muted-foreground';
 
+/** Demo credentials only — no real auth. */
+const MOCK_EMAIL = 'sample@aura.io';
+const MOCK_PASSWORD = 'sample';
+
 export default function LoginScreen() {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  function handleSignIn() {
+    setSubmitError(null);
+    const trimmed = email.trim().toLowerCase();
+    if (trimmed === MOCK_EMAIL.toLowerCase() && password === MOCK_PASSWORD) {
+      router.replace('/(tabs)' as Href);
+      return;
+    }
+    setSubmitError('Try sample@aura.io / sample.');
+  }
 
   return (
     <View className="flex-1">
@@ -63,6 +80,11 @@ export default function LoginScreen() {
             autoCorrect={false}
             placeholder="hello@aura.io"
             className="h-14 rounded-full border-border/40 bg-card"
+            value={email}
+            onChangeText={(t) => {
+              setEmail(t);
+              setSubmitError(null);
+            }}
           />
           <AuraTextField
             label="Password"
@@ -70,7 +92,13 @@ export default function LoginScreen() {
             leadingIcon={Lock}
             placeholder="••••••••"
             secureTextEntry={!passwordVisible}
+            errorText={submitError ?? undefined}
             className="h-14 rounded-full border-border/40 bg-card"
+            value={password}
+            onChangeText={(t) => {
+              setPassword(t);
+              setSubmitError(null);
+            }}
             trailing={
               <Pressable
                 accessibilityRole="button"
@@ -105,7 +133,7 @@ export default function LoginScreen() {
         <AuraButton
           label="Sign In"
           className="h-14 w-full rounded-full shadow-sm shadow-primary/30"
-          onPress={() => undefined}
+          onPress={handleSignIn}
           accessibilityLabel="Sign in"
         />
 
