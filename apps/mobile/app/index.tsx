@@ -16,5 +16,5 @@ export default function IndexRedirect() {
     }),
   }).catch(() => {});
   // #endregion
-  return <Redirect href={'/(tabs)' as Href} />;
+  return <Redirect href={'/welcome' as Href} />;
 }
