@@ -15,7 +15,7 @@ import {
 import { THEME } from '@/lib/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, type Href } from 'expo-router';
-import { useRef } from 'react';
+import { type ReactNode, useRef } from 'react';
 import {
   Image,
   Platform,
@@ -117,6 +117,26 @@ function WelcomeRadialBackground({ width, height }: { width: number; height: num
       <Rect x={0} y={0} width={width} height={height} fill="url(#welcomeRadialGlow)" />
       <Rect x={0} y={0} width={width} height={height} fill="url(#welcomeRadialAccent)" />
     </Svg>
+  );
+}
+
+/** Single glass fill so icon + copy share one surface (no nested “inner box”). */
+function WelcomeFeatureGlassCard({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <View className="relative overflow-hidden rounded-[28px] border border-white/[0.1] p-7" style={CARD_SHADOW}>
+      <LinearGradient
+        colors={[`rgba(${SURFACE_DIM_RGB},0.36)`, `rgba(${SURFACE_DIM_RGB},0.22)`]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+        pointerEvents="none"
+      />
+      <View className="relative z-10">{children}</View>
+    </View>
   );
 }
 
@@ -257,14 +277,12 @@ export default function WelcomeScreen() {
           </View>
 
           <View className="flex-col gap-4">
-            <View
-              className="relative overflow-hidden rounded-[28px] border border-white/[0.1] bg-white/[0.035] p-7"
-              style={CARD_SHADOW}>
+            <WelcomeFeatureGlassCard>
               <View className="flex-row gap-5">
-                <View className="border-secondary/20 bg-secondary/10 h-14 w-14 items-center justify-center rounded-2xl border">
+                <View className="border-secondary/20 bg-secondary/10 h-14 w-14 shrink-0 items-center justify-center rounded-2xl border">
                   <Icon as={Network} size={26} color={THEME.dark.secondary} />
                 </View>
-                <View className="flex-1 gap-2.5">
+                <View className="min-w-0 flex-1 gap-2.5">
                   <Text
                     className="text-xl font-bold text-white"
                     style={{ fontFamily: 'Manrope_700Bold' }}>
@@ -278,15 +296,13 @@ export default function WelcomeScreen() {
                   </Text>
                 </View>
               </View>
-            </View>
-            <View
-              className="relative overflow-hidden rounded-[28px] border border-white/[0.1] bg-white/[0.035] p-7"
-              style={CARD_SHADOW}>
+            </WelcomeFeatureGlassCard>
+            <WelcomeFeatureGlassCard>
               <View className="flex-row gap-5">
-                <View className="border-tertiary/25 bg-tertiary/10 h-14 w-14 items-center justify-center rounded-2xl border">
+                <View className="border-tertiary/25 bg-tertiary/10 h-14 w-14 shrink-0 items-center justify-center rounded-2xl border">
                   <Icon as={Lock} size={26} color={THEME.dark.tertiary} />
                 </View>
-                <View className="flex-1 gap-2.5">
+                <View className="min-w-0 flex-1 gap-2.5">
                   <Text
                     className="text-xl font-bold text-white"
                     style={{ fontFamily: 'Manrope_700Bold' }}>
@@ -300,7 +316,7 @@ export default function WelcomeScreen() {
                   </Text>
                 </View>
               </View>
-            </View>
+            </WelcomeFeatureGlassCard>
           </View>
         </View>
       </ScrollView>
