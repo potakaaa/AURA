@@ -113,3 +113,19 @@ export const VOICE_HUB = {
   orbRingInner: `rgba(${SECONDARY_RGB},0.08)`,
   sessionCardBorder: rgbaWhite(0.06),
 } as const;
+
+/** Learn More screen one-offs used to match reference artwork while preserving lint policy. */
+export const LEARN_MORE = {
+  pageBg: '#010208',
+  headerBg: '#070b14',
+  chipBg: '#121a2a',
+  cardBg: '#0a0d14',
+  statusCardBg: '#1a2130',
+  cardShadow: 'rgba(0, 0, 0, 0.45)',
+  vaultOverlayBg: 'rgba(78, 82, 89, 0.9)',
+  lockChipBg: 'rgba(199, 66, 87, 0.92)',
+  lockIcon: '#ff8ab4',
+  statusText: '#b8bec8',
+  checkBadgeBg: '#b4bbc5',
+  checkIcon: '#566173',
+} as const;
