@@ -21,6 +21,17 @@ type SQLiteLike = {
   openDatabaseAsync(name: string): Promise<SQLiteDatabaseLike>;
 };
 
+type ExpoSqliteModule = typeof import('expo-sqlite');
+
+let sqliteModuleCache: ExpoSqliteModule | null = null;
+
+function getExpoSqliteModule(): SQLiteLike {
+  if (!sqliteModuleCache) {
+    sqliteModuleCache = require('expo-sqlite') as ExpoSqliteModule;
+  }
+  return sqliteModuleCache;
+}
+
 type Logger = Pick<Console, 'info' | 'error' | 'warn'>;
 
 let database: QueryExecutor | null = null;
@@ -74,7 +85,7 @@ export async function initDatabase(options: InitDatabaseOptions = {}): Promise<Q
   }
 
   const logger = options.logger ?? console;
-  const sqliteModule = options.sqliteModule ?? (await import('expo-sqlite'));
+  const sqliteModule = options.sqliteModule ?? getExpoSqliteModule();
   const dbName = options.dbName ?? DEFAULT_DB_NAME;
   const useUnencryptedDb = options.useUnencryptedDb ?? false;
 

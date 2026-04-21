@@ -15,7 +15,7 @@ import {
 import { THEME } from '@/lib/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, type Href } from 'expo-router';
-import { type ReactNode, useRef } from 'react';
+import { type ReactNode } from 'react';
 import {
   Image,
   Platform,
@@ -142,7 +142,6 @@ function WelcomeFeatureGlassCard({
 
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
-  const scrollRef = useRef<ScrollView>(null);
   const { width, height } = useWindowDimensions();
 
   const topPad = insets.top;
@@ -156,7 +155,6 @@ export default function WelcomeScreen() {
       <AuthHeaderBrand backgroundColor={BG_BASE} />
 
       <ScrollView
-        ref={scrollRef}
         className="flex-1"
         contentContainerStyle={{
           paddingTop: contentTop,
@@ -220,7 +218,7 @@ export default function WelcomeScreen() {
             </Pressable>
             <Pressable
               accessibilityRole="button"
-              onPress={() => scrollRef.current?.scrollToEnd({ animated: true })}
+              onPress={() => router.push('/learn-more' as Href)}
               android_ripple={{ color: rgbaWhite(0.12) }}
               className="w-full items-center rounded-full border border-white/[0.14] bg-white/[0.05] py-[18px] active:opacity-90">
               <Text
