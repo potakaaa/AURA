@@ -1,6 +1,7 @@
 import { AuthenticatedAppTopBar, appTopBarOffsetTop } from '@/components/common';
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { Text } from '@/components/ui/text';
+import { THEME } from '@/lib/theme';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -26,13 +27,13 @@ export default function InsightTabScreen() {
             <View className="mt-4 h-52 w-52 items-center justify-center rounded-full border-2 border-dashed border-destructive/35">
               <View className="h-40 w-40 overflow-hidden rounded-full">
                 <LinearGradient
-                  colors={['rgba(225, 77, 103, 0.18)', 'rgba(178, 108, 255, 0.08)', 'rgba(7,10,16,0.9)']}
+                  colors={[THEME.dark.destructive, THEME.dark.primary, THEME.dark.background]}
                   start={{ x: 0.15, y: 0.85 }}
                   end={{ x: 0.8, y: 0.2 }}
                   style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
                 />
                 <View className="h-full w-full items-center justify-center">
-                  <CloudOff size={42} color="#E14D67" />
+                  <CloudOff size={42} color={THEME.dark.destructive} />
                 </View>
               </View>
             </View>
@@ -60,7 +61,7 @@ export default function InsightTabScreen() {
             <View className="mt-8 w-full gap-4">
               <View className="bg-card/70 border-border/50 rounded-[24px] border px-5 py-5">
                 <View className="mb-2 flex-row items-center gap-3">
-                  <Box size={19} color="#42CEF8" />
+                  <Box size={19} color={THEME.dark.secondary} />
                   <Text className="text-xl font-bold text-foreground" style={{ fontFamily: 'Manrope_700Bold' }}>
                     Vault Access
                   </Text>
@@ -72,7 +73,7 @@ export default function InsightTabScreen() {
 
               <View className="bg-card/70 border-border/50 rounded-[24px] border px-5 py-5">
                 <View className="mb-2 flex-row items-center gap-3">
-                  <ZapOff size={19} color="#FF6F9E" />
+                  <ZapOff size={19} color={THEME.dark.tertiary} />
                   <Text className="text-xl font-bold text-foreground" style={{ fontFamily: 'Manrope_700Bold' }}>
                     Local Sync
                   </Text>
@@ -86,7 +87,7 @@ export default function InsightTabScreen() {
             <View className="mt-8 w-full items-center gap-4">
               <Pressable className="w-[78%] overflow-hidden rounded-full active:opacity-90">
                 <LinearGradient
-                  colors={['#B77DFF', '#FF67B3']}
+                  colors={[THEME.dark.gradientAuraStart, THEME.dark.gradientAuraEnd]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   className="items-center justify-center rounded-full py-4">
