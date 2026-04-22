@@ -1,9 +1,6 @@
 ## Description
 
-Builds the foundational AURA mobile app shell in Expo React Native with full tab navigation,
-brand-aligned theme tokens (light/dark), reusable base UI components, and a dedicated showcase
-screen for visual verification. This establishes the baseline framework for future screens and
-feature work.
+Set up Supabase client integration for the Expo mobile app, including environment configuration and a shared `supabase` client instance. Also removes local debug ingest network calls and cleans up stale Vitest includes.
 
 ## Type of Change
 
@@ -22,6 +19,6 @@ N/A
 
 - [x] Code follows project coding guidelines (ESLint, Prettier)
 - [x] Self-review completed
-- [x] Comments added for complex logic where needed
+- [ ] Comments added for complex logic where needed
 - [x] Documentation updated if applicable
 - [x] No new warnings introduced
