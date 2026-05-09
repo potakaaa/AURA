@@ -1,4 +1,4 @@
-package com.aura.voice.stt
+package com.potakaaa.aura
 
 import android.media.AudioFormat
 import android.media.AudioRecord
@@ -91,19 +91,5 @@ class WhisperSttModule {
             "transcript" to transcript,
             "latencyMs" to latencyMs
         )
-    }
-}
-
-/**
- * Placeholder JNI contract for whisper.cpp.
- * Replace with your actual JNI bridge implementation.
- */
-object WhisperJniBridge {
-    fun transcribe(pcm16kMono: IntArray, sampleRateHz: Int, language: String): String {
-        // TODO: Bind whisper.cpp JNI entrypoint.
-        if (pcm16kMono.isEmpty()) {
-            return ""
-        }
-        return "[POC transcript placeholder]"
     }
 }
