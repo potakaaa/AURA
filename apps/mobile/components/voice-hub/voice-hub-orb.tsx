@@ -3,7 +3,7 @@ import { rgbaWhite, VOICE_HUB } from '@/lib/raw-colors';
 import { THEME } from '@/lib/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Sparkles } from 'lucide-react-native';
-import { Platform, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 
 const ORB_SIZE = 256;
 const ORB_RADIUS = ORB_SIZE / 2;
@@ -24,10 +24,21 @@ const ORB_GLOW = Platform.select({
 
 const SPARKLE_SIZE = 56;
 
+type VoiceHubOrbProps = {
+  onPress?: () => void;
+  disabled?: boolean;
+};
+
 /** Glass-style orb: radial-style linear gradient, soft highlight, center sparkle, outer rings. */
-export function VoiceHubOrb() {
+export function VoiceHubOrb({ onPress, disabled }: VoiceHubOrbProps) {
   return (
-    <View className="relative aspect-square w-full max-w-lg items-center justify-center self-center">
+    <Pressable
+      className="relative aspect-square w-full max-w-lg items-center justify-center self-center"
+      accessibilityRole="button"
+      accessibilityLabel="Activate voice capture"
+      onPress={onPress}
+      disabled={disabled}
+      style={disabled ? { opacity: 0.7 } : undefined}>
       <View
         className="absolute h-[80%] w-[80%] rounded-full border"
         style={{ borderColor: VOICE_HUB.orbRingOuter }}
@@ -75,6 +86,6 @@ export function VoiceHubOrb() {
           <Icon as={Sparkles} size={SPARKLE_SIZE} className="text-on-surface opacity-95" />
         </LinearGradient>
       </View>
-    </View>
+    </Pressable>
   );
 }
