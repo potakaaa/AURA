@@ -72,7 +72,26 @@ export function mergeChunkTranscripts(parts: readonly string[]): string {
     return "";
   }
 
-  // This keeps transcript merging deterministic. A future revision can
-  // deduplicate overlap text with timestamps/token alignment.
-  return normalized.join(" ").replace(/\s+/g, " ").trim();
+  const mergedWords: string[] = normalized[0].split(/\s+/);
+
+  for (let index = 1; index < normalized.length; index += 1) {
+    const nextWords = normalized[index].split(/\s+/);
+    let overlap = 0;
+
+    const maxOverlap = Math.min(mergedWords.length, nextWords.length);
+
+    for (let candidate = maxOverlap; candidate > 0; candidate -= 1) {
+      const mergedSuffix = mergedWords.slice(mergedWords.length - candidate).join(" ");
+      const nextPrefix = nextWords.slice(0, candidate).join(" ");
+
+      if (mergedSuffix === nextPrefix) {
+        overlap = candidate;
+        break;
+      }
+    }
+
+    mergedWords.push(...nextWords.slice(overlap));
+  }
+
+  return mergedWords.join(" ").trim();
 }

@@ -14,6 +14,9 @@ importers:
 
   apps/mobile:
     dependencies:
+      '@aura/voice':
+        specifier: workspace:*
+        version: link:../../packages/voice
       '@expo-google-fonts/manrope':
         specifier: ^0.4.2
         version: 0.4.2
@@ -137,9 +140,6 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.19(tsx@4.21.0)(yaml@2.8.2))
-      voice:
-        specifier: workspace:*
-        version: link:../../packages/voice
     devDependencies:
       '@babel/core':
         specifier: ^7.26.0
@@ -180,6 +180,9 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.9.3
+      vitest:
+        specifier: ^4.1.2
+        version: 4.1.2(@types/node@22.19.17)(vite@8.0.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@22.19.17)(esbuild@0.27.4)(jiti@1.21.7)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))
 
   services/api:
     dependencies:

@@ -16,11 +16,12 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "lint": "echo 'No lint configured'",
-    "test": "echo 'No tests'",
+    "test": "vitest run",
     "stt:benchmark": "node stt/benchmarks/run-benchmark.mjs",
     "stt:smoke": "node stt/smoke/run-smoke.mjs"
   },
   "devDependencies": {
+    "vitest": "^4.1.2",
     "typescript": "^5.8.3"
   }
 }
