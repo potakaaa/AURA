@@ -18,6 +18,7 @@
     "lint": "echo 'No lint configured'",
     "test": "vitest run",
     "stt:benchmark": "node stt/benchmarks/run-benchmark.mjs",
+    "stt:benchmark:device": "node stt/benchmarks/run-device-benchmark.mjs",
     "stt:smoke": "node stt/smoke/run-smoke.mjs"
   },
   "devDependencies": {
