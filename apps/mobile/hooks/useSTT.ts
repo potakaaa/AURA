@@ -8,7 +8,11 @@ import {
 const engine = new AndroidWhisperCppEngine("base");
 const capture = new AndroidWhisperCppCapture();
 const session = new WhisperSttSession(capture, engine, {
-  chunking: { windowSeconds: 1.5, overlapSeconds: 0.25 },
+  chunking: {
+    sampleRateHz: 16000,
+    chunkSeconds: 1.5,
+    overlapSeconds: 0.25,
+  },
 });
 
 export function useSTT() {
