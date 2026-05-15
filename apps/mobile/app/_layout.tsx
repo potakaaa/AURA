@@ -13,7 +13,6 @@ import { NAV_THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { useFonts } from 'expo-font';
-import { maybeRequireNativeModule } from 'expo-modules-core';
 import * as SplashScreen from 'expo-splash-screen';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -22,33 +21,6 @@ import { useEffect, useState } from 'react';
 import { Platform, Text, View } from 'react-native';
 
 void SplashScreen.preventAutoHideAsync();
-
-type WhisperStartCaptureConfig = {
-  sampleRateHz: 16000;
-  channelCount: 1;
-  maxDurationSeconds: number;
-  language: 'en';
-};
-
-type WhisperTranscribeConfig = {
-  pcm16kMono: number[];
-  language: 'en';
-  environment: 'quiet' | 'noisy';
-};
-
-const whisperModule =
-  Platform.OS === 'android' ? maybeRequireNativeModule<any>('AuraWhisperStt') : null;
-
-if (Platform.OS === 'android' && whisperModule) {
-  (globalThis as { __AURA_WHISPER_CPP__?: unknown }).__AURA_WHISPER_CPP__ = {
-    startCapture: (config: WhisperStartCaptureConfig) =>
-      whisperModule.startCapture(config.maxDurationSeconds, config.language),
-    stopCapture: () => whisperModule.stopCapture(),
-    readCapturedPcm16kMono: () => whisperModule.readCapturedPcm16kMono(),
-    transcribe: (config: WhisperTranscribeConfig) =>
-      whisperModule.transcribe(config.pcm16kMono, config.language, config.environment),
-  };
-}
 
 export {
   // Catch any errors thrown by the Layout component.

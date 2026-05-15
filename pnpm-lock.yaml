@@ -176,6 +176,10 @@ importers:
         version: 5.9.3
 
   packages/voice:
+    dependencies:
+      expo-modules-core:
+        specifier: 3.0.29
+        version: 3.0.29(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
     devDependencies:
       typescript:
         specifier: ^5.8.3

@@ -3,12 +3,14 @@ import { AuraCard } from '@/components/ui/aura-card';
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { AuraThemeToggleRow } from '@/components/ui/aura-theme-toggle-row';
 import { persistColorScheme } from '@/lib/color-scheme';
+import { useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
-import { View } from 'react-native';
+import { Button, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { colorScheme, setColorScheme } = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
 
@@ -28,6 +30,12 @@ export default function SettingsScreen() {
           <AuraCard title="Appearance" description="Material-style dark theme persistence">
             <AuraThemeToggleRow checked={isDarkMode} onCheckedChange={onToggleDarkMode} />
           </AuraCard>
+          <View className="mt-4">
+            <Button
+              title="Open STT Test (Temporary)"
+              onPress={() => router.push('/dev/stt-test')}
+            />
+          </View>
         </View>
       </View>
     </AuraScreen>
