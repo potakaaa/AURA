@@ -2,7 +2,10 @@ import { AuthenticatedAppTopBar, appTopBarOffsetTop } from '@/components/common'
 import { AuraCard } from '@/components/ui/aura-card';
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { AuraThemeToggleRow } from '@/components/ui/aura-theme-toggle-row';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import { persistColorScheme } from '@/lib/color-scheme';
+import { router, type Href } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -27,6 +30,13 @@ export default function SettingsScreen() {
           style={{ paddingTop: appTopBarOffsetTop(insets.top) + 12 }}>
           <AuraCard title="Appearance" description="Material-style dark theme persistence">
             <AuraThemeToggleRow checked={isDarkMode} onCheckedChange={onToggleDarkMode} />
+          </AuraCard>
+          <AuraCard
+            title="Temporary UI Lab"
+            description="Preview the temporary Sonner-like toast component and different states.">
+            <Button variant="outline" onPress={() => router.push('/(tabs)/toast-lab' as Href)}>
+              <Text>Open Toast Lab</Text>
+            </Button>
           </AuraCard>
         </View>
       </View>

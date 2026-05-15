@@ -18,6 +18,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="chat" options={{ href: null }} />
       <Tabs.Screen name="settings" options={{ href: null }} />
       <Tabs.Screen name="preview" options={{ href: null }} />
+      <Tabs.Screen name="toast-lab" options={{ href: null }} />
     </Tabs>
   );
 }
