@@ -48,3 +48,15 @@ yarn-error.*
 
 expo-env.d.ts
 # @end expo-cli
+
+# iOS dependencies
+apps/mobile/ios/Pods/
+apps/mobile/ios/Podfile.lock
+
+# Android build outputs
+apps/mobile/android/.gradle/
+apps/mobile/android/app/build/
+apps/mobile/android/build/
+
+# Large ML model files
+apps/mobile/android/app/src/main/assets/whisper/*.bin
