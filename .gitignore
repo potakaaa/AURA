@@ -59,4 +59,5 @@ apps/mobile/android/app/build/
 apps/mobile/android/build/
 
 # Large ML model files
+apps/mobile/android/app/src/main/assets/whisper/*.binapps/mobile/ios/Pods/
 apps/mobile/android/app/src/main/assets/whisper/*.bin
