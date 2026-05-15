@@ -6,7 +6,9 @@ import { AuraOrDivider } from '@/components/ui/aura-or-divider';
 import { AuraTextField } from '@/components/ui/aura-text-field';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { getAuthErrorMessage } from '@/lib/auth-errors';
 import { rgbaWhite } from '@/lib/raw-colors';
+import { supabase } from '@/lib/supabase';
 import { router, type Href } from 'expo-router';
 import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react-native';
 import { useState } from 'react';
@@ -14,10 +16,62 @@ import { Pressable, View } from 'react-native';
 
 const LABEL_CLASS =
   'text-[11px] font-bold uppercase tracking-[0.05em] text-muted-foreground';
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function SignupScreen() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
+  const [displayName, setDisplayName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSignUp() {
+    if (isSubmitting) {
+      return;
+    }
+
+    setSubmitError(null);
+
+    const trimmedDisplayName = displayName.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+
+    if (!trimmedDisplayName || !trimmedEmail || !password || !confirmPassword) {
+      setSubmitError('Please complete all fields.');
+      return;
+    }
+
+    if (!EMAIL_REGEX.test(trimmedEmail)) {
+      setSubmitError('Please enter a valid email address.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setSubmitError('Passwords do not match.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const { error } = await supabase.auth.signUp({
+      email: trimmedEmail,
+      password,
+      options: {
+        data: {
+          display_name: trimmedDisplayName,
+        },
+      },
+    });
+    setIsSubmitting(false);
+
+    if (error) {
+      setSubmitError(getAuthErrorMessage(error.message));
+      return;
+    }
+
+    router.replace('/(tabs)' as Href);
+  }
 
   return (
     <View className="flex-1">
@@ -63,6 +117,11 @@ export default function SignupScreen() {
             autoCorrect
             placeholder="Your name"
             className="h-14 rounded-full border-border/40 bg-card"
+            value={displayName}
+            onChangeText={(value) => {
+              setDisplayName(value);
+              setSubmitError(null);
+            }}
           />
           <AuraTextField
             label="Email Address"
@@ -73,6 +132,11 @@ export default function SignupScreen() {
             autoCorrect={false}
             placeholder="hello@aura.io"
             className="h-14 rounded-full border-border/40 bg-card"
+            value={email}
+            onChangeText={(value) => {
+              setEmail(value);
+              setSubmitError(null);
+            }}
           />
           <AuraTextField
             label="Password"
@@ -80,7 +144,13 @@ export default function SignupScreen() {
             leadingIcon={Lock}
             placeholder="••••••••"
             secureTextEntry={!passwordVisible}
+            errorText={submitError ?? undefined}
             className="h-14 rounded-full border-border/40 bg-card"
+            value={password}
+            onChangeText={(value) => {
+              setPassword(value);
+              setSubmitError(null);
+            }}
             trailing={
               <Pressable
                 accessibilityRole="button"
@@ -104,6 +174,11 @@ export default function SignupScreen() {
             placeholder="••••••••"
             secureTextEntry={!confirmVisible}
             className="h-14 rounded-full border-border/40 bg-card"
+            value={confirmPassword}
+            onChangeText={(value) => {
+              setConfirmPassword(value);
+              setSubmitError(null);
+            }}
             trailing={
               <Pressable
                 accessibilityRole="button"
@@ -123,9 +198,10 @@ export default function SignupScreen() {
         </View>
 
         <AuraButton
-          label="Create account"
+          label={isSubmitting ? 'Creating account...' : 'Create account'}
           className="h-14 w-full rounded-full shadow-sm shadow-primary/30"
-          onPress={() => undefined}
+          onPress={handleSignUp}
+          disabled={isSubmitting}
           accessibilityLabel="Create account"
         />
 

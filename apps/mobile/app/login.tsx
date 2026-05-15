@@ -6,7 +6,9 @@ import { AuraOrDivider } from '@/components/ui/aura-or-divider';
 import { AuraTextField } from '@/components/ui/aura-text-field';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { getAuthErrorMessage } from '@/lib/auth-errors';
 import { rgbaWhite } from '@/lib/raw-colors';
+import { supabase } from '@/lib/supabase';
 import { router, type Href } from 'expo-router';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react-native';
 import { useState } from 'react';
@@ -15,24 +17,44 @@ import { Pressable, View } from 'react-native';
 const LABEL_CLASS =
   'text-[11px] font-bold uppercase tracking-[0.05em] text-muted-foreground';
 
-/** Demo credentials only — no real auth. */
-const MOCK_EMAIL = 'sample@aura.io';
-const MOCK_PASSWORD = 'sample';
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginScreen() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSignIn() {
-    setSubmitError(null);
-    const trimmed = email.trim().toLowerCase();
-    if (trimmed === MOCK_EMAIL.toLowerCase() && password === MOCK_PASSWORD) {
-      router.replace('/(tabs)' as Href);
+  async function handleSignIn() {
+    if (isSubmitting) {
       return;
     }
-    setSubmitError('Try sample@aura.io / sample.');
+
+    setSubmitError(null);
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed || !password) {
+      setSubmitError('Please enter your email and password.');
+      return;
+    }
+    if (!EMAIL_REGEX.test(trimmed)) {
+      setSubmitError('Please enter a valid email address.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: trimmed,
+      password,
+    });
+    setIsSubmitting(false);
+
+    if (error) {
+      setSubmitError(getAuthErrorMessage(error.message));
+      return;
+    }
+
+    router.replace('/(tabs)' as Href);
   }
 
   return (
@@ -131,9 +153,10 @@ export default function LoginScreen() {
         </View>
 
         <AuraButton
-          label="Sign In"
+          label={isSubmitting ? 'Signing In...' : 'Sign In'}
           className="h-14 w-full rounded-full shadow-sm shadow-primary/30"
           onPress={handleSignIn}
+          disabled={isSubmitting}
           accessibilityLabel="Sign in"
         />
 

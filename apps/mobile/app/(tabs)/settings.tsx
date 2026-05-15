@@ -1,9 +1,12 @@
 import { AuthenticatedAppTopBar, appTopBarOffsetTop } from '@/components/common';
+import { AuraButton } from '@/components/ui/aura-button';
 import { AuraCard } from '@/components/ui/aura-card';
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { AuraThemeToggleRow } from '@/components/ui/aura-theme-toggle-row';
 import { persistColorScheme } from '@/lib/color-scheme';
+import { supabase } from '@/lib/supabase';
 import { useColorScheme } from 'nativewind';
+import { useState } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -11,11 +14,22 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { colorScheme, setColorScheme } = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   async function onToggleDarkMode(nextValue: boolean) {
     const nextScheme = nextValue ? 'dark' : 'light';
     setColorScheme(nextScheme);
     await persistColorScheme(nextScheme);
+  }
+
+  async function onSignOut() {
+    if (isSigningOut) {
+      return;
+    }
+
+    setIsSigningOut(true);
+    await supabase.auth.signOut();
+    setIsSigningOut(false);
   }
 
   return (
@@ -27,6 +41,16 @@ export default function SettingsScreen() {
           style={{ paddingTop: appTopBarOffsetTop(insets.top) + 12 }}>
           <AuraCard title="Appearance" description="Material-style dark theme persistence">
             <AuraThemeToggleRow checked={isDarkMode} onCheckedChange={onToggleDarkMode} />
+          </AuraCard>
+          <AuraCard className="mt-4" title="Account" description="Manage your current session">
+            <AuraButton
+              label={isSigningOut ? 'Signing out...' : 'Log out'}
+              auraVariant="secondary"
+              className="h-12 rounded-full"
+              onPress={onSignOut}
+              disabled={isSigningOut}
+              accessibilityLabel="Log out"
+            />
           </AuraCard>
         </View>
       </View>

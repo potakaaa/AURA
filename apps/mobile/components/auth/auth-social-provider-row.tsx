@@ -10,7 +10,7 @@ const PROVIDERS = [
 ] as const;
 
 /**
- * UI-only OAuth affordances (Google + Apple). No SDK wiring.
+ * OAuth actions are disabled for MVP until providers are fully wired.
  */
 export function AuthSocialProviderRow() {
   const { colorScheme } = useColorScheme();
@@ -24,8 +24,10 @@ export function AuthSocialProviderRow() {
           key={id}
           accessibilityRole="button"
           accessibilityLabel={label}
+          accessibilityState={{ disabled: true }}
+          disabled
           android_ripple={{ color: RIPPLE.onPrimary }}
-          className="h-14 max-w-[48%] flex-1 items-center justify-center rounded-full border border-border/40 bg-card active:opacity-80">
+          className="h-14 max-w-[48%] flex-1 items-center justify-center rounded-full border border-border/40 bg-card opacity-50">
           <FontAwesome5 name={icon} brand size={22} color={iconColor} />
         </Pressable>
       ))}
