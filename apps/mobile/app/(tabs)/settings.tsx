@@ -4,10 +4,8 @@ import { AuraCard } from '@/components/ui/aura-card';
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { AuraThemeToggleRow } from '@/components/ui/aura-theme-toggle-row';
 import { persistColorScheme } from '@/lib/color-scheme';
-import { useRouter } from 'expo-router';
-import { useColorScheme } from 'nativewind';
-import { Button, View } from 'react-native';
 import { supabase } from '@/lib/supabase';
+import { useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -47,9 +45,12 @@ export default function SettingsScreen() {
             <AuraThemeToggleRow checked={isDarkMode} onCheckedChange={onToggleDarkMode} />
           </AuraCard>
           <View className="mt-4">
-            <Button
-              title="Open STT Test (Temporary)"
+            <AuraButton
+              label="Open STT Test (Temporary)"
+              auraVariant="secondary"
+              className="h-12 rounded-full"
               onPress={() => router.push('/dev/stt-test')}
+              accessibilityLabel="Open STT Test"
             />
           </View>
           <AuraCard className="mt-4" title="Account" description="Manage your current session">
