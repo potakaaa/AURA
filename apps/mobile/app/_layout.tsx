@@ -8,12 +8,13 @@ import {
   Manrope_800ExtraBold,
 } from '@expo-google-fonts/manrope';
 import { initDatabase } from '@/src/db';
+import { AuthSessionProvider, useAuthSession } from '@/hooks/use-auth-session';
 import { loadStoredColorScheme, type AppColorScheme } from '@/lib/color-scheme';
 import { NAV_THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { useFonts } from 'expo-font';
-import { maybeRequireNativeModule } from 'expo-modules-core';
+import { requireOptionalNativeModule } from 'expo-modules-core';
 import * as SplashScreen from 'expo-splash-screen';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -37,7 +38,7 @@ type WhisperTranscribeConfig = {
 };
 
 const whisperModule =
-  Platform.OS === 'android' ? maybeRequireNativeModule<any>('AuraWhisperStt') : null;
+  Platform.OS === 'android' ? requireOptionalNativeModule<any>('AuraWhisperStt') : null;
 
 if (Platform.OS === 'android' && whisperModule) {
   (globalThis as { __AURA_WHISPER_CPP__?: unknown }).__AURA_WHISPER_CPP__ = {
@@ -154,14 +155,28 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={NAV_THEME[resolvedColorScheme]}>
       <StatusBar style={resolvedColorScheme === 'dark' ? 'light' : 'dark'} />
-      <Stack
-        screenOptions={{
-          animation: 'fade',
-          contentStyle: { backgroundColor: 'transparent' },
-          headerShown: false,
-        }}
-      />
+      <AuthSessionProvider>
+        <AuthNavigator />
+      </AuthSessionProvider>
       <PortalHost />
     </ThemeProvider>
+  );
+}
+
+function AuthNavigator() {
+  const { isLoading } = useAuthSession();
+
+  if (isLoading) {
+    return null;
+  }
+
+  return (
+    <Stack
+      screenOptions={{
+        animation: 'fade',
+        contentStyle: { backgroundColor: 'transparent' },
+        headerShown: false,
+      }}
+    />
   );
 }

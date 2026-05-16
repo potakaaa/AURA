@@ -4,11 +4,11 @@ import {
   VoiceHubQuickActionsRow,
   VoiceHubRadialBackground,
   VoiceHubStateSection,
-  useSTT,
   VOICE_HUB_TAB_CONTENT_INSET,
 } from '@/components/voice-hub';
 import { AuthenticatedAppTopBar, appTopBarOffsetTop } from '@/components/common';
 import { AuraScreen } from '@/components/ui/aura-screen';
+import { useSTT } from '@/hooks/useSTT';
 import { THEME } from '@/lib/theme';
 import { GradientText } from '@/components/welcome/gradient-text';
 import { Calendar, FileText, Mail } from 'lucide-react-native';
