@@ -1,34 +1,50 @@
-import { useCallback, useState } from "react";
-import {
-  AndroidWhisperCppCapture,
-  AndroidWhisperCppEngine,
-  WhisperSttSession,
-} from "@aura/voice";
-
-const engine = new AndroidWhisperCppEngine("base");
-const capture = new AndroidWhisperCppCapture();
-const session = new WhisperSttSession(capture, engine, {
-  chunking: {
-    sampleRateHz: 16000,
-    chunkSeconds: 1.5,
-    overlapSeconds: 0.25,
-  },
-});
+import { useCallback, useEffect, useState } from "react";
+import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from "expo-speech-recognition";
 
 export function useSTT() {
   const [transcript, setTranscript] = useState("");
   const [isListening, setIsListening] = useState(false);
 
-  const startListening = useCallback(async () => {
-    setIsListening(true);
-    const result = await session.transcribeFromCapture({
-      utteranceId: crypto.randomUUID(),
-      language: "en",
-      environment: "quiet",
-      maxDurationSeconds: 15,
-    });
-    setTranscript(result.transcript);
+  useSpeechRecognitionEvent("result", (event) => {
+    const joined = event.results
+      .map((result) => result.transcript)
+      .join(" ")
+      .trim();
+    setTranscript(joined);
+  });
+
+  useSpeechRecognitionEvent("end", () => {
     setIsListening(false);
+  });
+
+  useSpeechRecognitionEvent("error", () => {
+    setIsListening(false);
+  });
+
+  useEffect(() => {
+    return () => {
+      ExpoSpeechRecognitionModule.abort();
+    };
+  }, []);
+
+  const startListening = useCallback(async () => {
+    setTranscript("");
+
+    const permissions = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+    if (!permissions.granted) {
+      setIsListening(false);
+      return;
+    }
+
+    setIsListening(true);
+
+    await ExpoSpeechRecognitionModule.start({
+      lang: "en-US",
+      interimResults: true,
+      continuous: false,
+      maxAlternatives: 1,
+      requiresOnDeviceRecognition: false,
+    });
   }, []);
 
   return { transcript, isListening, startListening };

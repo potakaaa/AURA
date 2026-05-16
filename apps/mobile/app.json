@@ -54,6 +54,13 @@
           "imageWidth": 180
         }
       ],
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "AURA uses your microphone for voice transcription.",
+          "speechRecognitionPermission": "AURA uses speech recognition to transcribe your voice."
+        }
+      ],
       "expo-secure-store",
       "expo-web-browser"
     ],

@@ -1,21 +1,6 @@
 import { useState } from "react";
 import { Button, ScrollView, Text, View } from "react-native";
-
-import {
-  AndroidWhisperCppCapture,
-  AndroidWhisperCppEngine,
-  WhisperSttSession,
-} from "@aura/voice";
-
-const engine = new AndroidWhisperCppEngine("base");
-const capture = new AndroidWhisperCppCapture();
-const session = new WhisperSttSession(capture, engine, {
-  chunking: {
-    sampleRateHz: 16000,
-    chunkSeconds: 1.5,
-    overlapSeconds: 0.25,
-  },
-});
+import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from "expo-speech-recognition";
 
 export default function SttTestScreen() {
   const [log, setLog] = useState<string[]>([]);
@@ -23,31 +8,48 @@ export default function SttTestScreen() {
 
   const append = (msg: string) => setLog((prev) => [...prev, msg]);
 
+  useSpeechRecognitionEvent("result", (event) => {
+    const transcript = event.results.map((result) => result.transcript).join(" ").trim();
+    append(`transcript: \"${transcript}\"`);
+  });
+
+  useSpeechRecognitionEvent("end", () => {
+    setRunning(false);
+    append("recognition ended");
+  });
+
+  useSpeechRecognitionEvent("error", (event) => {
+    setRunning(false);
+    append(`error: ${event.error} (${event.message})`);
+  });
+
   const runTest = async () => {
     setRunning(true);
-    append("▶ Starting capture...");
+    append("starting recognition...");
 
     try {
-      const result = await session.transcribeFromCapture({
-        utteranceId: "test-001",
-        language: "en",
-        environment: "quiet",
-        maxDurationSeconds: 5,
+      const permissions = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+      if (!permissions.granted) {
+        append("permission denied");
+        setRunning(false);
+        return;
+      }
+
+      await ExpoSpeechRecognitionModule.start({
+        lang: "en-US",
+        interimResults: true,
+        continuous: false,
+        maxAlternatives: 1,
       });
-
-      append(`✅ Transcript: "${result.transcript}"`);
-      append(`⏱ Latency: ${result.totalLatencyMs}ms`);
-      append(`📦 Chunks: ${result.chunkCount}`);
     } catch (error) {
-      append(`❌ Error: ${String(error)}`);
+      append(`error: ${String(error)}`);
+      setRunning(false);
     }
-
-    setRunning(false);
   };
 
   return (
     <View style={{ flex: 1, padding: 24 }}>
-      <Button title={running ? "Listening..." : "Start 5s Test"} onPress={runTest} disabled={running} />
+      <Button title={running ? "Listening..." : "Start Speech Test"} onPress={runTest} disabled={running} />
       <ScrollView style={{ marginTop: 16 }}>
         {log.map((line, index) => (
           <Text key={index} style={{ fontFamily: "monospace", fontSize: 13 }}>

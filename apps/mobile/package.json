@@ -17,6 +17,7 @@
     "clean": "rm -rf .expo node_modules"
   },
   "dependencies": {
+    "@aura/voice": "workspace:*",
     "@expo-google-fonts/manrope": "^0.4.2",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-masked-view/masked-view": "^0.3.2",
@@ -38,6 +39,7 @@
     "expo-linking": "~8.0.11",
     "expo-router": "~6.0.19",
     "expo-secure-store": "~15.0.8",
+    "expo-speech-recognition": "^3.1.3",
     "expo-splash-screen": "~31.0.12",
     "expo-sqlite": "~16.0.10",
     "expo-status-bar": "~3.0.9",
@@ -45,7 +47,6 @@
     "expo-web-browser": "^15.0.10",
     "lucide-react-native": "^0.545.0",
     "nativewind": "^4.2.1",
-    "@aura/voice": "workspace:*",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
