@@ -9,12 +9,12 @@ import {
   Manrope_800ExtraBold,
 } from '@expo-google-fonts/manrope';
 import { initDatabase } from '@/src/db';
+import { AuthSessionProvider, useAuthSession } from '@/hooks/use-auth-session';
 import { loadStoredColorScheme, type AppColorScheme } from '@/lib/color-scheme';
 import { NAV_THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { useFonts } from 'expo-font';
-import { requireOptionalNativeModule } from 'expo-modules-core';
 import * as SplashScreen from 'expo-splash-screen';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -23,33 +23,6 @@ import { useEffect, useState } from 'react';
 import { Platform, Text, View } from 'react-native';
 
 void SplashScreen.preventAutoHideAsync();
-
-type WhisperStartCaptureConfig = {
-  sampleRateHz: 16000;
-  channelCount: 1;
-  maxDurationSeconds: number;
-  language: 'en';
-};
-
-type WhisperTranscribeConfig = {
-  pcm16kMono: number[];
-  language: 'en';
-  environment: 'quiet' | 'noisy';
-};
-
-const whisperModule =
-  Platform.OS === 'android' ? requireOptionalNativeModule<any>('AuraWhisperStt') : null;
-
-if (Platform.OS === 'android' && whisperModule) {
-  (globalThis as { __AURA_WHISPER_CPP__?: unknown }).__AURA_WHISPER_CPP__ = {
-    startCapture: (config: WhisperStartCaptureConfig) =>
-      whisperModule.startCapture(config.maxDurationSeconds, config.language),
-    stopCapture: () => whisperModule.stopCapture(),
-    readCapturedPcm16kMono: () => whisperModule.readCapturedPcm16kMono(),
-    transcribe: (config: WhisperTranscribeConfig) =>
-      whisperModule.transcribe(config.pcm16kMono, config.language, config.environment),
-  };
-}
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -163,7 +136,28 @@ export default function RootLayout() {
         }}
       />
       <Toaster />
+      <AuthSessionProvider>
+        <AuthNavigator />
+      </AuthSessionProvider>
       <PortalHost />
     </ThemeProvider>
+  );
+}
+
+function AuthNavigator() {
+  const { isLoading } = useAuthSession();
+
+  if (isLoading) {
+    return null;
+  }
+
+  return (
+    <Stack
+      screenOptions={{
+        animation: 'fade',
+        contentStyle: { backgroundColor: 'transparent' },
+        headerShown: false,
+      }}
+    />
   );
 }
