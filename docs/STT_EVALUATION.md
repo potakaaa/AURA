@@ -1,152 +1,106 @@
-# STT Evaluation for AURA (Issue #14)
+# STT Implementation for AURA (Expo Speech Recognition)
 
-## 1) Objective
+## 1) Current Decision
 
-Select the speech-to-text approach for MVP and define a production-ready Android proof of concept (POC) for AURA, prioritizing privacy (on-device first) while maintaining acceptable latency and recognition quality for short voice commands.
+AURA now uses **`expo-speech-recognition` as the only STT provider** for mobile voice input.
 
-This evaluation compares:
+- No Whisper / `whisper.cpp` runtime path
+- No PCM chunking pipeline in `@aura/voice`
+- No on-device model-size selection in app code
 
-- Whisper on-device via `whisper.cpp`
-- Whisper on-device via ONNX Runtime
-- Whisper API (cloud)
-- Google Speech-to-Text (cloud)
-- Android built-in STT
+## 2) Source of Truth
 
-## 2) Evaluation Setup
+Primary implementation locations:
 
-### Device and profile
+- `packages/voice/stt/expoSpeechRecognition.ts`
+- `packages/voice/stt/types.ts`
+- `apps/mobile/hooks/useSpeechRecognition.ts`
+- `apps/mobile/app/(tabs)/index.tsx`
 
-- Device profile: single Android baseline (Pixel 7a class)
-- Locale: English (`en-US`)
-- Command style: short assistant commands under 15 seconds
-- Audio target: 16 kHz mono PCM
-- Environments: quiet room and noisy room (coffee-shop noise playback)
+## 3) Runtime Permissions
 
-### Test corpus
+AURA requires microphone and speech recognition permissions through Expo config + runtime request flow.
 
-- 24 utterances in `packages/voice/stt/benchmarks/data/utterances.en.json`
-- Includes wake/chat-style commands:
-  - task creation
-  - reminders
-  - messaging
-  - playback controls
-  - settings changes
+Configured in mobile app config:
 
-### Metrics
+- iOS `NSMicrophoneUsageDescription`
+- Android `android.permission.RECORD_AUDIO`
+- `expo-speech-recognition` config plugin permission strings
 
-- Accuracy: Word Error Rate (WER) across 24 utterances
-- Latency: end-to-end STT response in milliseconds (`p50`, `p95`)
-- Model size: on-device model artifact size where applicable
-- Battery estimate: coarse estimate from 10-minute repeated command loops
+See `apps/mobile/app.json`.
 
-### Pipeline notes
+## 4) Dev Client Requirement
 
-The final Android POC uses the same chunking principle that worked well in WhisperKit experimentation: 1-2 second windows with overlap to reduce word loss at boundaries. WhisperKit itself is Apple-platform specific, so Android implementation uses `whisper.cpp` with equivalent chunking behavior.
+`expo-speech-recognition` is a native module. **Expo Go is not sufficient** for validating full STT behavior.
 
-## 3) Option Comparison
+Use an Expo dev client build:
 
-| Option | Privacy | Offline | Engineering complexity | Notes |
-| --- | --- | --- | --- | --- |
-| Whisper `whisper.cpp` on-device | Strong | Yes | Medium-High | Best privacy/control, predictable behavior |
-| Whisper ONNX on-device | Strong | Yes | High | Good portability, but Android perf tuning risk |
-| Whisper API (cloud) | Lower | No | Low-Medium | Good quality, network dependency and data egress |
-| Google Speech-to-Text | Lower | No | Low-Medium | Strong latency on good network, vendor lock-in |
-| Android built-in STT | Medium-Low | OEM-dependent | Low | Fast to integrate, variable OEM quality/privacy |
+1. `pnpm install`
+2. `pnpm --filter mobile typecheck`
+3. Build/run Android or iOS dev client (`expo run:android` / `expo run:ios` or equivalent project workflow)
+4. Launch the app in dev client and test mic interactions
 
-## 4) Benchmarks (Recorded)
+## 5) Setup / Build / Test Commands
 
-Benchmark summaries are generated from recorded run files via:
+From repo root:
 
-- `node packages/voice/stt/benchmarks/run-benchmark.mjs`
+```bash
+pnpm install
+pnpm --filter @aura/voice build
+pnpm --filter @aura/voice test
+pnpm --filter mobile typecheck
+```
 
-The source run artifacts are in:
+## 6) Manual QA
 
-- `packages/voice/stt/benchmarks/data/providers.json`
-- `packages/voice/stt/benchmarks/results/generated-runs/*.json`
+Use the STT checklist:
 
-For this repository POC, recordings are represented as reproducible run artifacts generated from the benchmark provider profiles and utterance corpus. Replace these with direct device-captured runs in performance hardening.
+- [STT Manual QA Checklist](issues/qa/stt-manual-qa-checklist.md)
 
-### 4.1 Runtime options (single Android profile)
+Checklist includes:
 
-| Option | WER (24 utt.) | Latency p50 (ms) | Latency p95 (ms) | Model size | Battery estimate |
-| --- | ---: | ---: | ---: | --- | --- |
-| Whisper on-device (`whisper.cpp` tiny) | 0.182 | 650 | 900 | 75 MB | 6.8%/hr |
-| Whisper on-device (`whisper.cpp` base) | 0.128 | 1040 | 1490 | 142 MB | 9.5%/hr |
-| Whisper on-device (`whisper.cpp` small) | 0.049 | 1770 | 2590 | 466 MB | 14.8%/hr |
-| Whisper API (cloud) | 0.030 | 1520 | 2330 | N/A (server-side) | 4.2%/hr (+network radio) |
-| Google Speech-to-Text | 0.128 | 900 | 1460 | N/A (server-side) | 4.0%/hr (+network radio) |
-| Android built-in STT | 0.182 | 600 | 970 | N/A (system) | 3.6%/hr |
+- Start/stop/cancel behavior from voice hub orb
+- Partial transcript rendering
+- Final transcript propagation
+- Permission denied handling
+- Unsupported-device messaging
 
-### 4.2 Quiet vs noisy smoke check (`whisper.cpp` base)
+## 7) Troubleshooting
 
-- Quiet: WER `0.060`, pass (`<= 0.12`)
-- Noisy: WER `0.196`, pass (`<= 0.20`)
+### Permission denied
 
-Smoke outputs are generated by:
+Symptoms:
 
-- `node packages/voice/stt/smoke/run-smoke.mjs`
+- Error state shown in voice UI
+- Mic action disabled after denial
 
-And written to:
+Actions:
 
-- `packages/voice/stt/smoke/results/quiet.json`
-- `packages/voice/stt/smoke/results/noisy.json`
+1. Open device Settings and enable microphone/speech permissions for AURA.
+2. Reopen app and retry voice capture.
+3. Confirm permission copy in `app.json` is present and dev client is rebuilt.
 
-## 5) Model Size Decision (tiny vs base vs small)
+### Unsupported STT device/service
 
-### Decision
+Symptoms:
 
-Use `whisper.cpp` **base** model for MVP on-device STT.
+- `not_available` error in UI
+- Mic action disabled with unsupported message
 
-### Rationale
+Actions:
 
-- `tiny` is very fast but accuracy drop is visible in noisy conditions.
-- `small` improves accuracy modestly but misses latency target for interactive command feel and significantly increases model/battery cost.
-- `base` gives best balance for command-style English input on a single-device MVP profile.
+1. Verify device has speech recognition service available.
+2. Test on a different emulator/device image.
+3. Confirm app runs in dev client, not Expo Go.
 
-## 6) Recommended Production Approach
+### No speech detected
 
-### Primary path (MVP)
+Symptoms:
 
-- On-device `whisper.cpp` (base model) as default transcription path
-- 16 kHz mono capture + 1-2 second overlapping windows
-- English-only command transcription (`< 15s` per utterance)
+- `no_speech` error shown
 
-### Fallback path
+Actions:
 
-- If on-device transcription repeatedly fails (3 consecutive failures), route to cloud fallback (Whisper API preferred, Google STT secondary) when network is available.
-
-### Why this fits AURA
-
-- Aligns with privacy-first design and local-first intent
-- Maintains acceptable latency for short commands without mandatory network round trips
-- Keeps a practical fallback for edge cases
-
-## 7) Android POC Implementation Summary
-
-POC code location:
-
-- `packages/voice/stt/`
-
-Implemented scope:
-
-- Android native module scaffold for mic capture and whisper.cpp invocation contract
-- TypeScript bridge + session orchestration
-- Overlapping chunking utilities
-- Benchmark and smoke harness scripts with reproducible artifacts
-
-## 8) Multilingual Feasibility (Future)
-
-MVP remains English-only. Multilingual support is feasible post-MVP with trade-offs:
-
-- Larger multilingual models increase package size and battery use
-- Language auto-detection can increase latency variance
-- Recommended staged rollout:
-  1) Add explicit language selection in settings
-  2) Add top 2-3 target languages with fixed locale models
-  3) Re-benchmark latency/battery per language before enabling auto-detect
-
-## 9) Risks and Follow-ups
-
-- Native integration risk in Expo-managed workflow: use Expo prebuild + dev client path.
-- Device variability: this benchmark uses one Android profile; expand to two-tier device testing in next iteration.
-- Battery estimate is coarse; refine with Android battery historian in performance hardening phase.
+1. Retry in quieter environment.
+2. Check active microphone source and OS-level mic access.
+3. Verify you are tapping orb to start before speaking.

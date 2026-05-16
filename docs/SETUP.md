@@ -79,7 +79,7 @@ API defaults to `http://localhost:3000` unless `PORT` is set.
 
 ## Run Android App on Emulator
 
-AURA mobile is currently Expo-managed. There is no committed Android Gradle project in this repo yet.
+AURA mobile is Expo-managed and uses native modules (including STT), so use a **dev client** for feature validation.
 
 1. Start an Android emulator from Android Studio Device Manager.
 2. In a new terminal from repo root, run:
@@ -99,6 +99,41 @@ If you only want the dev server first:
 ```bash
 pnpm dev:mobile
 ```
+
+## STT-Specific Setup (Expo Speech Recognition)
+
+AURA uses `expo-speech-recognition` as the only STT provider.
+
+1. Ensure dependencies are installed from repo root:
+
+```bash
+pnpm install
+```
+
+2. Validate package and mobile typing/build:
+
+```bash
+pnpm --filter @aura/voice build
+pnpm --filter @aura/voice test
+pnpm --filter mobile typecheck
+```
+
+3. Build/run a dev client for native module testing (Android and/or iOS):
+
+```bash
+pnpm --filter mobile android
+pnpm --filter mobile ios
+```
+
+4. Confirm permissions are configured in `apps/mobile/app.json`:
+
+- iOS microphone usage description
+- Android `RECORD_AUDIO`
+- `expo-speech-recognition` plugin permission strings
+
+Manual test steps are documented here:
+
+- `docs/issues/qa/stt-manual-qa-checklist.md`
 
 ## Run Tests
 
