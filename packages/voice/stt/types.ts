@@ -67,3 +67,26 @@ export interface SttError {
   readonly recoverable: boolean;
   readonly rawCode?: string;
 }
+
+export interface SttPermissionState {
+  readonly granted: boolean;
+  readonly canAskAgain: boolean;
+  readonly status: string;
+}
+
+export interface SttSessionCallbacks {
+  readonly onStatusChange?: (status: SttSessionStatus) => void;
+  readonly onPartialTranscript?: (result: SttTranscriptResult) => void;
+  readonly onFinalTranscript?: (result: SttTranscriptResult) => void;
+  readonly onError?: (error: SttError) => void;
+}
+
+export interface SttSession {
+  getStatus(): SttSessionStatus;
+  checkPermissions(): Promise<SttPermissionState>;
+  requestPermissions(): Promise<SttPermissionState>;
+  start(request: SttSessionStartRequest): Promise<void>;
+  stop(request: SttSessionStopRequest): Promise<void>;
+  cancel(request: SttSessionCancelRequest): Promise<void>;
+  dispose(): void;
+}

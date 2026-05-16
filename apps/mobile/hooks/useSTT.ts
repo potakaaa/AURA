@@ -1,51 +1,45 @@
-import { useCallback, useEffect, useState } from "react";
-import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from "expo-speech-recognition";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ExpoSpeechRecognitionSession } from "@aura/voice";
 
 export function useSTT() {
   const [transcript, setTranscript] = useState("");
   const [isListening, setIsListening] = useState(false);
 
-  useSpeechRecognitionEvent("result", (event) => {
-    const joined = event.results
-      .map((result) => result.transcript)
-      .join(" ")
-      .trim();
-    setTranscript(joined);
-  });
-
-  useSpeechRecognitionEvent("end", () => {
-    setIsListening(false);
-  });
-
-  useSpeechRecognitionEvent("error", () => {
-    setIsListening(false);
-  });
+  const session = useMemo(
+    () =>
+      new ExpoSpeechRecognitionSession({
+        onStatusChange: (status) => {
+          setIsListening(status === "starting" || status === "listening");
+        },
+        onPartialTranscript: (result) => {
+          setTranscript(result.transcript);
+        },
+        onFinalTranscript: (result) => {
+          setTranscript(result.transcript);
+        },
+      }),
+    [],
+  );
 
   useEffect(() => {
     return () => {
-      ExpoSpeechRecognitionModule.abort();
+      session.dispose();
     };
-  }, []);
+  }, [session]);
 
   const startListening = useCallback(async () => {
     setTranscript("");
 
-    const permissions = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-    if (!permissions.granted) {
-      setIsListening(false);
-      return;
-    }
-
-    setIsListening(true);
-
-    await ExpoSpeechRecognitionModule.start({
-      lang: "en-US",
+    await session.start({
+      action: "start",
+      sessionId: crypto.randomUUID(),
+      locale: "en-US",
       interimResults: true,
       continuous: false,
       maxAlternatives: 1,
       requiresOnDeviceRecognition: false,
     });
-  }, []);
+  }, [session]);
 
   return { transcript, isListening, startListening };
 }
