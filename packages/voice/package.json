@@ -21,6 +21,9 @@
     "stt:benchmark:device": "node stt/benchmarks/run-device-benchmark.mjs",
     "stt:smoke": "node stt/smoke/run-smoke.mjs"
   },
+  "dependencies": {
+    "expo-modules-core": "3.0.29"
+  },
   "devDependencies": {
     "vitest": "^4.1.2",
     "typescript": "^5.8.3"

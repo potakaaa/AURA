@@ -6,21 +6,17 @@ import type {
   SttTranscriptionRequest,
   SttTranscriptionResult,
 } from "../types.js";
+import { requireNativeModule } from "expo-modules-core";
 
 interface AndroidWhisperCppNativeModule {
-  startCapture(config: {
-    readonly sampleRateHz: 16000;
-    readonly channelCount: 1;
-    readonly maxDurationSeconds: number;
-    readonly language: "en";
-  }): Promise<void>;
+  startCapture(maxDurationSeconds: number, language: "en"): Promise<void>;
   stopCapture(): Promise<void>;
   readCapturedPcm16kMono(): Promise<number[]>;
-  transcribe(config: {
-    readonly pcm16kMono: number[];
-    readonly language: "en";
-    readonly environment: "quiet" | "noisy";
-  }): Promise<{
+  transcribe(
+    pcm16kMono: number[],
+    language: "en",
+    environment: "quiet" | "noisy",
+  ): Promise<{
     readonly transcript: string;
     readonly latencyMs: number;
     readonly confidence?: number;
@@ -28,17 +24,15 @@ interface AndroidWhisperCppNativeModule {
 }
 
 function getNativeModule(): AndroidWhisperCppNativeModule {
-  const maybeModule = (globalThis as { __AURA_WHISPER_CPP__?: AndroidWhisperCppNativeModule })
-    .__AURA_WHISPER_CPP__;
-
-  if (!maybeModule) {
+  try {
+    return requireNativeModule<AndroidWhisperCppNativeModule>("AuraWhisperStt");
+  } catch {
     throw new Error(
-      "Android whisper.cpp native module is not registered. " +
-        "Attach `__AURA_WHISPER_CPP__` from native bridge initialization.",
+      "Android whisper.cpp native module `AuraWhisperStt` is unavailable. " +
+        "This requires an Android dev/client build with the native module compiled in; " +
+        "Expo Go does not include custom native modules.",
     );
   }
-
-  return maybeModule;
 }
 
 export class AndroidWhisperCppCapture implements SttAudioCapture {
@@ -46,12 +40,7 @@ export class AndroidWhisperCppCapture implements SttAudioCapture {
     request: SttTranscriptionRequest,
     _onChunk: (chunk: SttAudioChunk) => Promise<void>,
   ): Promise<void> {
-    await getNativeModule().startCapture({
-      sampleRateHz: 16000,
-      channelCount: 1,
-      maxDurationSeconds: request.maxDurationSeconds,
-      language: request.language,
-    });
+    await getNativeModule().startCapture(request.maxDurationSeconds, request.language);
   }
 
   public async stop(): Promise<void> {
@@ -86,11 +75,11 @@ export class AndroidWhisperCppEngine implements SttEngine {
     chunk: SttAudioChunk,
     request: SttTranscriptionRequest,
   ): Promise<SttTranscriptionResult> {
-    const response = await getNativeModule().transcribe({
-      pcm16kMono: Array.from(chunk.pcm16kMono),
-      language: request.language,
-      environment: request.environment,
-    });
+    const response = await getNativeModule().transcribe(
+      Array.from(chunk.pcm16kMono),
+      request.language,
+      request.environment,
+    );
 
     return {
       utteranceId: request.utteranceId,

@@ -5,6 +5,7 @@ import { AuraScreen } from '@/components/ui/aura-screen';
 import { AuraThemeToggleRow } from '@/components/ui/aura-theme-toggle-row';
 import { persistColorScheme } from '@/lib/color-scheme';
 import { supabase } from '@/lib/supabase';
+import { useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -12,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { colorScheme, setColorScheme } = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -42,6 +44,15 @@ export default function SettingsScreen() {
           <AuraCard title="Appearance" description="Material-style dark theme persistence">
             <AuraThemeToggleRow checked={isDarkMode} onCheckedChange={onToggleDarkMode} />
           </AuraCard>
+          <View className="mt-4">
+            <AuraButton
+              label="Open STT Test (Temporary)"
+              auraVariant="secondary"
+              className="h-12 rounded-full"
+              onPress={() => router.push('/dev/stt-test')}
+              accessibilityLabel="Open STT Test"
+            />
+          </View>
           <AuraCard className="mt-4" title="Account" description="Manage your current session">
             <AuraButton
               label={isSigningOut ? 'Signing out...' : 'Log out'}
