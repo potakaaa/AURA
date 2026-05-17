@@ -19,8 +19,11 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "AURA uses your microphone for on-device voice transcription."
-      }
+        "NSMicrophoneUsageDescription": "AURA uses your microphone for voice transcription.",
+        "NSSpeechRecognitionUsageDescription": "AURA uses speech recognition to transcribe your voice.",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "bundleIdentifier": "com.potaka.AURA"
     },
     "android": {
       "edgeToEdgeEnabled": true,
@@ -66,6 +69,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b919d4bf-e363-44ea-b4ee-faca6d5651cf"
+      }
     }
   }
 }

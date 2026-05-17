@@ -1,4 +1,4 @@
-export { ExpoSpeechRecognitionSession } from "./expoSpeechRecognition.js";
+export { ExpoSpeechRecognitionSession } from "./expoSpeechRecognition";
 export type {
   SttError,
   SttErrorCode,
@@ -13,4 +13,4 @@ export type {
   SttTranscriptAlternative,
   SttTranscriptKind,
   SttTranscriptResult,
-} from "./types.js";
+} from "./types";

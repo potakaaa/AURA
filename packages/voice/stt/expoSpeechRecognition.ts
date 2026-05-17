@@ -1,10 +1,11 @@
-import { ExpoSpeechRecognitionModule } from "expo-speech-recognition";
 import type {
   ExpoSpeechRecognitionErrorCode,
   ExpoSpeechRecognitionErrorEvent,
+  ExpoSpeechRecognitionNativeEventMap,
   ExpoSpeechRecognitionResult,
   ExpoSpeechRecognitionResultEvent,
 } from "expo-speech-recognition";
+import { requireNativeModule } from "expo-modules-core";
 
 import type {
   SttError,
@@ -19,9 +20,42 @@ import type {
   SttTranscriptAlternative,
   SttTranscriptKind,
   SttTranscriptResult,
-} from "./types.js";
+} from "./types";
 
 type Subscription = { remove: () => void };
+type ExpoModule = {
+  addListener<K extends keyof ExpoSpeechRecognitionNativeEventMap>(
+    eventName: K,
+    listener: (event: ExpoSpeechRecognitionNativeEventMap[K]) => void,
+  ): { remove: () => void };
+  start(options: {
+    lang?: string;
+    interimResults?: boolean;
+    maxAlternatives?: number;
+    continuous?: boolean;
+    requiresOnDeviceRecognition?: boolean;
+  }): void;
+  stop(): void;
+  abort(): void;
+  getPermissionsAsync(): Promise<{
+    granted: boolean;
+    canAskAgain: boolean;
+    status: string;
+  }>;
+  requestPermissionsAsync(): Promise<{
+    granted: boolean;
+    canAskAgain: boolean;
+    status: string;
+  }>;
+};
+
+function getSpeechModule(): ExpoModule | null {
+  try {
+    return requireNativeModule<ExpoModule>("ExpoSpeechRecognition");
+  } catch {
+    return null;
+  }
+}
 
 function toConfidence(value: number): number | null {
   if (typeof value !== "number" || value < 0) {
@@ -74,21 +108,27 @@ export class ExpoSpeechRecognitionSession implements SttSession {
   private activeSessionId: string | null = null;
 
   private readonly subscriptions: Subscription[] = [];
+  private readonly speechModule: ExpoModule | null;
 
   public constructor(private readonly callbacks: SttSessionCallbacks = {}) {
+    this.speechModule = getSpeechModule();
+    if (!this.speechModule) {
+      return;
+    }
+
     this.subscriptions.push(
-      ExpoSpeechRecognitionModule.addListener("start", () => {
+      this.speechModule.addListener("start", () => {
         this.setStatus("listening");
       }) as Subscription,
-      ExpoSpeechRecognitionModule.addListener("end", () => {
+      this.speechModule.addListener("end", () => {
         if (this.status !== "canceled") {
           this.setStatus("stopped");
         }
       }) as Subscription,
-      ExpoSpeechRecognitionModule.addListener("result", (event) => {
+      this.speechModule.addListener("result", (event: ExpoSpeechRecognitionResultEvent) => {
         this.handleResult(event);
       }) as Subscription,
-      ExpoSpeechRecognitionModule.addListener("error", (event) => {
+      this.speechModule.addListener("error", (event: ExpoSpeechRecognitionErrorEvent) => {
         this.handleError(event);
       }) as Subscription,
     );
@@ -99,7 +139,15 @@ export class ExpoSpeechRecognitionSession implements SttSession {
   }
 
   public async checkPermissions(): Promise<SttPermissionState> {
-    const response = await ExpoSpeechRecognitionModule.getPermissionsAsync();
+    if (!this.speechModule) {
+      return {
+        granted: false,
+        canAskAgain: false,
+        status: "unavailable",
+      };
+    }
+
+    const response = await this.speechModule.getPermissionsAsync();
 
     return {
       granted: response.granted,
@@ -109,8 +157,17 @@ export class ExpoSpeechRecognitionSession implements SttSession {
   }
 
   public async requestPermissions(): Promise<SttPermissionState> {
+    if (!this.speechModule) {
+      this.emitUnavailableError();
+      return {
+        granted: false,
+        canAskAgain: false,
+        status: "unavailable",
+      };
+    }
+
     this.setStatus("requesting-permission");
-    const response = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+    const response = await this.speechModule.requestPermissionsAsync();
 
     if (!response.granted) {
       this.setStatus("error");
@@ -133,6 +190,10 @@ export class ExpoSpeechRecognitionSession implements SttSession {
 
   public async start(request: SttSessionStartRequest): Promise<void> {
     this.activeSessionId = request.sessionId;
+    if (!this.speechModule) {
+      this.emitUnavailableError();
+      return;
+    }
 
     const permissions = await this.checkPermissions();
     if (!permissions.granted) {
@@ -145,7 +206,7 @@ export class ExpoSpeechRecognitionSession implements SttSession {
     }
 
     this.setStatus("starting");
-    ExpoSpeechRecognitionModule.start({
+    this.speechModule.start({
       lang: request.locale,
       interimResults: request.interimResults,
       maxAlternatives: request.maxAlternatives,
@@ -158,18 +219,26 @@ export class ExpoSpeechRecognitionSession implements SttSession {
     if (this.activeSessionId !== request.sessionId) {
       return;
     }
+    if (!this.speechModule) {
+      this.emitUnavailableError();
+      return;
+    }
 
     this.setStatus("stopping");
-    ExpoSpeechRecognitionModule.stop();
+    this.speechModule.stop();
   }
 
   public async cancel(request: SttSessionCancelRequest): Promise<void> {
     if (this.activeSessionId !== request.sessionId) {
       return;
     }
+    if (!this.speechModule) {
+      this.emitUnavailableError();
+      return;
+    }
 
     this.setStatus("canceled");
-    ExpoSpeechRecognitionModule.abort();
+    this.speechModule.abort();
   }
 
   public dispose(): void {
@@ -220,6 +289,20 @@ export class ExpoSpeechRecognitionSession implements SttSession {
       message: event.message,
       recoverable: isRecoverable(normalizedCode),
       rawCode: event.error,
+    };
+
+    this.setStatus("error");
+    this.callbacks.onError?.(error);
+  }
+
+  private emitUnavailableError(): void {
+    const error: SttError = {
+      sessionId: this.activeSessionId ?? "",
+      code: "not_available",
+      message:
+        "Speech recognition native module is unavailable. Use an Expo dev client build (not Expo Go).",
+      recoverable: false,
+      rawCode: "module_unavailable",
     };
 
     this.setStatus("error");

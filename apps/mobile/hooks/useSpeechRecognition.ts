@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ExpoSpeechRecognitionSession } from "@aura/voice";
+import * as ExpoCrypto from "expo-crypto";
 
 export interface SpeechRecognitionError {
   readonly sessionId: string;
@@ -114,7 +115,7 @@ export function useSpeechRecognition(
   }, [session]);
 
   const startListening = useCallback(async () => {
-    const sessionId = crypto.randomUUID();
+    const sessionId = ExpoCrypto.randomUUID();
     sessionIdRef.current = sessionId;
 
     setError(null);

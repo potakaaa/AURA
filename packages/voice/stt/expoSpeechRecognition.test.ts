@@ -26,8 +26,8 @@ const {
   })),
 }));
 
-vi.mock("expo-speech-recognition", () => ({
-  ExpoSpeechRecognitionModule: {
+vi.mock("expo-modules-core", () => ({
+  requireNativeModule: () => ({
     addListener: (eventName: string, listener: (event: any) => void) => {
       callbacks[eventName] ??= [];
       callbacks[eventName].push(listener);
@@ -38,7 +38,7 @@ vi.mock("expo-speech-recognition", () => ({
     abort: abortMock,
     getPermissionsAsync: getPermissionsAsyncMock,
     requestPermissionsAsync: requestPermissionsAsyncMock,
-  },
+  }),
 }));
 
 import { ExpoSpeechRecognitionSession } from "./expoSpeechRecognition.js";
