@@ -20,7 +20,7 @@ import type {
   SttTranscriptAlternative,
   SttTranscriptKind,
   SttTranscriptResult,
-} from "./types.js";
+} from "./types";
 
 type Subscription = { remove: () => void };
 type ExpoModule = {
