@@ -16,7 +16,19 @@ export type LlmChatResponse = {
   raw?: unknown;
 };
 
-export type LlmProviderName = "openai-compatible";
+export type LlmProviderName =
+  | "openai-compatible"
+  | "openai"
+  | "ollama"
+  | "gemini";
+
+export type LlmProviderConfig = {
+  provider: LlmProviderName;
+  baseUrl: string;
+  apiKey?: string;
+  model: string;
+  timeoutMs: number;
+};
 
 export interface LlmProvider {
   readonly name: LlmProviderName;
@@ -33,4 +45,8 @@ export class LlmProviderError extends Error {
     this.provider = options.provider;
     this.status = options.status;
   }
+}
+
+export function assertNever(value: never): never {
+  throw new Error(`Unhandled LLM provider: ${String(value)}`);
 }
