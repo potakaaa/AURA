@@ -3,18 +3,8 @@ import type {
   LlmChatResponse,
   LlmProvider,
   LlmProviderConfig,
-  LlmProviderName,
 } from "./types.js";
 import { LlmProviderError } from "./types.js";
-
-type OpenAiCompatibleChatCompletionResponse = {
-  model?: string;
-  choices?: Array<{
-    message?: {
-      content?: string | null;
-    };
-  }>;
-};
 
 type OllamaChatResponse = {
   model?: string;
@@ -32,44 +22,6 @@ type GeminiGenerateContentResponse = {
     };
   }>;
 };
-
-export class OpenAiCompatibleProvider implements LlmProvider {
-  readonly name: LlmProviderName;
-
-  constructor(private readonly config: LlmProviderConfig) {
-    this.name = config.provider;
-  }
-
-  async chat(request: LlmChatRequest): Promise<LlmChatResponse> {
-    if (!this.config.apiKey) {
-      throw new LlmProviderError(
-        "LLM_API_KEY is required for OpenAI-compatible providers.",
-        { provider: this.name },
-      );
-    }
-
-    const data = await postJson<OpenAiCompatibleChatCompletionResponse>(
-      `${this.config.baseUrl}/chat/completions`,
-      {
-        model: request.model ?? this.config.model,
-        messages: request.messages,
-        temperature: request.temperature,
-      },
-      this.config.timeoutMs,
-      this.name,
-      {
-        Authorization: `Bearer ${this.config.apiKey}`,
-      },
-    );
-
-    return {
-      content: data.choices?.[0]?.message?.content ?? "",
-      provider: this.name,
-      model: data.model ?? request.model ?? this.config.model,
-      raw: data,
-    };
-  }
-}
 
 export class OllamaProvider implements LlmProvider {
   readonly name = "ollama";
