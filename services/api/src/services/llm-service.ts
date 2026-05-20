@@ -1,19 +1,9 @@
 import { env } from "../config/env.js";
+import { createLlmProvider } from "../llm/provider-factory.js";
+import type { LlmMessage } from "../llm/types.js";
+import { LlmProviderError } from "../llm/types.js";
 
-export type ChatMessage = {
-  role: "system" | "user" | "assistant";
-  content: string;
-};
-
-type ChatCompletionResponse = {
-  id: string;
-  model: string;
-  choices: Array<{
-    index: number;
-    message: { role: string; content: string | null };
-    finish_reason: string | null;
-  }>;
-};
+export type ChatMessage = LlmMessage;
 
 export async function generateChatResponse(
   messages: ChatMessage[],
@@ -22,26 +12,22 @@ export async function generateChatResponse(
     return "LLM_API_KEY is not set. Add it to use real model responses.";
   }
 
-  const response = await fetch(`${env.LLM_BASE_URL}/chat/completions`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${env.LLM_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: env.LLM_MODEL,
+  try {
+    const provider = createLlmProvider();
+    const response = await provider.chat({
       messages,
+      model: env.LLM_MODEL,
       temperature: 0.3,
-    }),
-  });
+    });
 
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(
-      `LLM request failed (${response.status}): ${errorBody || response.statusText}`,
-    );
+    return response.content;
+  } catch (error) {
+    if (error instanceof LlmProviderError) {
+      throw error;
+    }
+
+    const message =
+      error instanceof Error ? error.message : "Unknown LLM error occurred";
+    throw new LlmProviderError(message, { provider: env.LLM_PROVIDER });
   }
-
-  const data = (await response.json()) as ChatCompletionResponse;
-  return data.choices[0]?.message?.content ?? "";
 }
