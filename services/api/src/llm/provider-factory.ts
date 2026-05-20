@@ -1,5 +1,5 @@
 import { env } from "../config/env.js";
-import { GeminiProvider } from "./provider.js";
+import { GeminiProvider } from "./providers/gemini-provider.js";
 import { OllamaProvider } from "./providers/ollama-provider.js";
 import { OpenAiCompatibleProvider } from "./providers/openai-compatible-provider.js";
 import type { LlmProvider, LlmProviderConfig } from "./types.js";
