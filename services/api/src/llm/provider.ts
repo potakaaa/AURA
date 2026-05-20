@@ -6,13 +6,6 @@ import type {
 } from "./types.js";
 import { LlmProviderError } from "./types.js";
 
-type OllamaChatResponse = {
-  model?: string;
-  message?: {
-    content?: string;
-  };
-};
-
 type GeminiGenerateContentResponse = {
   candidates?: Array<{
     content?: {
@@ -22,36 +15,6 @@ type GeminiGenerateContentResponse = {
     };
   }>;
 };
-
-export class OllamaProvider implements LlmProvider {
-  readonly name = "ollama";
-
-  constructor(private readonly config: LlmProviderConfig) {}
-
-  async chat(request: LlmChatRequest): Promise<LlmChatResponse> {
-    const data = await postJson<OllamaChatResponse>(
-      `${this.config.baseUrl}/api/chat`,
-      {
-        model: request.model ?? this.config.model,
-        messages: request.messages,
-        stream: false,
-        options:
-          request.temperature === undefined
-            ? undefined
-            : { temperature: request.temperature },
-      },
-      this.config.timeoutMs,
-      this.name,
-    );
-
-    return {
-      content: data.message?.content ?? "",
-      provider: this.name,
-      model: data.model ?? request.model ?? this.config.model,
-      raw: data,
-    };
-  }
-}
 
 export class GeminiProvider implements LlmProvider {
   readonly name = "gemini";
