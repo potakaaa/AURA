@@ -3,6 +3,7 @@ import {
   createLlmProvider,
   getLlmProviderConfig,
 } from "../llm/provider-factory.js";
+import { buildChatContext } from "../llm/context-builder.js";
 import type { LlmMessage, LlmProvider } from "../llm/types.js";
 import { LlmProviderError } from "../llm/types.js";
 
@@ -26,8 +27,9 @@ export async function generateChatResponse(
 
   try {
     const provider = options.provider ?? createLlmProvider(getLlmProviderConfig());
+    const context = buildChatContext(messages);
     const response = await provider.chat({
-      messages,
+      messages: context.messages,
       model: env.LLM_MODEL,
       temperature: 0.3,
     });

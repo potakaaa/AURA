@@ -59,7 +59,7 @@ import {
   CLAUDE_TOOLS,
   assembleContextWindow,
   OUTPUT_FORMAT_SCHEMAS,
-} from "ai-engine";
+} from "@aura/ai-engine";
 ```
 
 ## Current MVP tool set
@@ -82,4 +82,3 @@ See `prompts/examples/` for input/output fixtures used to regression-test:
 - confirmation previews
 - clarification behavior
 - multi-step action plans
-

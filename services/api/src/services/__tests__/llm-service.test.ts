@@ -12,11 +12,11 @@ test("generateChatResponse works with a mock LlmProvider", async () => {
   const response = await generateChatResponse(messages, { provider });
 
   assert.equal(response, "Provider reply");
-  assert.deepEqual(provider.lastRequest, {
-    messages,
-    model: "gpt-4o-mini",
-    temperature: 0.3,
-  });
+  assert.equal(provider.lastRequest?.messages[0].role, "system");
+  assert.match(provider.lastRequest?.messages[0].content ?? "", /You are AURA/);
+  assert.deepEqual(provider.lastRequest?.messages.at(-1), messages[0]);
+  assert.equal(provider.lastRequest?.model, "gpt-4o-mini");
+  assert.equal(provider.lastRequest?.temperature, 0.3);
 });
 
 test("service depends on normalized content, not OpenAI choices", async () => {
