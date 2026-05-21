@@ -9,9 +9,17 @@
     "check:no-hardcoded-colors": "node scripts/check-no-hardcoded-colors.mjs",
     "dev": "turbo run dev",
     "dev:mobile": "pnpm --filter mobile dev",
-    "dev:api": "pnpm --filter api dev"
+    "dev:api": "pnpm --filter api dev",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "devDependencies": {
     "turbo": "^2.3.3"
+  },
+  "version": "1.0.0",
+  "dependencies": {
+    "expo": "~54.0.33",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
   }
 }

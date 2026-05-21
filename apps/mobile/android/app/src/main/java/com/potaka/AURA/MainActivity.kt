@@ -1,4 +1,4 @@
-package com.potakaaa.aura
+package com.potaka.AURA
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

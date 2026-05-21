@@ -1,4 +1,4 @@
-package com.potakaaa.aura
+package com.potaka.AURA
 
 import android.app.Application
 import android.content.res.Configuration
