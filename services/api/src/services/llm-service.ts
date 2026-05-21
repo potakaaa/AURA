@@ -3,20 +3,29 @@ import {
   createLlmProvider,
   getLlmProviderConfig,
 } from "../llm/provider-factory.js";
-import type { LlmMessage } from "../llm/types.js";
+import type { LlmMessage, LlmProvider } from "../llm/types.js";
 import { LlmProviderError } from "../llm/types.js";
 
 export type ChatMessage = LlmMessage;
 
+type GenerateChatResponseOptions = {
+  provider?: LlmProvider;
+};
+
 export async function generateChatResponse(
   messages: ChatMessage[],
+  options: GenerateChatResponseOptions = {},
 ): Promise<string> {
-  if (env.LLM_PROVIDER === "openai-compatible" && !env.LLM_API_KEY) {
+  if (
+    !options.provider &&
+    env.LLM_PROVIDER === "openai-compatible" &&
+    !env.LLM_API_KEY
+  ) {
     return "LLM_API_KEY is not set. Add it to use real model responses.";
   }
 
   try {
-    const provider = createLlmProvider(getLlmProviderConfig());
+    const provider = options.provider ?? createLlmProvider(getLlmProviderConfig());
     const response = await provider.chat({
       messages,
       model: env.LLM_MODEL,

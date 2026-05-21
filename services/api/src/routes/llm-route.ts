@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { generateChatResponse } from "../services/llm-service.js";
+import type { ChatMessage } from "../services/llm-service.js";
 
 const chatSchema = z.object({
   messages: z
@@ -13,23 +14,34 @@ const chatSchema = z.object({
     .min(1),
 });
 
-export const llmRoute = Router();
+export type LlmRouteOptions = {
+  generateChatResponse?: (messages: ChatMessage[]) => Promise<string>;
+};
 
-llmRoute.post("/chat", async (req, res) => {
-  const parsed = chatSchema.safeParse(req.body);
-  if (!parsed.success) {
-    return res.status(400).json({
-      error: "Invalid request body",
-      details: parsed.error.flatten(),
-    });
-  }
+export function createLlmRoute(options: LlmRouteOptions = {}) {
+  const route = Router();
+  const generateResponse = options.generateChatResponse ?? generateChatResponse;
 
-  try {
-    const reply = await generateChatResponse(parsed.data.messages);
-    return res.json({ reply });
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown LLM error occurred";
-    return res.status(502).json({ error: message });
-  }
-});
+  route.post("/chat", async (req, res) => {
+    const parsed = chatSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: "Invalid request body",
+        details: parsed.error.flatten(),
+      });
+    }
+
+    try {
+      const reply = await generateResponse(parsed.data.messages);
+      return res.json({ reply });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unknown LLM error occurred";
+      return res.status(502).json({ error: message });
+    }
+  });
+
+  return route;
+}
+
+export const llmRoute = createLlmRoute();
