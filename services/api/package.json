@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.json",
+    "build": "pnpm --filter @aura/ai-engine build && tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "lint": "echo 'No lint configured'",
-    "test": "echo 'No tests configured'"
+    "test": "pnpm --filter @aura/ai-engine build && node --import tsx --test \"src/**/*.test.ts\""
   },
   "dependencies": {
+    "@aura/ai-engine": "workspace:*",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

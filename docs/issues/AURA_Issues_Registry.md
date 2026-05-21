@@ -367,23 +367,26 @@ Build the Settings screen with app configuration options and runtime permission 
 ---
 
 ### Issue #14
-**[[W3 | Mar 30-Apr 5 | P0] STT evaluation and selection — Whisper integration research](https://github.com/potakaaa/AURA/issues/14)**
+**[[W3 | Mar 30-Apr 5 | P0] STT evaluation and selection — Expo speech recognition decision](https://github.com/potakaaa/AURA/issues/14)**
 
 **Labels:** `P0` `voice` `research`
 
 ## Description
 
-Evaluate speech-to-text options and finalize the Whisper integration approach for AURA. Determine whether to use on-device Whisper (via whisper.cpp or ONNX) or a cloud fallback, and benchmark accuracy and latency.
+Evaluate speech-to-text options and finalize the Expo speech recognition approach for AURA.
+
+Superseded implementation note:
+
+- STT provider for MVP is `expo-speech-recognition` only.
+- Legacy Whisper/CPP evaluation notes are historical and not implementation guidance.
 
 ## Acceptance Criteria
 
-- [ ] Evaluation document in `docs/STT_EVALUATION.md` comparing: Whisper on-device (whisper.cpp/ONNX), Whisper API (cloud), Google Speech-to-Text, Android built-in STT
-- [ ] Benchmarks recorded for each option: accuracy (WER on 20+ test utterances), latency (p50, p95), model size, battery impact estimate
-- [ ] Recommended approach documented with rationale (on-device preferred for privacy)
-- [ ] Proof-of-concept Android code in `packages/voice/stt/` that captures audio and produces transcription using the chosen approach
-- [ ] POC handles: English input, short commands (< 15 seconds), quiet and noisy environments (basic test)
-- [ ] Decision on model size (tiny, base, small) with accuracy/latency trade-off documented
-- [ ] Multilingual support feasibility assessed (relevant for future; English-only for MVP)
+- [ ] `docs/STT_EVALUATION.md` documents Expo-only STT implementation and operational constraints
+- [ ] `packages/voice/stt/` exposes reusable Expo STT session API and normalized errors
+- [ ] Mobile integration supports English short-command transcription (<15 seconds)
+- [ ] Permission denied and unsupported service/device states have user-facing UI handling
+- [ ] Manual QA checklist exists and is linked from docs (`docs/issues/qa/stt-manual-qa-checklist.md`)
 
 ---
 
@@ -414,26 +417,22 @@ Integrate an on-device wake word detection engine so AURA can be activated hands
 ---
 
 ### Issue #16
-**[[W4 | Apr 7-12 | P0] Whisper STT integration — Audio capture to transcription pipeline](https://github.com/potakaaa/AURA/issues/16)**
+**[[W4 | Apr 7-12 | P0] STT integration — Expo speech recognition pipeline](https://github.com/potakaaa/AURA/issues/16)**
 
 **Labels:** `P0` `android` `voice`
 
 ## Description
 
-Build the full audio capture → transcription pipeline. After wake word detection triggers, the system captures the user's voice command and transcribes it using the Whisper model selected in W3.
+Build the full audio capture → transcription pipeline using `expo-speech-recognition`.
 
 ## Acceptance Criteria
 
-- [ ] Audio capture starts automatically after wake word detection
-- [ ] Voice Activity Detection (VAD) detects end-of-speech and stops capture (silence threshold: 1.5s)
-- [ ] Audio format: 16kHz mono PCM (Whisper's expected input)
-- [ ] Noise reduction applied before transcription (basic spectral gating or Android's built-in noise suppressor)
-- [ ] Transcription completes within 2 seconds for a 5-second utterance (on-device target)
-- [ ] Transcription result delivered as a string to the AI reasoning pipeline
-- [ ] Confidence score included with transcription (if supported by the chosen STT engine)
-- [ ] Error handling: microphone busy, audio capture failure, transcription timeout — all surface user-friendly messages
-- [ ] Fallback to text input if STT consistently fails (3 consecutive failures → prompt user to type)
-- [ ] Audio buffers are cleared from memory immediately after transcription (privacy)
+- [ ] Audio capture starts when user activates the mic UI
+- [ ] Partial transcript is shown during active recognition
+- [ ] Final transcript is delivered to the assistant flow on recognition completion
+- [ ] Start/stop/cancel controls are supported by the STT session API
+- [ ] Error handling: permission denied, unsupported device/service, no speech, and generic failures surface user-friendly messages
+- [ ] Fallback to text input is available when STT fails
 
 ---
 

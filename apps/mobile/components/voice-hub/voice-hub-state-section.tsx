@@ -5,9 +5,19 @@ import { useWindowDimensions, View } from 'react-native';
 
 type VoiceHubStateSectionProps = {
   micPermissionMessage?: string | null;
+  speechStatus?: string;
+  partialTranscript?: string;
+  finalTranscript?: string;
+  speechErrorMessage?: string | null;
 };
 
-export function VoiceHubStateSection({ micPermissionMessage }: VoiceHubStateSectionProps) {
+export function VoiceHubStateSection({
+  micPermissionMessage,
+  speechStatus,
+  partialTranscript,
+  finalTranscript,
+  speechErrorMessage,
+}: VoiceHubStateSectionProps) {
   const { width } = useWindowDimensions();
   const row = width >= 720;
 
@@ -19,6 +29,15 @@ export function VoiceHubStateSection({ micPermissionMessage }: VoiceHubStateSect
             className="text-on-surface-variant text-xs font-medium"
             style={{ fontFamily: 'Manrope_500Medium' }}>
             {micPermissionMessage}
+          </Text>
+        </View>
+      ) : null}
+      {speechErrorMessage ? (
+        <View className="w-full rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3">
+          <Text
+            className="text-xs font-medium text-red-200"
+            style={{ fontFamily: 'Manrope_500Medium' }}>
+            {speechErrorMessage}
           </Text>
         </View>
       ) : null}
@@ -41,6 +60,11 @@ export function VoiceHubStateSection({ micPermissionMessage }: VoiceHubStateSect
             className="text-on-surface-variant mt-4 max-w-md text-sm leading-relaxed"
             style={{ fontFamily: 'Manrope_500Medium' }}>
             You've reached 85% of your focus goal. Your environmental noise is optimized for creative flow.
+          </Text>
+          <Text
+            className="text-on-surface-variant mt-3 text-xs uppercase tracking-widest"
+            style={{ fontFamily: 'Manrope_700Bold' }}>
+            Voice Status: {speechStatus ?? 'idle'}
           </Text>
         </View>
 
@@ -70,6 +94,20 @@ export function VoiceHubStateSection({ micPermissionMessage }: VoiceHubStateSect
               style={{ fontFamily: 'Manrope_700Bold' }}>
               Focus Session
             </Text>
+            {partialTranscript ? (
+              <Text
+                className="text-on-surface mt-3 text-center text-xs"
+                style={{ fontFamily: 'Manrope_500Medium' }}>
+                Listening: {partialTranscript}
+              </Text>
+            ) : null}
+            {finalTranscript ? (
+              <Text
+                className="text-on-surface mt-2 text-center text-xs"
+                style={{ fontFamily: 'Manrope_500Medium' }}>
+                Final: {finalTranscript}
+              </Text>
+            ) : null}
           </View>
         </LinearGradient>
       </View>

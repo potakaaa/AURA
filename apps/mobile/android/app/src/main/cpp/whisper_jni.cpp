@@ -44,7 +44,8 @@ Java_com_potakaaa_aura_WhisperJniBridge_loadModel(
   }
 
   const char *model_path = env->GetStringUTFChars(assetPath, nullptr);
-  whisper_context *ctx = whisper_init_from_file(model_path);
+  whisper_context_params context_params = whisper_context_default_params();
+  whisper_context *ctx = whisper_init_from_file_with_params(model_path, context_params);
   env->ReleaseStringUTFChars(assetPath, model_path);
 
   if (ctx == nullptr) {
@@ -90,7 +91,7 @@ Java_com_potakaaa_aura_WhisperJniBridge_transcribe(
   params.translate = false;
   params.no_context = true;
   params.single_segment = false;
-  params.sample_rate = static_cast<int>(sampleRateHz);
+  (void) sampleRateHz;
 
   const char *language_cstr = nullptr;
   if (language != nullptr) {

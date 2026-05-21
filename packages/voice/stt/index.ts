@@ -1,18 +1,16 @@
-export { AndroidWhisperCppCapture, AndroidWhisperCppEngine } from "./adapters/androidWhisperCpp.js";
-export {
-  assertChunkingConfig,
-  createOverlappingChunks,
-  mergeChunkTranscripts,
-  type ChunkingConfig,
-} from "./chunking.js";
-export { WhisperSttSession, type SttSessionConfig } from "./pipeline.js";
+export { ExpoSpeechRecognitionSession } from "./expoSpeechRecognition";
 export type {
-  SttAudioCapture,
-  SttAudioChunk,
-  SttEngine,
-  SttEngineMetadata,
-  SttEnvironment,
-  SttSessionOutput,
-  SttTranscriptionRequest,
-  SttTranscriptionResult,
-} from "./types.js";
+  SttError,
+  SttErrorCode,
+  SttPermissionState,
+  SttSession,
+  SttSessionCancelRequest,
+  SttSessionCallbacks,
+  SttSessionControlRequest,
+  SttSessionStartRequest,
+  SttSessionStatus,
+  SttSessionStopRequest,
+  SttTranscriptAlternative,
+  SttTranscriptKind,
+  SttTranscriptResult,
+} from "./types";

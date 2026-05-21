@@ -1,53 +1,72 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, ScrollView, Text, View } from "react-native";
-
-import {
-  AndroidWhisperCppCapture,
-  AndroidWhisperCppEngine,
-  WhisperSttSession,
-} from "@aura/voice";
-
-const engine = new AndroidWhisperCppEngine("base");
-const capture = new AndroidWhisperCppCapture();
-const session = new WhisperSttSession(capture, engine, {
-  chunking: {
-    sampleRateHz: 16000,
-    chunkSeconds: 1.5,
-    overlapSeconds: 0.25,
-  },
-});
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 
 export default function SttTestScreen() {
   const [log, setLog] = useState<string[]>([]);
-  const [running, setRunning] = useState(false);
+  const {
+    status,
+    isListening,
+    partialTranscript,
+    finalTranscript,
+    error,
+    startListening,
+    stopListening,
+    cancelListening,
+    resetTranscript,
+  } = useSpeechRecognition();
 
   const append = (msg: string) => setLog((prev) => [...prev, msg]);
 
-  const runTest = async () => {
-    setRunning(true);
-    append("▶ Starting capture...");
+  useEffect(() => {
+    append(`status: ${status}`);
+  }, [status]);
 
-    try {
-      const result = await session.transcribeFromCapture({
-        utteranceId: "test-001",
-        language: "en",
-        environment: "quiet",
-        maxDurationSeconds: 5,
-      });
-
-      append(`✅ Transcript: "${result.transcript}"`);
-      append(`⏱ Latency: ${result.totalLatencyMs}ms`);
-      append(`📦 Chunks: ${result.chunkCount}`);
-    } catch (error) {
-      append(`❌ Error: ${String(error)}`);
+  useEffect(() => {
+    if (partialTranscript) {
+      append(`partial: "${partialTranscript}"`);
     }
+  }, [partialTranscript]);
 
-    setRunning(false);
+  useEffect(() => {
+    if (finalTranscript) {
+      append(`final: "${finalTranscript}"`);
+    }
+  }, [finalTranscript]);
+
+  useEffect(() => {
+    if (error) {
+      append(`error: ${error.code} (${error.message})`);
+    }
+  }, [error]);
+
+  const runTest = async () => {
+    append("starting recognition...");
+    await startListening();
   };
 
   return (
     <View style={{ flex: 1, padding: 24 }}>
-      <Button title={running ? "Listening..." : "Start 5s Test"} onPress={runTest} disabled={running} />
+      <Button
+        title={isListening ? "Listening..." : "Start Speech Test"}
+        onPress={runTest}
+        disabled={isListening}
+      />
+      <View style={{ marginTop: 8 }}>
+        <Button title="Stop" onPress={stopListening} disabled={!isListening} />
+      </View>
+      <View style={{ marginTop: 8 }}>
+        <Button title="Cancel" onPress={cancelListening} disabled={!isListening && status !== "processing"} />
+      </View>
+      <View style={{ marginTop: 8 }}>
+        <Button
+          title="Reset"
+          onPress={() => {
+            resetTranscript();
+            setLog([]);
+          }}
+        />
+      </View>
       <ScrollView style={{ marginTop: 16 }}>
         {log.map((line, index) => (
           <Text key={index} style={{ fontFamily: "monospace", fontSize: 13 }}>

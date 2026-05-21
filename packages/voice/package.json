@@ -3,26 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "react-native": "./index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+      "types": "./index.ts",
+      "react-native": "./index.ts",
+      "import": "./index.ts",
+      "default": "./index.ts"
     }
   },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "lint": "echo 'No lint configured'",
-    "test": "vitest run",
-    "stt:benchmark": "node stt/benchmarks/run-benchmark.mjs",
-    "stt:benchmark:device": "node stt/benchmarks/run-device-benchmark.mjs",
-    "stt:smoke": "node stt/smoke/run-smoke.mjs"
+    "test": "vitest run stt/expoSpeechRecognition.test.ts"
   },
   "dependencies": {
-    "expo-modules-core": "3.0.29"
+    "expo-modules-core": "3.0.29",
+    "expo-speech-recognition": "^3.1.3"
   },
   "devDependencies": {
     "vitest": "^4.1.2",
