@@ -1,5 +1,6 @@
 import '@/global.css';
 
+import { Toaster } from '@/components/ui/toaster';
 import {
   Manrope_400Regular,
   Manrope_500Medium,
@@ -127,6 +128,14 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={NAV_THEME[resolvedColorScheme]}>
       <StatusBar style={resolvedColorScheme === 'dark' ? 'light' : 'dark'} />
+      <Stack
+        screenOptions={{
+          animation: 'fade',
+          contentStyle: { backgroundColor: 'transparent' },
+          headerShown: false,
+        }}
+      />
+      <Toaster />
       <AuthSessionProvider>
         <AuthNavigator />
       </AuthSessionProvider>

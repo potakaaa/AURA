@@ -3,9 +3,11 @@ import { AuraButton } from '@/components/ui/aura-button';
 import { AuraCard } from '@/components/ui/aura-card';
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { AuraThemeToggleRow } from '@/components/ui/aura-theme-toggle-row';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import { persistColorScheme } from '@/lib/color-scheme';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'expo-router';
+import { Href, useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -44,6 +46,12 @@ export default function SettingsScreen() {
           <AuraCard title="Appearance" description="Material-style dark theme persistence">
             <AuraThemeToggleRow checked={isDarkMode} onCheckedChange={onToggleDarkMode} />
           </AuraCard>
+          <AuraCard
+            title="Temporary UI Lab"
+            description="Preview the temporary Sonner-like toast component and different states.">
+            <Button variant="outline" onPress={() => router.push('/(tabs)/toast-lab' as Href)}>
+              <Text>Open Toast Lab</Text>
+            </Button>
           <View className="mt-4">
             <AuraButton
               label="Open STT Test (Temporary)"
@@ -53,6 +61,7 @@ export default function SettingsScreen() {
               accessibilityLabel="Open STT Test"
             />
           </View>
+          </AuraCard>
           <AuraCard className="mt-4" title="Account" description="Manage your current session">
             <AuraButton
               label={isSigningOut ? 'Signing out...' : 'Log out'}
