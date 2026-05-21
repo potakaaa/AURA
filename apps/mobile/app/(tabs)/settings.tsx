@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { persistColorScheme } from '@/lib/color-scheme';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'expo-router';
+import { Href, useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -61,6 +61,7 @@ export default function SettingsScreen() {
               accessibilityLabel="Open STT Test"
             />
           </View>
+          </AuraCard>
           <AuraCard className="mt-4" title="Account" description="Manage your current session">
             <AuraButton
               label={isSigningOut ? 'Signing out...' : 'Log out'}
