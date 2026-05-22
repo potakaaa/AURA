@@ -119,6 +119,7 @@ export const VOICE_HUB = {
   statusDotIdle: rgbaWhite(0.38),
   statusDotActive: `rgba(${SECONDARY_RGB},0.95)`,
   transcriptSurface: rgbaWhite(0.055),
+  placeholderText: rgbaWhite(0.45),
 } as const;
 
 /** Learn More screen one-offs used to match reference artwork while preserving lint policy. */

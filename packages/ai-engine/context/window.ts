@@ -41,7 +41,7 @@ export type AssembleContextInput = {
   readonly systemPrompt: string;
   readonly userPreferences?: UserPreferences;
   readonly history: readonly ContextMessage[];
-  readonly newUserMessage: string;
+  readonly newUserMessage?: string;
   readonly countTokens?: TokenCounter;
 };
 
@@ -93,6 +93,17 @@ export const serializeUserPreferences = (prefs: UserPreferences): string => {
   return sections.join("\n");
 };
 
+export const normalizeContextHistory = (
+  messages: readonly ContextMessage[],
+): ContextMessage[] =>
+  messages
+    .map((message) => ({
+      role: message.role,
+      content: message.content.trim(),
+      tokenCount: message.tokenCount,
+    }))
+    .filter((message) => message.content.length > 0);
+
 /**
  * Assembles ordered context within the 8K total target.
  *
@@ -116,14 +127,31 @@ export const assembleContextWindow = (
   );
   const preferenceTokens = countTokens(boundedPreferences);
 
-  const historyBudget = Math.max(HISTORY_TOKEN_BUDGET, 0);
+  const rawNewUserMessage = input.newUserMessage?.trim() ?? "";
+  const newMessageBudget = Math.max(
+    TOTAL_CONTEXT_TOKEN_BUDGET -
+      systemTokens -
+      preferenceTokens -
+      RESPONSE_RESERVE_TOKEN_BUDGET -
+      TOOL_TURN_RESERVE_TOKEN_BUDGET,
+    0,
+  );
+  const boundedNewUserMessage = trimToTokenBudget(
+    rawNewUserMessage,
+    newMessageBudget,
+    countTokens,
+  );
+  const newMessageTokens = countTokens(boundedNewUserMessage);
+  const historyBudget = Math.max(
+    Math.min(HISTORY_TOKEN_BUDGET, newMessageBudget - newMessageTokens),
+    0,
+  );
   const retainedHistory = retainRecentHistoryWithinBudget(
-    input.history,
+    normalizeContextHistory(input.history),
     historyBudget,
     countTokens,
   );
 
-  const newMessageTokens = countTokens(input.newUserMessage);
   const reservedTokens =
     RESPONSE_RESERVE_TOKEN_BUDGET + TOOL_TURN_RESERVE_TOKEN_BUDGET;
 
@@ -140,11 +168,13 @@ export const assembleContextWindow = (
   }
 
   messages.push(...retainedHistory.messages);
-  messages.push({
-    role: "user",
-    content: input.newUserMessage,
-    tokenCount: newMessageTokens,
-  });
+  if (boundedNewUserMessage.length > 0) {
+    messages.push({
+      role: "user",
+      content: boundedNewUserMessage,
+      tokenCount: newMessageTokens,
+    });
+  }
 
   const historyTokens = retainedHistory.tokens;
   const totalUsed =
@@ -217,4 +247,3 @@ const trimToTokenBudget = (
 
   return truncated.trimEnd();
 };
-

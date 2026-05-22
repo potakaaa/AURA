@@ -9,14 +9,19 @@ import {
 import { AuthenticatedAppTopBar, appTopBarOffsetTop } from '@/components/common';
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
+import { postLlmChat, type LlmChatMessage } from '@/lib/llm-chat';
 import { THEME } from '@/lib/theme';
 import { GradientText } from '@/components/welcome/gradient-text';
 import { Calendar, FileText, Mail } from 'lucide-react-native';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, ScrollView, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const BG = THEME.dark.surfaceDim;
+const SYSTEM_PROMPT =
+  'You are Aura, a concise voice-first personal assistant. Answer clearly and keep replies useful for a mobile chat.';
+const ASSISTANT_ERROR_MESSAGE =
+  'Aura could not get a response right now. Check your connection and try again.';
 
 export default function VoiceHubScreen() {
   const insets = useSafeAreaInsets();
@@ -24,6 +29,13 @@ export default function VoiceHubScreen() {
   const topPad = appTopBarOffsetTop(insets.top);
   const bottomPad = VOICE_HUB_TAB_CONTENT_INSET + insets.bottom;
   const [micPermissionMessage, setMicPermissionMessage] = useState<string | null>(null);
+  const [draftMessage, setDraftMessage] = useState('');
+  const [chatMessages, setChatMessages] = useState<LlmChatMessage[]>([]);
+  const [isAssistantThinking, setIsAssistantThinking] = useState(false);
+  const [assistantErrorMessage, setAssistantErrorMessage] = useState<string | null>(null);
+  const lastSentTranscriptRef = useRef('');
+  const lastFailedUserMessageRef = useRef<string | null>(null);
+  const chatMessagesRef = useRef<LlmChatMessage[]>([]);
   const {
     status,
     isListening,
@@ -56,6 +68,71 @@ export default function VoiceHubScreen() {
   }, [error]);
 
   const micDisabled = error?.code === 'permission_denied' || error?.code === 'not_available';
+
+  useEffect(() => {
+    chatMessagesRef.current = chatMessages;
+  }, [chatMessages]);
+
+  const sendMessage = useCallback(
+    async (rawMessage: string, options: { appendUserMessage?: boolean } = {}) => {
+      const appendUserMessage = options.appendUserMessage ?? true;
+      const userContent = rawMessage.trim();
+
+      if (!userContent || isAssistantThinking) {
+        return;
+      }
+
+      const nextMessages: LlmChatMessage[] = appendUserMessage
+        ? [...chatMessagesRef.current, { role: 'user', content: userContent }]
+        : chatMessagesRef.current;
+
+      setChatMessages(nextMessages);
+      setDraftMessage('');
+      setAssistantErrorMessage(null);
+      setIsAssistantThinking(true);
+      lastFailedUserMessageRef.current = null;
+
+      try {
+        const response = await postLlmChat([
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...nextMessages,
+        ]);
+
+        setChatMessages([...nextMessages, { role: 'assistant', content: response.reply }]);
+      } catch {
+        lastFailedUserMessageRef.current = userContent;
+        setAssistantErrorMessage(ASSISTANT_ERROR_MESSAGE);
+      } finally {
+        setIsAssistantThinking(false);
+      }
+    },
+    [isAssistantThinking]
+  );
+
+  useEffect(() => {
+    const transcript = finalTranscript.trim();
+
+    if (!transcript || transcript === lastSentTranscriptRef.current) {
+      return;
+    }
+
+    lastSentTranscriptRef.current = transcript;
+    void sendMessage(transcript);
+  }, [finalTranscript, sendMessage]);
+
+  const handleSendDraftMessage = useCallback(() => {
+    void sendMessage(draftMessage);
+  }, [draftMessage, sendMessage]);
+
+  const handleRetryAssistantMessage = useCallback(() => {
+    const failedMessage = lastFailedUserMessageRef.current;
+
+    if (!failedMessage || isAssistantThinking) {
+      return;
+    }
+
+    void sendMessage(failedMessage, { appendUserMessage: false });
+  }, [isAssistantThinking, sendMessage]);
 
   const handleOrbPress = useCallback(async () => {
     setMicPermissionMessage(null);
@@ -156,6 +233,14 @@ export default function VoiceHubScreen() {
               partialTranscript={partialTranscript}
               finalTranscript={finalTranscript}
               speechErrorMessage={speechErrorMessage}
+              chatMessages={chatMessages}
+              draftMessage={draftMessage}
+              isAssistantThinking={isAssistantThinking}
+              assistantErrorMessage={assistantErrorMessage}
+              canRetryAssistantMessage={Boolean(lastFailedUserMessageRef.current)}
+              onDraftMessageChange={setDraftMessage}
+              onSendDraftMessage={handleSendDraftMessage}
+              onRetryAssistantMessage={handleRetryAssistantMessage}
             />
             <View className="h-2" />
           </View>

@@ -1,8 +1,11 @@
 import { Icon } from '@/components/ui/icon';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
+import type { LlmChatMessage } from '@/lib/llm-chat';
 import { VOICE_HUB } from '@/lib/raw-colors';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Activity, Clock3, Waves } from 'lucide-react-native';
+import { Activity, Clock3, RefreshCw, Send, Waves } from 'lucide-react-native';
 import { useMemo } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 
@@ -12,6 +15,14 @@ type VoiceHubStateSectionProps = {
   partialTranscript?: string;
   finalTranscript?: string;
   speechErrorMessage?: string | null;
+  chatMessages?: LlmChatMessage[];
+  draftMessage?: string;
+  isAssistantThinking?: boolean;
+  assistantErrorMessage?: string | null;
+  canRetryAssistantMessage?: boolean;
+  onDraftMessageChange?: (message: string) => void;
+  onSendDraftMessage?: () => void;
+  onRetryAssistantMessage?: () => void;
 };
 
 export function VoiceHubStateSection({
@@ -20,12 +31,21 @@ export function VoiceHubStateSection({
   partialTranscript,
   finalTranscript,
   speechErrorMessage,
+  chatMessages = [],
+  draftMessage = '',
+  isAssistantThinking = false,
+  assistantErrorMessage,
+  canRetryAssistantMessage = false,
+  onDraftMessageChange,
+  onSendDraftMessage,
+  onRetryAssistantMessage,
 }: VoiceHubStateSectionProps) {
   const { width } = useWindowDimensions();
   const row = width >= 720;
   const transcript = finalTranscript || partialTranscript;
   const status = speechStatus ?? 'idle';
   const isActive = status === 'listening' || status === 'processing';
+  const canSendDraft = draftMessage.trim().length > 0 && !isAssistantThinking;
   const humanStatus = useMemo(
     () => status.replace(/_/g, ' ').replace(/^\w/, (char) => char.toUpperCase()),
     [status]
@@ -49,6 +69,26 @@ export function VoiceHubStateSection({
             style={{ fontFamily: 'Manrope_500Medium' }}>
             {speechErrorMessage}
           </Text>
+        </View>
+      ) : null}
+      {assistantErrorMessage ? (
+        <View className="w-full gap-3 rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3">
+          <Text
+            className="text-xs font-medium text-red-200"
+            style={{ fontFamily: 'Manrope_500Medium' }}>
+            {assistantErrorMessage}
+          </Text>
+          {canRetryAssistantMessage ? (
+            <Button
+              className="self-start rounded-full px-4"
+              variant="outline"
+              size="sm"
+              disabled={isAssistantThinking}
+              onPress={onRetryAssistantMessage}>
+              <Icon as={RefreshCw} size={14} className="text-on-surface" />
+              <Text style={{ fontFamily: 'Manrope_700Bold' }}>Retry</Text>
+            </Button>
+          ) : null}
         </View>
       ) : null}
       <View className={`gap-4 ${row ? 'flex-row' : 'flex-col'}`}>
@@ -160,6 +200,69 @@ export function VoiceHubStateSection({
             ) : null}
           </View>
         </LinearGradient>
+      </View>
+      <View className="border-border/30 bg-surface-container/80 w-full gap-4 rounded-3xl border p-5">
+        <View className="gap-3">
+          {chatMessages.length > 0 ? (
+            chatMessages.map((message, index) => {
+              const isUser = message.role === 'user';
+
+              return (
+                <View
+                  key={`${message.role}-${index}-${message.content.slice(0, 12)}`}
+                  className={`max-w-[88%] rounded-2xl px-4 py-3 ${
+                    isUser
+                      ? 'bg-primary self-end rounded-br-md'
+                      : 'bg-surface-container-high/80 self-start rounded-bl-md'
+                  }`}>
+                  <Text
+                    className={`text-sm leading-5 ${
+                      isUser ? 'text-primary-foreground' : 'text-on-surface'
+                    }`}
+                    style={{ fontFamily: 'Manrope_500Medium' }}>
+                    {message.content}
+                  </Text>
+                </View>
+              );
+            })
+          ) : (
+            <Text
+              className="text-on-surface-variant text-sm leading-5"
+              style={{ fontFamily: 'Manrope_500Medium' }}>
+              Type a message or use the mic to start a conversation.
+            </Text>
+          )}
+
+          {isAssistantThinking ? (
+            <View className="bg-surface-container-high/80 self-start rounded-2xl rounded-bl-md px-4 py-3">
+              <Text
+                className="text-on-surface-variant text-sm"
+                style={{ fontFamily: 'Manrope_700Bold' }}>
+                Aura is thinking...
+              </Text>
+            </View>
+          ) : null}
+        </View>
+
+        <View className="flex-row items-end gap-3">
+          <Input
+            className="border-border/40 bg-surface-container-high/70 text-on-surface min-h-[44px] flex-1 rounded-2xl px-4 py-3"
+            multiline
+            editable={!isAssistantThinking}
+            placeholder="Message Aura"
+            placeholderTextColor={VOICE_HUB.placeholderText}
+            value={draftMessage}
+            onChangeText={onDraftMessageChange}
+            onSubmitEditing={canSendDraft ? onSendDraftMessage : undefined}
+          />
+          <Button
+            className="h-11 w-11 rounded-full p-0"
+            size="icon"
+            disabled={!canSendDraft}
+            onPress={onSendDraftMessage}>
+            <Icon as={Send} size={18} className="text-primary-foreground" />
+          </Button>
+        </View>
       </View>
     </View>
   );
