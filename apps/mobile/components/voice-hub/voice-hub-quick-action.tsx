@@ -1,6 +1,7 @@
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import { rgbaWhite } from '@/lib/raw-colors';
+import { rgbaWhite, VOICE_HUB } from '@/lib/raw-colors';
+import { LinearGradient } from 'expo-linear-gradient';
 import type { LucideIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
@@ -24,19 +25,33 @@ export function VoiceHubQuickAction({
       accessibilityLabel={label}
       onPress={onPress}
       android_ripple={{ color: rgbaWhite(0.08) }}
-      className="border-border/40 bg-surface-container w-full flex-row items-center justify-center gap-2 rounded-full border px-6 py-3 active:scale-[0.98]">
-      <Icon as={icon} size={18} className={iconClassName} />
-      <Text
-        className="text-muted-foreground text-sm font-medium"
-        style={{ fontFamily: 'Manrope_500Medium' }}>
-        {label}
-      </Text>
+      className="w-full overflow-hidden rounded-2xl border border-white/10 active:scale-[0.98]">
+      <LinearGradient
+        colors={[...VOICE_HUB.quickActionGradient]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{
+          minHeight: 56,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 12,
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+        }}>
+        <View className="bg-surface-container-high/80 h-9 w-9 items-center justify-center rounded-full">
+          <Icon as={icon} size={18} className={iconClassName} />
+        </View>
+        <Text
+          className="text-on-surface flex-1 text-sm font-semibold"
+          numberOfLines={2}
+          style={{ fontFamily: 'Manrope_700Bold' }}>
+          {label}
+        </Text>
+      </LinearGradient>
     </Pressable>
   );
 }
 
 export function VoiceHubQuickActionsRow({ children }: { children: ReactNode }) {
-  return (
-    <View className="w-full flex-col items-stretch gap-3">{children}</View>
-  );
+  return <View className="w-full flex-col items-stretch gap-3">{children}</View>;
 }

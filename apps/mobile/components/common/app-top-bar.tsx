@@ -4,14 +4,13 @@ import { cn } from '@/lib/utils';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { ReactNode } from 'react';
 import { Platform, StyleSheet, View, type ViewProps } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /** Height of the inner row (`h-20`) — use with `insets.top` to offset scroll content below the bar. */
 export const APP_TOP_BAR_INNER_HEIGHT = 80;
 
-/** Total top padding for content below {@link AppTopBar} (safe area + inner row). */
-export function appTopBarOffsetTop(insetsTop: number): number {
-  return insetsTop + APP_TOP_BAR_INNER_HEIGHT;
+/** Total top padding for content below {@link AppTopBar}. Root layout owns device safe-area spacing. */
+export function appTopBarOffsetTop(_insetsTop = 0): number {
+  return APP_TOP_BAR_INNER_HEIGHT;
 }
 
 const BAR_SHADOW = Platform.select({
@@ -46,13 +45,12 @@ export function AppTopBar({
   className,
   style,
 }: AppTopBarProps) {
-  const insets = useSafeAreaInsets();
   const centerOnly = trailing === false;
 
   return (
     <View
       className={cn('absolute left-0 right-0 top-0 z-50 overflow-hidden px-6', className)}
-      style={[{ paddingTop: insets.top, backgroundColor }, BAR_SHADOW, style]}>
+      style={[{ backgroundColor }, BAR_SHADOW, style]}>
       <LinearGradient
         pointerEvents="none"
         colors={[...BAR_SIMPLE.topSheen]}

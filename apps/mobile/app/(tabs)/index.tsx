@@ -64,7 +64,7 @@ export default function VoiceHubScreen() {
       setMicPermissionMessage(
         error?.code === 'permission_denied'
           ? 'Microphone access is required to start voice capture. Enable it in Settings to continue.'
-          : 'Speech recognition is unavailable on this device.',
+          : 'Speech recognition is unavailable on this device.'
       );
       return;
     }
@@ -86,7 +86,15 @@ export default function VoiceHubScreen() {
         setMicPermissionMessage('Unable to start voice capture. Check microphone permission.');
       }
     }
-  }, [cancelListening, error?.code, isListening, micDisabled, startListening, status, stopListening]);
+  }, [
+    cancelListening,
+    error?.code,
+    isListening,
+    micDisabled,
+    startListening,
+    status,
+    stopListening,
+  ]);
 
   return (
     <AuraScreen>
@@ -104,17 +112,22 @@ export default function VoiceHubScreen() {
           }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
-          <View className="w-full max-w-2xl gap-10 self-center">
-            <View className="items-center gap-8">
-              <VoiceHubOrb onPress={handleOrbPress} disabled={micDisabled} />
+          <View className="w-full max-w-2xl gap-8 self-center">
+            <View className="items-center gap-7">
+              <VoiceHubOrb
+                onPress={handleOrbPress}
+                disabled={micDisabled}
+                isListening={isListening}
+                isProcessing={status === 'processing'}
+              />
 
               <View className="w-full items-center gap-6">
                 <GradientText
                   variant="surfaceHeadline"
-                  className="text-center text-4xl font-extrabold leading-tight tracking-tight"
+                  className="text-center text-[34px] font-extrabold leading-tight tracking-tight"
                   outerClassName="self-center px-1"
                   textStyle={{ fontFamily: 'Manrope_800ExtraBold' }}>
-                  How can I assist your focus today?
+                  What should Aura help with next?
                 </GradientText>
 
                 <VoiceHubQuickActionsRow>

@@ -21,6 +21,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from 'react';
 import { Platform, Text, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -126,14 +127,18 @@ export default function RootLayout() {
   const resolvedColorScheme = colorScheme ?? 'dark';
 
   return (
-    <ThemeProvider value={NAV_THEME[resolvedColorScheme]}>
-      <StatusBar style={resolvedColorScheme === 'dark' ? 'light' : 'dark'} />
-      <Toaster />
-      <AuthSessionProvider>
-        <AuthNavigator />
-      </AuthSessionProvider>
-      <PortalHost />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider value={NAV_THEME[resolvedColorScheme]}>
+        <SafeAreaView className="flex-1 bg-background" edges={['top', 'bottom']}>
+          <StatusBar style={resolvedColorScheme === 'dark' ? 'light' : 'dark'} />
+          <Toaster />
+          <AuthSessionProvider>
+            <AuthNavigator />
+          </AuthSessionProvider>
+          <PortalHost />
+        </SafeAreaView>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
 

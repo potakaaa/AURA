@@ -109,9 +109,16 @@ export const RIPPLE = {
 /** Voice Hub one-offs (orbs, session card gradient) — keep literals here for `check-no-hardcoded-colors`. */
 export const VOICE_HUB = {
   focusSessionGradient: [`rgba(${PRIMARY_RGB},0.22)`, `rgba(${SECONDARY_RGB},0.18)`] as const,
+  quickActionGradient: [`rgba(${PRIMARY_RGB},0.14)`, rgbaWhite(0.045)] as const,
   orbRingOuter: `rgba(${PRIMARY_RGB},0.12)`,
   orbRingInner: `rgba(${SECONDARY_RGB},0.08)`,
+  orbRingActive: `rgba(${SECONDARY_RGB},0.44)`,
+  orbRingActiveSoft: `rgba(${PRIMARY_RGB},0.26)`,
+  orbHalo: rgbaWhite(0.08),
   sessionCardBorder: rgbaWhite(0.06),
+  statusDotIdle: rgbaWhite(0.38),
+  statusDotActive: `rgba(${SECONDARY_RGB},0.95)`,
+  transcriptSurface: rgbaWhite(0.055),
 } as const;
 
 /** Learn More screen one-offs used to match reference artwork while preserving lint policy. */
