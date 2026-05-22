@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { persistColorScheme } from '@/lib/color-scheme';
 import { supabase } from '@/lib/supabase';
+import { clearLocalConversationData } from '@/src/db/conversation-history';
 import { Href, useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
@@ -19,6 +20,7 @@ export default function SettingsScreen() {
   const { colorScheme, setColorScheme } = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isClearingConversations, setIsClearingConversations] = useState(false);
 
   async function onToggleDarkMode(nextValue: boolean) {
     const nextScheme = nextValue ? 'dark' : 'light';
@@ -34,6 +36,22 @@ export default function SettingsScreen() {
     setIsSigningOut(true);
     await supabase.auth.signOut();
     setIsSigningOut(false);
+  }
+
+  async function onClearConversationData() {
+    if (isClearingConversations) {
+      return;
+    }
+
+    setIsClearingConversations(true);
+    try {
+      await clearLocalConversationData();
+      Alert.alert('Conversation data cleared', 'Local Voice Hub messages were removed.');
+    } catch {
+      Alert.alert('Unable to clear data', 'Try again in a moment.');
+    } finally {
+      setIsClearingConversations(false);
+    }
   }
 
   return (
@@ -61,6 +79,19 @@ export default function SettingsScreen() {
               accessibilityLabel="Open STT Test"
             />
           </View>
+          </AuraCard>
+          <AuraCard
+            className="mt-4"
+            title="Privacy"
+            description="Manage local conversation history stored on this device.">
+            <AuraButton
+              label={isClearingConversations ? 'Clearing...' : 'Clear local conversations'}
+              auraVariant="secondary"
+              className="h-12 rounded-full"
+              onPress={onClearConversationData}
+              disabled={isClearingConversations}
+              accessibilityLabel="Clear local conversations"
+            />
           </AuraCard>
           <AuraCard className="mt-4" title="Account" description="Manage your current session">
             <AuraButton

@@ -36,9 +36,28 @@ export class ConversationsRepository {
 
   async listByUser(userId: string): Promise<ConversationRecord[]> {
     return this.db.getAll<ConversationRecord>(
-      'SELECT * FROM conversations WHERE user_id = ? ORDER BY created_at DESC;',
+      'SELECT * FROM conversations WHERE user_id = ? ORDER BY updated_at DESC, created_at DESC;',
       [userId]
     );
+  }
+
+  async upsert(input: CreateConversationInput): Promise<void> {
+    await this.db.run(
+      `INSERT INTO conversations (id, user_id, title, updated_at)
+       VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+       ON CONFLICT(id) DO UPDATE SET
+         title = excluded.title,
+         updated_at = CURRENT_TIMESTAMP;`,
+      [input.id, input.userId, input.title]
+    );
+  }
+
+  async touch(id: string): Promise<boolean> {
+    const result = await this.db.run(
+      'UPDATE conversations SET updated_at = CURRENT_TIMESTAMP WHERE id = ?;',
+      [id]
+    );
+    return result.changes > 0;
   }
 
   async update(id: string, input: UpdateConversationInput): Promise<boolean> {
@@ -52,5 +71,10 @@ export class ConversationsRepository {
   async delete(id: string): Promise<boolean> {
     const result = await this.db.run('DELETE FROM conversations WHERE id = ?;', [id]);
     return result.changes > 0;
+  }
+
+  async deleteAll(): Promise<number> {
+    const result = await this.db.run('DELETE FROM conversations;');
+    return result.changes;
   }
 }

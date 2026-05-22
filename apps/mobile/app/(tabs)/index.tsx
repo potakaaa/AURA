@@ -10,6 +10,10 @@ import { AuthenticatedAppTopBar, appTopBarOffsetTop } from '@/components/common'
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { LlmChatClientError, postLlmChat, type LlmChatMessage } from '@/lib/llm-chat';
+import {
+  loadRecentVoiceHubMessages,
+  saveVoiceHubExchange,
+} from '@/src/db/conversation-history';
 import { THEME } from '@/lib/theme';
 import { GradientText } from '@/components/welcome/gradient-text';
 import { Calendar, FileText, Mail } from 'lucide-react-native';
@@ -71,6 +75,27 @@ export default function VoiceHubScreen() {
     chatMessagesRef.current = chatMessages;
   }, [chatMessages]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    async function hydrateConversationHistory() {
+      try {
+        const recentMessages = await loadRecentVoiceHubMessages();
+        if (isMounted && recentMessages.length > 0) {
+          setChatMessages(recentMessages);
+        }
+      } catch (error) {
+        console.warn('[voice-hub] Unable to load local conversation history.', error);
+      }
+    }
+
+    void hydrateConversationHistory();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const sendMessage = useCallback(
     async (rawMessage: string, options: { appendUserMessage?: boolean } = {}) => {
       const appendUserMessage = options.appendUserMessage ?? true;
@@ -96,6 +121,12 @@ export default function VoiceHubScreen() {
           ...nextMessages,
         ]);
 
+        void saveVoiceHubExchange({
+          userContent,
+          assistantContent: response.reply,
+        }).catch((storageError) => {
+          console.warn('[voice-hub] Unable to save local conversation exchange.', storageError);
+        });
         setChatMessages([...nextMessages, { role: 'assistant', content: response.reply }]);
       } catch (error) {
         lastFailedUserMessageRef.current = userContent;

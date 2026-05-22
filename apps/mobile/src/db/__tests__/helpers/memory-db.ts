@@ -66,7 +66,14 @@ export class MemoryQueryExecutor implements QueryExecutor {
 
     if (normalized.startsWith('INSERT INTO CONVERSATIONS')) {
       const [id, userId, title] = params as [string, string, string];
-      this.conversations.set(id, { id, user_id: userId, title, created_at: this.now() });
+      const existing = this.conversations.get(id);
+      this.conversations.set(id, {
+        id,
+        user_id: userId,
+        title,
+        created_at: existing?.created_at ?? this.now(),
+        updated_at: this.now(),
+      });
       return { changes: 1, lastInsertRowId: 1 };
     }
 
@@ -80,9 +87,30 @@ export class MemoryQueryExecutor implements QueryExecutor {
       return { changes: 1, lastInsertRowId: 0 };
     }
 
+    if (normalized.startsWith('UPDATE CONVERSATIONS SET UPDATED_AT')) {
+      const [id] = params as [string];
+      const existing = this.conversations.get(id);
+      if (!existing) {
+        return { changes: 0, lastInsertRowId: 0 };
+      }
+      this.conversations.set(id, { ...existing, updated_at: this.now() });
+      return { changes: 1, lastInsertRowId: 0 };
+    }
+
     if (normalized.startsWith('DELETE FROM CONVERSATIONS')) {
+      if (params.length === 0) {
+        const changes = this.conversations.size;
+        this.conversations.clear();
+        this.messages.clear();
+        return { changes, lastInsertRowId: 0 };
+      }
       const [id] = params as [string];
       const removed = this.conversations.delete(id);
+      for (const [messageId, message] of this.messages.entries()) {
+        if (message.conversation_id === id) {
+          this.messages.delete(messageId);
+        }
+      }
       return { changes: removed ? 1 : 0, lastInsertRowId: 0 };
     }
 
@@ -114,7 +142,22 @@ export class MemoryQueryExecutor implements QueryExecutor {
     }
 
     if (normalized.startsWith('DELETE FROM MESSAGES')) {
+      if (params.length === 0) {
+        const changes = this.messages.size;
+        this.messages.clear();
+        return { changes, lastInsertRowId: 0 };
+      }
       const [id] = params as [string];
+      if (normalized.includes('WHERE CONVERSATION_ID =')) {
+        let changes = 0;
+        for (const [messageId, message] of this.messages.entries()) {
+          if (message.conversation_id === id) {
+            this.messages.delete(messageId);
+            changes += 1;
+          }
+        }
+        return { changes, lastInsertRowId: 0 };
+      }
       const removed = this.messages.delete(id);
       return { changes: removed ? 1 : 0, lastInsertRowId: 0 };
     }
@@ -187,6 +230,14 @@ export class MemoryQueryExecutor implements QueryExecutor {
       return Array.from(this.messages.values()).filter(
         (item) => item.conversation_id === conversationId
       ) as T[];
+    }
+
+    if (normalized.startsWith('SELECT * FROM ( SELECT * FROM MESSAGES WHERE CONVERSATION_ID =')) {
+      const [conversationId, limit] = params as [string, number];
+      return Array.from(this.messages.values())
+        .filter((item) => item.conversation_id === conversationId)
+        .sort((a, b) => a.created_at.localeCompare(b.created_at))
+        .slice(-limit) as T[];
     }
 
     if (normalized.startsWith('SELECT * FROM PREFERENCES')) {

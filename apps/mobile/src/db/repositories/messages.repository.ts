@@ -43,6 +43,18 @@ export class MessagesRepository {
     );
   }
 
+  async listRecentByConversation(conversationId: string, limit: number): Promise<MessageRecord[]> {
+    return this.db.getAll<MessageRecord>(
+      `SELECT * FROM (
+         SELECT * FROM messages
+         WHERE conversation_id = ?
+         ORDER BY created_at DESC
+         LIMIT ?
+       ) ORDER BY created_at ASC;`,
+      [conversationId, limit]
+    );
+  }
+
   async update(id: string, input: UpdateMessageInput): Promise<boolean> {
     const result = await this.db.run('UPDATE messages SET content = ? WHERE id = ?;', [
       input.content,
@@ -54,5 +66,17 @@ export class MessagesRepository {
   async delete(id: string): Promise<boolean> {
     const result = await this.db.run('DELETE FROM messages WHERE id = ?;', [id]);
     return result.changes > 0;
+  }
+
+  async deleteByConversation(conversationId: string): Promise<number> {
+    const result = await this.db.run('DELETE FROM messages WHERE conversation_id = ?;', [
+      conversationId,
+    ]);
+    return result.changes;
+  }
+
+  async deleteAll(): Promise<number> {
+    const result = await this.db.run('DELETE FROM messages;');
+    return result.changes;
   }
 }
