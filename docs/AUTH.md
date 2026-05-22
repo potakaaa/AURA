@@ -16,7 +16,7 @@ automatically refreshed through the stored refresh token.
 
 ## OAuth2 Flow
 
-1. Mobile app starts Google OAuth consent with scopes `openid email profile`.
+1. Mobile app starts Google OAuth consent with scopes `openid email profile https://www.googleapis.com/auth/calendar`.
 2. Google redirects with an authorization `code`.
 3. Client sends `code` to `POST /auth/google`.
 4. Backend exchanges `code` at Google token endpoint and fetches user profile.
@@ -33,7 +33,7 @@ Set these in `services/api/.env` (and keep `services/api/.env.example` as templa
 - `GOOGLE_CLIENT_ID`: OAuth client id from Google Cloud Console.
 - `GOOGLE_CLIENT_SECRET`: OAuth client secret from Google Cloud Console.
 - `GOOGLE_REDIRECT_URI`: redirect URI registered in OAuth credentials.
-- `GOOGLE_OAUTH_SCOPES`: default `openid email profile`.
+- `GOOGLE_OAUTH_SCOPES`: default `openid email profile https://www.googleapis.com/auth/calendar`.
 - `GOOGLE_TOKEN_ENDPOINT`: default `https://oauth2.googleapis.com/token`.
 - `GOOGLE_USERINFO_ENDPOINT`: default `https://openidconnect.googleapis.com/v1/userinfo`.
 - `AUTH_DB_PATH`: SQLite path for auth/session persistence.
@@ -61,7 +61,7 @@ Response `200`:
   "accessToken": "google-access-token",
   "refreshToken": "google-refresh-token",
   "tokenType": "Bearer",
-  "scope": "openid email profile",
+  "scope": "openid email profile https://www.googleapis.com/auth/calendar",
   "expiresIn": 3600,
   "user": {
     "sub": "google-subject",
@@ -89,7 +89,7 @@ Response `200`:
   "sessionId": "uuid",
   "accessToken": "new-google-access-token",
   "tokenType": "Bearer",
-  "scope": "openid email profile",
+  "scope": "openid email profile https://www.googleapis.com/auth/calendar",
   "expiresIn": 3600
 }
 ```
@@ -111,7 +111,7 @@ Error response example (`401 Unauthorized`):
 1. Open [Google Cloud Console](https://console.cloud.google.com/).
 2. Create or select a project.
 3. Enable OAuth consent screen and configure app details.
-4. Add scopes: `openid`, `email`, `profile`.
+4. Add scopes: `openid`, `email`, `profile`, `https://www.googleapis.com/auth/calendar`.
 5. Create OAuth client credentials.
 6. Add your mobile redirect URI (`aura://oauth2redirect/google`) and any web callback URIs.
 7. Copy client id and secret into `services/api/.env`.
@@ -119,4 +119,4 @@ Error response example (`401 Unauthorized`):
 ## Notes
 
 - Keep credentials in environment variables only (never hardcode in source).
-- Additional Google integration scopes are intentionally deferred to W7.
+- Calendar uses `https://www.googleapis.com/auth/calendar` so AURA can read schedules and create events after user confirmation.

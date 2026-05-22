@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import { z } from "zod";
+import { DEFAULT_GOOGLE_OAUTH_SCOPES } from "../auth/google-scopes.js";
 
 dotenv.config();
 
@@ -17,6 +18,9 @@ const envSchema = z.object({
   LLM_API_KEY: z.string().optional(),
   LLM_MODEL: z.string().default("gpt-4o-mini"),
   LLM_TIMEOUT_MS: z.coerce.number().int().positive().default(30000),
+  GOOGLE_OAUTH_SCOPES: z
+    .string()
+    .default(DEFAULT_GOOGLE_OAUTH_SCOPES.join(" ")),
 }).superRefine((value, ctx) => {
   if (["openai", "gemini"].includes(value.LLM_PROVIDER) && !value.LLM_API_KEY) {
     ctx.addIssue({

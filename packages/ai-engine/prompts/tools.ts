@@ -112,6 +112,11 @@ const CREATE_EVENT_SCHEMA: ToolInputSchema = {
       type: "boolean",
       description: "Whether execution should wait for explicit user approval.",
     },
+    confirmed: {
+      type: "boolean",
+      description:
+        "Set true only after the user explicitly approves the preview returned by the calendar action.",
+    },
   },
 };
 
@@ -228,13 +233,13 @@ export const CLAUDE_TOOLS: readonly ClaudeToolDefinition[] = [
   {
     name: "read_calendar",
     description:
-      "Read calendar events in a date range for planning/summarization. Example: check tomorrow's meetings before proposing new schedule.",
+      "Read Google Calendar events in a date range for planning/summarization. Return events with title, start/end, description, attendees, and location. Use when the user asks what's scheduled, asks for availability, or needs conflict checks. Date/time arguments must be ISO-8601; resolve relative phrases like 'tomorrow', 'next Monday', and 'in 2 hours' before calling. Example: check tomorrow's meetings before proposing a new schedule.",
     input_schema: READ_CALENDAR_SCHEMA,
   },
   {
     name: "create_event",
     description:
-      "Create a calendar event draft from user intent. Example: schedule a team sync next Monday at 10:00.",
+      "Create a Google Calendar event from user intent after confirmation. First call with confirmed=false or omit confirmed to get a preview and conflict warning; call again with confirmed=true only after the user approves. Date/time arguments must be ISO-8601; use reasoning to resolve relative phrases like 'tomorrow at 3 PM', 'next Monday', and 'in 2 hours'. Example: schedule a team sync next Monday at 10:00.",
     input_schema: CREATE_EVENT_SCHEMA,
   },
   {
@@ -256,4 +261,3 @@ export const CLAUDE_TOOLS: readonly ClaudeToolDefinition[] = [
     input_schema: EXECUTE_ACTION_SCHEMA,
   },
 ];
-
