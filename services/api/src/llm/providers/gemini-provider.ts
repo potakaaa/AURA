@@ -98,7 +98,7 @@ export class GeminiProvider implements LlmProvider {
       if (error instanceof Error && error.name === "AbortError") {
         throw new LlmProviderError(
           `LLM request timed out after ${this.config.timeoutMs}ms`,
-          { provider: this.name },
+          { provider: this.name, code: "timeout" },
         );
       }
 

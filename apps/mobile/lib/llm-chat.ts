@@ -11,6 +11,13 @@ export type LlmChatResponse = {
   reply: string;
 };
 
+export type LlmChatErrorCode =
+  | 'invalid_request'
+  | 'provider_unavailable'
+  | 'timeout'
+  | 'provider_error'
+  | 'unknown';
+
 const DEFAULT_API_BASE_URL = Platform.select({
   android: 'http://10.0.2.2:4000',
   default: 'http://localhost:4000',
@@ -40,10 +47,61 @@ function containsBackendDiagnostic(reply: string): boolean {
 }
 
 export class LlmChatClientError extends Error {
-  constructor() {
-    super('Aura could not reach the assistant service. Please try again.');
+  readonly code: LlmChatErrorCode;
+
+  constructor(code: LlmChatErrorCode = 'unknown') {
+    super(getLlmChatErrorMessage(code));
     this.name = 'LlmChatClientError';
+    this.code = code;
   }
+}
+
+function getLlmChatErrorMessage(code: LlmChatErrorCode): string {
+  switch (code) {
+    case 'provider_unavailable':
+      return 'Aura is temporarily unavailable. Please try again in a moment.';
+    case 'timeout':
+      return 'Aura took too long to respond. Retry when your connection is stable.';
+    case 'invalid_request':
+      return 'Aura could not send that message. Try rephrasing it.';
+    case 'provider_error':
+    case 'unknown':
+    default:
+      return 'Aura could not get a response right now. Check your connection and try again.';
+  }
+}
+
+function getErrorCode(status: number, body: unknown): LlmChatErrorCode {
+  if (typeof body === 'object' && body !== null && 'code' in body) {
+    const code = (body as { code?: unknown }).code;
+
+    if (
+      code === 'provider_unavailable' ||
+      code === 'timeout' ||
+      code === 'provider_error' ||
+      code === 'unknown'
+    ) {
+      return code;
+    }
+  }
+
+  if (status === 400) {
+    return 'invalid_request';
+  }
+
+  if (status === 503) {
+    return 'provider_unavailable';
+  }
+
+  if (status === 504) {
+    return 'timeout';
+  }
+
+  if (status === 502) {
+    return 'provider_error';
+  }
+
+  return 'unknown';
 }
 
 export async function postLlmChat(messages: LlmChatMessage[]): Promise<LlmChatResponse> {
@@ -66,13 +124,16 @@ export async function postLlmChat(messages: LlmChatMessage[]): Promise<LlmChatRe
 
     const body = (await response.json().catch(() => null)) as Partial<LlmChatResponse> | null;
 
+    if (!response.ok) {
+      throw new LlmChatClientError(getErrorCode(response.status, body));
+    }
+
     if (
-      !response.ok ||
       typeof body?.reply !== 'string' ||
       !body.reply.trim() ||
       containsBackendDiagnostic(body.reply)
     ) {
-      throw new LlmChatClientError();
+      throw new LlmChatClientError('provider_error');
     }
 
     return { reply: body.reply.trim() };
@@ -81,6 +142,6 @@ export async function postLlmChat(messages: LlmChatMessage[]): Promise<LlmChatRe
       throw error;
     }
 
-    throw new LlmChatClientError();
+    throw new LlmChatClientError('provider_unavailable');
   }
 }

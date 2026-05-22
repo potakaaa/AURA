@@ -9,7 +9,7 @@ import {
 import { AuthenticatedAppTopBar, appTopBarOffsetTop } from '@/components/common';
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
-import { postLlmChat, type LlmChatMessage } from '@/lib/llm-chat';
+import { LlmChatClientError, postLlmChat, type LlmChatMessage } from '@/lib/llm-chat';
 import { THEME } from '@/lib/theme';
 import { GradientText } from '@/components/welcome/gradient-text';
 import { Calendar, FileText, Mail } from 'lucide-react-native';
@@ -20,8 +20,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const BG = THEME.dark.surfaceDim;
 const SYSTEM_PROMPT =
   'You are Aura, a concise voice-first personal assistant. Answer clearly and keep replies useful for a mobile chat.';
-const ASSISTANT_ERROR_MESSAGE =
-  'Aura could not get a response right now. Check your connection and try again.';
 
 export default function VoiceHubScreen() {
   const insets = useSafeAreaInsets();
@@ -99,9 +97,13 @@ export default function VoiceHubScreen() {
         ]);
 
         setChatMessages([...nextMessages, { role: 'assistant', content: response.reply }]);
-      } catch {
+      } catch (error) {
         lastFailedUserMessageRef.current = userContent;
-        setAssistantErrorMessage(ASSISTANT_ERROR_MESSAGE);
+        setAssistantErrorMessage(
+          error instanceof LlmChatClientError
+            ? error.message
+            : 'Aura could not get a response right now. Check your connection and try again.'
+        );
       } finally {
         setIsAssistantThinking(false);
       }

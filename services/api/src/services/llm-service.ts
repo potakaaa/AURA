@@ -22,7 +22,10 @@ export async function generateChatResponse(
     env.LLM_PROVIDER === "openai-compatible" &&
     !env.LLM_API_KEY
   ) {
-    return "LLM_API_KEY is not set. Add it to use real model responses.";
+    throw new LlmProviderError("LLM provider is not configured.", {
+      provider: env.LLM_PROVIDER,
+      code: "provider_unavailable",
+    });
   }
 
   try {

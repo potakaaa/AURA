@@ -38,13 +38,36 @@ export interface LlmProvider {
 export class LlmProviderError extends Error {
   readonly provider: string;
   readonly status?: number;
+  readonly code: "provider_unavailable" | "timeout" | "provider_error" | "unknown";
 
-  constructor(message: string, options: { provider: string; status?: number }) {
+  constructor(
+    message: string,
+    options: {
+      provider: string;
+      status?: number;
+      code?: "provider_unavailable" | "timeout" | "provider_error" | "unknown";
+    },
+  ) {
     super(message);
     this.name = "LlmProviderError";
     this.provider = options.provider;
     this.status = options.status;
+    this.code = options.code ?? inferProviderErrorCode(options.status);
   }
+}
+
+function inferProviderErrorCode(
+  status?: number,
+): "provider_unavailable" | "timeout" | "provider_error" | "unknown" {
+  if (status === 408 || status === 504) {
+    return "timeout";
+  }
+
+  if (status === undefined || status >= 500) {
+    return "provider_unavailable";
+  }
+
+  return "provider_error";
 }
 
 export function assertNever(value: never): never {

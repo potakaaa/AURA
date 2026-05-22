@@ -58,7 +58,7 @@ export class OllamaProvider implements LlmProvider {
       if (!response.ok) {
         const errorBody = await response.text();
         throw new LlmProviderError(
-          `LLM request failed (${response.status}): ${errorBody || response.statusText}`,
+          `LLM request failed (${response.status}): ${sanitizeProviderErrorText(errorBody) || response.statusText}`,
           { provider: this.name, status: response.status },
         );
       }
@@ -72,15 +72,25 @@ export class OllamaProvider implements LlmProvider {
       if (error instanceof Error && error.name === "AbortError") {
         throw new LlmProviderError(
           `LLM request timed out after ${this.config.timeoutMs}ms`,
-          { provider: this.name },
+          { provider: this.name, code: "timeout" },
         );
       }
 
       const message =
         error instanceof Error ? error.message : "Unknown LLM error occurred";
-      throw new LlmProviderError(message, { provider: this.name });
+      throw new LlmProviderError(sanitizeProviderErrorText(message), {
+        provider: this.name,
+      });
     } finally {
       clearTimeout(timeout);
     }
   }
+}
+
+function sanitizeProviderErrorText(text: string): string {
+  return text
+    .replace(/Bearer\s+[A-Za-z0-9._~+/=-]+/gi, "Bearer [REDACTED]")
+    .replace(/Authorization["':\s]+[A-Za-z0-9._~+/=-]+/gi, "Authorization [REDACTED]")
+    .replace(/sk-[A-Za-z0-9_-]+/g, "sk-[REDACTED]")
+    .replace(/AIza[A-Za-z0-9_-]+/g, "AIza[REDACTED]");
 }
