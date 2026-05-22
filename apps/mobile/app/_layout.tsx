@@ -128,13 +128,6 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={NAV_THEME[resolvedColorScheme]}>
       <StatusBar style={resolvedColorScheme === 'dark' ? 'light' : 'dark'} />
-      <Stack
-        screenOptions={{
-          animation: 'fade',
-          contentStyle: { backgroundColor: 'transparent' },
-          headerShown: false,
-        }}
-      />
       <Toaster />
       <AuthSessionProvider>
         <AuthNavigator />
