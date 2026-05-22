@@ -8,6 +8,7 @@ import {
   HISTORY_TOKEN_BUDGET,
   TOTAL_CONTEXT_TOKEN_BUDGET,
   assembleContextWindow,
+  normalizeContextHistory,
 } from "../context/window.js";
 
 test("registers the expected MVP tool names", () => {
@@ -63,9 +64,35 @@ test("context assembler truncates oldest history when budget is tight", () => {
   );
 });
 
+test("context utilities normalize blank and padded history before truncation", () => {
+  const normalized = normalizeContextHistory([
+    { role: "user", content: "  " },
+    { role: "assistant", content: " kept reply " },
+    { role: "user", content: "\nkept question\n" },
+  ]);
+
+  assert.deepEqual(normalized, [
+    { role: "assistant", content: "kept reply", tokenCount: undefined },
+    { role: "user", content: "kept question", tokenCount: undefined },
+  ]);
+});
+
+test("context assembler bounds oversized incoming user messages", () => {
+  const perCharCounter = (text: string): number => text.length;
+  const result = assembleContextWindow({
+    systemPrompt: "S",
+    history: [{ role: "assistant", content: "old reply".repeat(1_000) }],
+    newUserMessage: "n".repeat(TOTAL_CONTEXT_TOKEN_BUDGET * 2),
+    countTokens: perCharCounter,
+  });
+
+  assert.equal(result.droppedHistoryMessages, 1);
+  assert.equal(result.messages.at(-1)?.role, "user");
+  assert.ok(result.usage.totalUsed <= TOTAL_CONTEXT_TOKEN_BUDGET);
+});
+
 test("system prompt includes core behavior constraints", () => {
   assert.match(SYSTEM_PROMPT, /voice-first, privacy-aware/i);
   assert.match(SYSTEM_PROMPT, /never invent/i);
   assert.match(SYSTEM_PROMPT, /confirmation preview/i);
 });
-

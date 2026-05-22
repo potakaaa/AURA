@@ -15,6 +15,23 @@ Small Express backend scaffold for:
 pnpm --filter api dev
 ```
 
+## Conversation context
+
+`POST /llm/chat` currently accepts `{ "messages": [{ "role": "user", "content": "..." }] }`
+and returns `{ "reply": "..." }`. Keep this request shape until the mobile app
+is ready to send conversation or session identifiers.
+
+For the MVP, mobile owns short-term conversation restore by keeping the visible
+turns in local UI state and, when persistence is enabled, saving the latest
+bounded turns in local storage before replaying them as `messages` on the next
+request. The API treats `messages` as provider-agnostic AURA chat history with
+shared `system`, `user`, and `assistant` roles.
+
+Context assembly happens before provider dispatch in `src/llm/context-builder.ts`
+using `@aura/ai-engine` utilities. Provider adapters receive already-normalized,
+bounded `LlmMessage[]` values and should only translate that shape to their
+transport format.
+
 ## Ollama
 
 Set `LLM_PROVIDER=ollama` to use the native Ollama `/api/chat` endpoint. The

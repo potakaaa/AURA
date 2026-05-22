@@ -1,5 +1,6 @@
 import {
   assembleContextWindow,
+  normalizeContextHistory,
   SYSTEM_PROMPT,
 } from "@aura/ai-engine";
 import type {
@@ -26,32 +27,20 @@ export const buildChatContext = (
 ): BuildChatContextResult => {
   const normalizedMessages = normalizeChatHistory(messages);
   const lastUserMessageIndex = findLastUserMessageIndex(normalizedMessages);
-
-  if (
-    lastUserMessageIndex === -1 ||
-    normalizedMessages.at(-1)?.role !== "user"
-  ) {
-    return {
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        ...normalizedMessages.map(toLlmMessage),
-      ],
-      droppedHistoryMessages: 0,
-      usage: assembleContextWindow({
-        systemPrompt: SYSTEM_PROMPT,
-        userPreferences: options.userPreferences,
-        history: normalizedMessages,
-        newUserMessage: "",
-        countTokens: options.countTokens,
-      }).usage,
-    };
-  }
+  const history =
+    lastUserMessageIndex === normalizedMessages.length - 1
+      ? normalizedMessages.slice(0, lastUserMessageIndex)
+      : normalizedMessages;
+  const newUserMessage =
+    lastUserMessageIndex === normalizedMessages.length - 1
+      ? normalizedMessages[lastUserMessageIndex].content
+      : undefined;
 
   const assembled = assembleContextWindow({
     systemPrompt: SYSTEM_PROMPT,
     userPreferences: options.userPreferences,
-    history: normalizedMessages.slice(0, lastUserMessageIndex),
-    newUserMessage: normalizedMessages[lastUserMessageIndex].content,
+    history,
+    newUserMessage,
     countTokens: options.countTokens,
   });
 
@@ -59,9 +48,7 @@ export const buildChatContext = (
     messages: assembled.messages.map(toLlmMessage),
     droppedHistoryMessages:
       assembled.droppedHistoryMessages +
-      normalizedMessages.length -
-      lastUserMessageIndex -
-      1,
+      (newUserMessage ? normalizedMessages.length - lastUserMessageIndex - 1 : 0),
     usage: assembled.usage,
   };
 };
@@ -69,12 +56,7 @@ export const buildChatContext = (
 const normalizeChatHistory = (
   messages: readonly LlmMessage[],
 ): ContextMessage[] =>
-  messages
-    .map((message) => ({
-      role: message.role,
-      content: message.content.trim(),
-    }))
-    .filter((message) => message.content.length > 0);
+  normalizeContextHistory(messages);
 
 const findLastUserMessageIndex = (
   messages: readonly ContextMessage[],
