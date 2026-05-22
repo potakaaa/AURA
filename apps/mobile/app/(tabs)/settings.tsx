@@ -4,14 +4,23 @@ import { AuraCard } from '@/components/ui/aura-card';
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { AuraThemeToggleRow } from '@/components/ui/aura-theme-toggle-row';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';
 import { persistColorScheme } from '@/lib/color-scheme';
 import { supabase } from '@/lib/supabase';
 import { clearLocalConversationData } from '@/src/db/conversation-history';
+import {
+  clearPreferenceMemories,
+  deletePreferenceMemory,
+  getPreferenceMemorySettings,
+  listPreferenceMemories,
+  setInferredPreferenceMemoryEnabled,
+} from '@/src/db/preference-memory';
+import type { PreferenceMemoryRecord } from '@/src/db/repositories';
 import { Href, useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
-import { useState } from 'react';
-import { Alert, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
@@ -21,6 +30,41 @@ export default function SettingsScreen() {
   const isDarkMode = colorScheme === 'dark';
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isClearingConversations, setIsClearingConversations] = useState(false);
+  const [isInferredMemoryEnabled, setIsInferredMemoryEnabled] = useState(false);
+  const [preferenceMemories, setPreferenceMemories] = useState<PreferenceMemoryRecord[]>([]);
+  const [isLoadingPreferenceMemory, setIsLoadingPreferenceMemory] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function hydratePreferenceMemory() {
+      try {
+        const [settings, memories] = await Promise.all([
+          getPreferenceMemorySettings(),
+          listPreferenceMemories(),
+        ]);
+
+        if (isMounted) {
+          setIsInferredMemoryEnabled(settings.inferredMemoryEnabled);
+          setPreferenceMemories(memories);
+        }
+      } catch {
+        if (isMounted) {
+          setPreferenceMemories([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingPreferenceMemory(false);
+        }
+      }
+    }
+
+    void hydratePreferenceMemory();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   async function onToggleDarkMode(nextValue: boolean) {
     const nextScheme = nextValue ? 'dark' : 'light';
@@ -54,12 +98,45 @@ export default function SettingsScreen() {
     }
   }
 
+  async function onToggleInferredMemory(nextValue: boolean) {
+    setIsInferredMemoryEnabled(nextValue);
+    try {
+      await setInferredPreferenceMemoryEnabled(nextValue);
+    } catch {
+      setIsInferredMemoryEnabled(!nextValue);
+      Alert.alert('Unable to update preference memory', 'Try again in a moment.');
+    }
+  }
+
+  async function refreshPreferenceMemories() {
+    setPreferenceMemories(await listPreferenceMemories());
+  }
+
+  async function onDeletePreferenceMemory(id: string) {
+    try {
+      await deletePreferenceMemory(id);
+      await refreshPreferenceMemories();
+    } catch {
+      Alert.alert('Unable to delete preference', 'Try again in a moment.');
+    }
+  }
+
+  async function onClearPreferenceMemories() {
+    try {
+      await clearPreferenceMemories();
+      setPreferenceMemories([]);
+    } catch {
+      Alert.alert('Unable to clear preferences', 'Try again in a moment.');
+    }
+  }
+
   return (
     <AuraScreen>
       <View className="flex-1 bg-background">
         <AuthenticatedAppTopBar title="Settings" showSettingsAction={false} />
-        <View
-          className="flex-1 px-5 pb-6"
+        <ScrollView
+          className="flex-1"
+          contentContainerClassName="px-5 pb-6"
           style={{ paddingTop: appTopBarOffsetTop(insets.top) + 12 }}>
           <AuraCard title="Appearance" description="Material-style dark theme persistence">
             <AuraThemeToggleRow checked={isDarkMode} onCheckedChange={onToggleDarkMode} />
@@ -93,6 +170,70 @@ export default function SettingsScreen() {
               accessibilityLabel="Clear local conversations"
             />
           </AuraCard>
+          <AuraCard
+            className="mt-4"
+            title="Preference Memory"
+            description="Explicit settings are saved locally. Inferred memories stay off until enabled.">
+            <View className="gap-4">
+              <View className="flex-row items-center justify-between gap-4">
+                <View className="min-w-0 flex-1">
+                  <Text className="text-on-surface text-sm font-semibold">
+                    Store inferred preferences
+                  </Text>
+                  <Text className="text-on-surface-variant mt-1 text-xs leading-5">
+                    When off, Aura only stores preferences you explicitly set.
+                  </Text>
+                </View>
+                <Switch
+                  checked={isInferredMemoryEnabled}
+                  onCheckedChange={onToggleInferredMemory}
+                  disabled={isLoadingPreferenceMemory}
+                />
+              </View>
+
+              <View className="gap-3">
+                {preferenceMemories.length > 0 ? (
+                  preferenceMemories.map((memory) => (
+                    <View
+                      key={memory.id}
+                      className="border-border/40 bg-surface-container/70 gap-3 rounded-2xl border p-3">
+                      <View className="min-w-0">
+                        <Text className="text-on-surface text-sm font-semibold">
+                          {memory.key}
+                        </Text>
+                        <Text className="text-on-surface-variant mt-1 text-xs leading-5">
+                          {memory.value}
+                        </Text>
+                        <Text className="text-on-surface-variant mt-2 text-[11px] uppercase">
+                          {memory.source} · confidence {Math.round(memory.confidence * 100)}%
+                        </Text>
+                      </View>
+                      <AuraButton
+                        label="Delete"
+                        auraVariant="tertiary"
+                        className="h-10 self-start rounded-full"
+                        onPress={() => onDeletePreferenceMemory(memory.id)}
+                        accessibilityLabel={`Delete preference ${memory.key}`}
+                      />
+                    </View>
+                  ))
+                ) : (
+                  <Text className="text-on-surface-variant text-sm leading-5">
+                    No stored preference memories.
+                  </Text>
+                )}
+              </View>
+
+              <AuraButton
+                label="Clear preference memories"
+                auraVariant="secondary"
+                className="h-12 rounded-full"
+                onPress={onClearPreferenceMemories}
+                disabled={preferenceMemories.length === 0}
+                accessibilityLabel="Clear preference memories"
+              />
+            </View>
+          </AuraCard>
           <AuraCard className="mt-4" title="Account" description="Manage your current session">
             <AuraButton
               label={isSigningOut ? 'Signing out...' : 'Log out'}
@@ -103,7 +244,7 @@ export default function SettingsScreen() {
               accessibilityLabel="Log out"
             />
           </AuraCard>
-        </View>
+        </ScrollView>
       </View>
     </AuraScreen>
   );

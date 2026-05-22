@@ -1,6 +1,7 @@
 import {
   ConversationsRepository,
   MessagesRepository,
+  PreferenceMemoriesRepository,
   PreferencesRepository,
   UsersRepository,
 } from './index';
@@ -60,12 +61,63 @@ describe('repositories', () => {
     const preferences = new PreferencesRepository(db);
 
     await preferences.upsert({ id: 'p1', userId: 'u1', theme: 'dark', locale: 'en-US' });
-    expect(await preferences.getByUserId('u1')).toMatchObject({ theme: 'dark', locale: 'en-US' });
+    expect(await preferences.getByUserId('u1')).toMatchObject({
+      theme: 'dark',
+      locale: 'en-US',
+      inferred_memory_enabled: 0,
+    });
 
-    await preferences.upsert({ id: 'p2', userId: 'u1', theme: 'light', locale: 'en-PH' });
-    expect(await preferences.getByUserId('u1')).toMatchObject({ theme: 'light', locale: 'en-PH' });
+    await preferences.upsert({
+      id: 'p2',
+      userId: 'u1',
+      theme: 'light',
+      locale: 'en-PH',
+      inferredMemoryEnabled: true,
+    });
+    expect(await preferences.getByUserId('u1')).toMatchObject({
+      theme: 'light',
+      locale: 'en-PH',
+      inferred_memory_enabled: 1,
+    });
+
+    await preferences.setInferredMemoryEnabled('u1', false);
+    expect(await preferences.getByUserId('u1')).toMatchObject({
+      inferred_memory_enabled: 0,
+    });
 
     expect(await preferences.deleteByUserId('u1')).toBe(true);
     expect(await preferences.getByUserId('u1')).toBeNull();
+  });
+
+  it('supports preference memory create/update/list/delete operations', async () => {
+    const db = new MemoryQueryExecutor();
+    const memories = new PreferenceMemoriesRepository(db);
+
+    await memories.upsert({
+      id: 'pm1',
+      userId: 'u1',
+      key: 'timezone',
+      value: 'Asia/Manila',
+      source: 'explicit',
+      confidence: 1,
+    });
+    expect(await memories.listByUser('u1')).toMatchObject([
+      { id: 'pm1', key: 'timezone', value: 'Asia/Manila', source: 'explicit', confidence: 1 },
+    ]);
+
+    await memories.upsert({
+      id: 'pm2',
+      userId: 'u1',
+      key: 'timezone',
+      value: 'UTC',
+      source: 'explicit',
+      confidence: 0.9,
+    });
+    expect(await memories.listByUser('u1')).toMatchObject([
+      { id: 'pm1', key: 'timezone', value: 'UTC', source: 'explicit', confidence: 0.9 },
+    ]);
+
+    expect(await memories.delete('pm1')).toBe(true);
+    expect(await memories.listByUser('u1')).toEqual([]);
   });
 });

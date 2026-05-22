@@ -1,8 +1,13 @@
 import { migration001Initial } from './001_initial';
 import { migration002AddConversationUpdatedAt } from './002_add_conversation_updated_at';
+import { migration003AddPreferenceMemories } from './003_add_preference_memories';
 import type { Migration, QueryExecutor } from '../types';
 
-const MIGRATIONS: Migration[] = [migration001Initial, migration002AddConversationUpdatedAt];
+const MIGRATIONS: Migration[] = [
+  migration001Initial,
+  migration002AddConversationUpdatedAt,
+  migration003AddPreferenceMemories,
+];
 
 export const LATEST_DB_VERSION = MIGRATIONS[MIGRATIONS.length - 1]?.version ?? 0;
 

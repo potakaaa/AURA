@@ -49,6 +49,27 @@ pnpm dlx eas build --profile development --platform android
 
 Set `EXPO_PUBLIC_DB_UNENCRYPTED=true` only in development builds to disable SQLCipher for debugging.
 
+## Preference memory privacy
+
+AURA separates explicit settings from inferred memories:
+
+- Explicit settings live in `preferences` and include app-controlled values such
+  as theme, locale, and whether inferred preference memory is enabled.
+- Preference memories live in `preference_memories` and store a lightweight
+  `key`, `value`, `source`, `confidence`, and `updated_at` record per local
+  user.
+
+Preference memory is local-first through the existing Expo SQLite database. In
+dev clients where SQLCipher is enabled, these rows use the same encrypted
+database setup as conversations. Inferred preference writes are disabled by
+default and must be enabled in Settings before anything inferred is stored.
+Explicit memories can be stored without that opt-in because they are user-set
+values. Settings lets users view and delete stored preference memories.
+
+Future model-based extraction must use the shared LLM provider interface and
+feed provider-agnostic user preference fields into `@aura/ai-engine`; provider
+adapters should not own preference policy or extraction rules.
+
 ### Security verification checklist
 
 1. Build and install a dev client (`eas build --profile development`).

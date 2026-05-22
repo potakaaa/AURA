@@ -20,6 +20,16 @@ type PreferenceRow = {
   user_id: string;
   theme: string;
   locale: string;
+  inferred_memory_enabled: number;
+  updated_at: string;
+};
+type PreferenceMemoryRow = {
+  id: string;
+  user_id: string;
+  key: string;
+  value: string;
+  source: 'explicit' | 'inferred';
+  confidence: number;
   updated_at: string;
 };
 
@@ -28,6 +38,7 @@ export class MemoryQueryExecutor implements QueryExecutor {
   private readonly conversations = new Map<string, ConversationRow>();
   private readonly messages = new Map<string, MessageRow>();
   private readonly preferencesByUser = new Map<string, PreferenceRow>();
+  private readonly preferenceMemories = new Map<string, PreferenceMemoryRow>();
   private version = 0;
 
   async exec(sql: string): Promise<void> {
@@ -163,20 +174,82 @@ export class MemoryQueryExecutor implements QueryExecutor {
     }
 
     if (normalized.startsWith('INSERT INTO PREFERENCES')) {
-      const [id, userId, theme, locale] = params as [string, string, string, string];
+      const [id, userId, theme, locale, inferredMemoryEnabled] = params as [
+        string,
+        string,
+        string,
+        string,
+        number,
+      ];
       this.preferencesByUser.set(userId, {
         id,
         user_id: userId,
         theme,
         locale,
+        inferred_memory_enabled: inferredMemoryEnabled,
         updated_at: this.now(),
       });
       return { changes: 1, lastInsertRowId: 1 };
     }
 
+    if (normalized.startsWith('UPDATE PREFERENCES SET INFERRED_MEMORY_ENABLED')) {
+      const [enabled, userId] = params as [number, string];
+      const existing = this.preferencesByUser.get(userId);
+      if (!existing) {
+        return { changes: 0, lastInsertRowId: 0 };
+      }
+      this.preferencesByUser.set(userId, {
+        ...existing,
+        inferred_memory_enabled: enabled,
+        updated_at: this.now(),
+      });
+      return { changes: 1, lastInsertRowId: 0 };
+    }
+
     if (normalized.startsWith('DELETE FROM PREFERENCES')) {
       const [userId] = params as [string];
       const removed = this.preferencesByUser.delete(userId);
+      return { changes: removed ? 1 : 0, lastInsertRowId: 0 };
+    }
+
+    if (normalized.startsWith('INSERT INTO PREFERENCE_MEMORIES')) {
+      const [id, userId, key, value, source, confidence] = params as [
+        string,
+        string,
+        string,
+        string,
+        PreferenceMemoryRow['source'],
+        number,
+      ];
+      const existing = Array.from(this.preferenceMemories.values()).find(
+        (memory) => memory.user_id === userId && memory.key === key && memory.source === source
+      );
+      const memoryId = existing?.id ?? id;
+      this.preferenceMemories.set(memoryId, {
+        id: memoryId,
+        user_id: userId,
+        key,
+        value,
+        source,
+        confidence,
+        updated_at: this.now(),
+      });
+      return { changes: 1, lastInsertRowId: 1 };
+    }
+
+    if (normalized.startsWith('DELETE FROM PREFERENCE_MEMORIES')) {
+      const [id] = params as [string];
+      if (normalized.includes('WHERE USER_ID =')) {
+        let changes = 0;
+        for (const [memoryId, memory] of this.preferenceMemories.entries()) {
+          if (memory.user_id === id) {
+            this.preferenceMemories.delete(memoryId);
+            changes += 1;
+          }
+        }
+        return { changes, lastInsertRowId: 0 };
+      }
+      const removed = this.preferenceMemories.delete(id);
       return { changes: removed ? 1 : 0, lastInsertRowId: 0 };
     }
 
@@ -242,6 +315,13 @@ export class MemoryQueryExecutor implements QueryExecutor {
 
     if (normalized.startsWith('SELECT * FROM PREFERENCES')) {
       return Array.from(this.preferencesByUser.values()) as T[];
+    }
+
+    if (normalized.startsWith('SELECT * FROM PREFERENCE_MEMORIES WHERE USER_ID =')) {
+      const [userId] = params as [string];
+      return Array.from(this.preferenceMemories.values())
+        .filter((memory) => memory.user_id === userId)
+        .sort((a, b) => b.updated_at.localeCompare(a.updated_at)) as T[];
     }
 
     return [];

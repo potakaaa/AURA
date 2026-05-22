@@ -1,4 +1,4 @@
-import { getUserVersion, runMigrations } from './index';
+import { LATEST_DB_VERSION, getUserVersion, runMigrations } from './index';
 import type { QueryExecutor, RunResult, SqlParams } from '../types';
 import { describe, expect, it } from 'vitest';
 
@@ -52,9 +52,9 @@ describe('runMigrations', () => {
 
     await runMigrations(db);
 
-    expect(await getUserVersion(db)).toBe(2);
+    expect(await getUserVersion(db)).toBe(LATEST_DB_VERSION);
     const migrationStarts = db.statements.filter((statement) => statement === 'BEGIN IMMEDIATE;');
-    expect(migrationStarts.length).toBe(2);
+    expect(migrationStarts.length).toBe(LATEST_DB_VERSION);
   });
 
   it('supports backward-compatible v1 to v2 upgrades', async () => {
@@ -62,11 +62,15 @@ describe('runMigrations', () => {
 
     await runMigrations(db);
 
-    expect(await getUserVersion(db)).toBe(2);
+    expect(await getUserVersion(db)).toBe(LATEST_DB_VERSION);
     const hadAlterConversation = db.statements.some((statement) =>
       statement.includes('ALTER TABLE CONVERSATIONS')
     );
+    const hadPreferenceMemories = db.statements.some((statement) =>
+      statement.includes('CREATE TABLE IF NOT EXISTS PREFERENCE_MEMORIES')
+    );
     expect(hadAlterConversation).toBe(true);
+    expect(hadPreferenceMemories).toBe(true);
   });
 
   it('rolls back and throws when migration fails', async () => {
