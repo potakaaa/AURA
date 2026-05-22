@@ -3,6 +3,7 @@ import test from "node:test";
 import { GeminiProvider } from "../gemini-provider.js";
 import { OllamaProvider } from "../ollama-provider.js";
 import { OpenAiCompatibleProvider } from "../openai-compatible-provider.js";
+import { buildChatContext } from "../../context-builder.js";
 import { LlmProviderError } from "../../types.js";
 import type { LlmProviderConfig } from "../../types.js";
 
@@ -270,5 +271,71 @@ test("timeout behavior normalizes aborts consistently", async () => {
         );
       }
     },
+  );
+});
+
+test("provider adapters preserve assembled context ordering during transport mapping", async () => {
+  const assembledMessages = buildChatContext([
+    { role: "user", content: "First question" },
+    { role: "assistant", content: "First answer" },
+    { role: "user", content: "Follow-up" },
+  ]).messages;
+
+  const capturedBodies: unknown[] = [];
+
+  await withMockFetch(
+    (async (_input, init) => {
+      capturedBodies.push(JSON.parse(String(init?.body)));
+
+      if (capturedBodies.length === 3) {
+        return new Response(
+          JSON.stringify({
+            candidates: [{ content: { parts: [{ text: "Gemini reply" }] } }],
+          }),
+          { status: 200 },
+        );
+      }
+
+      if (capturedBodies.length === 2) {
+        return new Response(
+          JSON.stringify({
+            model: "llama3.2",
+            message: { content: "Ollama reply" },
+          }),
+          { status: 200 },
+        );
+      }
+
+      return new Response(
+        JSON.stringify({
+          model: "gpt-test",
+          choices: [{ message: { content: "OpenAI-compatible reply" } }],
+        }),
+        { status: 200 },
+      );
+    }) as typeof fetch,
+    async () => {
+      await new OpenAiCompatibleProvider(config()).chat({
+        messages: assembledMessages,
+      });
+      await new OllamaProvider(config({ provider: "ollama" })).chat({
+        messages: assembledMessages,
+      });
+      await new GeminiProvider(config({ provider: "gemini" })).chat({
+        messages: assembledMessages,
+      });
+    },
+  );
+
+  assert.deepEqual((capturedBodies[0] as { messages: unknown[] }).messages, assembledMessages);
+  assert.deepEqual((capturedBodies[1] as { messages: unknown[] }).messages, assembledMessages);
+  assert.deepEqual((capturedBodies[2] as { contents: unknown[] }).contents, [
+    { role: "user", parts: [{ text: "First question" }] },
+    { role: "model", parts: [{ text: "First answer" }] },
+    { role: "user", parts: [{ text: "Follow-up" }] },
+  ]);
+  assert.deepEqual(
+    (capturedBodies[2] as { systemInstruction: { parts: unknown[] } }).systemInstruction.parts,
+    [{ text: assembledMessages[0].content }],
   );
 });

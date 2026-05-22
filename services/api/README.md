@@ -27,10 +27,12 @@ bounded turns in local storage before replaying them as `messages` on the next
 request. The API treats `messages` as provider-agnostic AURA chat history with
 shared `system`, `user`, and `assistant` roles.
 
-Context assembly happens before provider dispatch in `src/llm/context-builder.ts`
-using `@aura/ai-engine` utilities. Provider adapters receive already-normalized,
-bounded `LlmMessage[]` values and should only translate that shape to their
-transport format.
+Prompt and context policy lives in `@aura/ai-engine`: `SYSTEM_PROMPT` defines
+AURA's base behavior and `assembleContextWindow(...)` owns history truncation,
+user preference injection, and context ordering. The API applies that policy in
+`src/llm/context-builder.ts` before provider dispatch. Provider adapters receive
+already-normalized, bounded `LlmMessage[]` values and should only translate that
+shape to their transport format.
 
 ## Ollama
 

@@ -6,11 +6,13 @@ import {
 import { buildChatContext } from "../llm/context-builder.js";
 import type { LlmMessage, LlmProvider } from "../llm/types.js";
 import { LlmProviderError } from "../llm/types.js";
+import type { UserPreferences } from "@aura/ai-engine";
 
 export type ChatMessage = LlmMessage;
 
 type GenerateChatResponseOptions = {
   provider?: LlmProvider;
+  userPreferences?: UserPreferences;
 };
 
 export async function generateChatResponse(
@@ -30,7 +32,9 @@ export async function generateChatResponse(
 
   try {
     const provider = options.provider ?? createLlmProvider(getLlmProviderConfig());
-    const context = buildChatContext(messages);
+    const context = buildChatContext(messages, {
+      userPreferences: options.userPreferences,
+    });
     const response = await provider.chat({
       messages: context.messages,
       model: env.LLM_MODEL,

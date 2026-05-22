@@ -32,6 +32,26 @@ test("service depends on normalized content, not OpenAI choices", async () => {
   assert.equal(response, "Interface reply");
 });
 
+test("generateChatResponse injects optional user preferences before provider dispatch", async () => {
+  const provider = new MockLlmProvider({ content: "Preference-aware reply" });
+
+  await generateChatResponse(messages, {
+    provider,
+    userPreferences: {
+      name: "AURA Tester",
+      timezone: "Asia/Manila",
+    },
+  });
+
+  assert.deepEqual(provider.lastRequest?.messages.map((message) => message.role), [
+    "system",
+    "system",
+    "user",
+  ]);
+  assert.match(provider.lastRequest?.messages[1].content ?? "", /User preferences/);
+  assert.match(provider.lastRequest?.messages[1].content ?? "", /name: AURA Tester/);
+});
+
 test("empty model responses are handled safely", async () => {
   const provider = new MockLlmProvider({ content: "" });
 

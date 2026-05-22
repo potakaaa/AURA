@@ -28,11 +28,11 @@ export const buildChatContext = (
   const normalizedMessages = normalizeChatHistory(messages);
   const lastUserMessageIndex = findLastUserMessageIndex(normalizedMessages);
   const history =
-    lastUserMessageIndex === normalizedMessages.length - 1
+    lastUserMessageIndex >= 0 && lastUserMessageIndex === normalizedMessages.length - 1
       ? normalizedMessages.slice(0, lastUserMessageIndex)
       : normalizedMessages;
   const newUserMessage =
-    lastUserMessageIndex === normalizedMessages.length - 1
+    lastUserMessageIndex >= 0 && lastUserMessageIndex === normalizedMessages.length - 1
       ? normalizedMessages[lastUserMessageIndex].content
       : undefined;
 
