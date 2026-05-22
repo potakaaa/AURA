@@ -87,15 +87,28 @@ export default function SettingsScreen() {
       return;
     }
 
-    setIsClearingConversations(true);
-    try {
-      await clearLocalConversationData();
-      Alert.alert('Conversation data cleared', 'Local Voice Hub messages were removed.');
-    } catch {
-      Alert.alert('Unable to clear data', 'Try again in a moment.');
-    } finally {
-      setIsClearingConversations(false);
-    }
+    Alert.alert(
+      'Clear all local conversations?',
+      'This permanently removes local Voice Hub history from this device.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear history',
+          style: 'destructive',
+          onPress: async () => {
+            setIsClearingConversations(true);
+            try {
+              await clearLocalConversationData();
+              Alert.alert('Conversation data cleared', 'Local Voice Hub messages were removed.');
+            } catch {
+              Alert.alert('Unable to clear data', 'Try again in a moment.');
+            } finally {
+              setIsClearingConversations(false);
+            }
+          },
+        },
+      ]
+    );
   }
 
   async function onToggleInferredMemory(nextValue: boolean) {

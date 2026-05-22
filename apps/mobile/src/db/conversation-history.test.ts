@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   clearLocalConversationData,
+  deleteLocalConversation,
+  listLocalConversationSummaries,
   loadRecentVoiceHubMessages,
   saveVoiceHubExchange,
 } from './conversation-history';
@@ -52,5 +54,36 @@ describe('conversation history', () => {
     await clearLocalConversationData(repositories);
 
     await expect(loadRecentVoiceHubMessages(24, repositories)).resolves.toEqual([]);
+  });
+
+  it('lists local conversation summaries from stored messages', async () => {
+    const repositories = createTestRepositories();
+
+    await saveVoiceHubExchange(
+      { userContent: 'Summarize my morning standup', assistantContent: 'You have three actions.' },
+      repositories
+    );
+
+    await expect(listLocalConversationSummaries(repositories)).resolves.toMatchObject([
+      {
+        title: 'Summarize my morning standup',
+        preview: 'You have three actions.',
+        messageCount: 2,
+      },
+    ]);
+  });
+
+  it('deletes a single local conversation', async () => {
+    const repositories = createTestRepositories();
+
+    await saveVoiceHubExchange(
+      { userContent: 'Hello', assistantContent: 'Hi there' },
+      repositories
+    );
+
+    const [conversation] = await listLocalConversationSummaries(repositories);
+    await deleteLocalConversation(conversation.id, repositories);
+
+    await expect(listLocalConversationSummaries(repositories)).resolves.toEqual([]);
   });
 });

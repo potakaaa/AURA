@@ -11,12 +11,14 @@ import { AuraScreen } from '@/components/ui/aura-screen';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { LlmChatClientError, postLlmChat, type LlmChatMessage } from '@/lib/llm-chat';
 import {
-  loadRecentVoiceHubMessages,
+  loadConversationMessages,
   saveVoiceHubExchange,
+  VOICE_HUB_CONVERSATION_ID,
 } from '@/src/db/conversation-history';
 import { THEME } from '@/lib/theme';
 import { GradientText } from '@/components/welcome/gradient-text';
-import { Calendar, FileText, Mail } from 'lucide-react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Calendar, History, Mail } from 'lucide-react-native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, ScrollView, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -27,9 +29,12 @@ const SYSTEM_PROMPT =
 
 export default function VoiceHubScreen() {
   const insets = useSafeAreaInsets();
+  const params = useLocalSearchParams<{ conversationId?: string }>();
+  const router = useRouter();
   const { width, height } = useWindowDimensions();
   const topPad = appTopBarOffsetTop(insets.top);
   const bottomPad = VOICE_HUB_TAB_CONTENT_INSET + insets.bottom;
+  const activeConversationId = params.conversationId || VOICE_HUB_CONVERSATION_ID;
   const [micPermissionMessage, setMicPermissionMessage] = useState<string | null>(null);
   const [draftMessage, setDraftMessage] = useState('');
   const [chatMessages, setChatMessages] = useState<LlmChatMessage[]>([]);
@@ -80,9 +85,11 @@ export default function VoiceHubScreen() {
 
     async function hydrateConversationHistory() {
       try {
-        const recentMessages = await loadRecentVoiceHubMessages();
+        const recentMessages = await loadConversationMessages(activeConversationId);
         if (isMounted && recentMessages.length > 0) {
           setChatMessages(recentMessages);
+        } else if (isMounted) {
+          setChatMessages([]);
         }
       } catch (error) {
         console.warn('[voice-hub] Unable to load local conversation history.', error);
@@ -94,7 +101,7 @@ export default function VoiceHubScreen() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [activeConversationId]);
 
   const sendMessage = useCallback(
     async (rawMessage: string, options: { appendUserMessage?: boolean } = {}) => {
@@ -124,6 +131,7 @@ export default function VoiceHubScreen() {
         void saveVoiceHubExchange({
           userContent,
           assistantContent: response.reply,
+          conversationId: activeConversationId,
         }).catch((storageError) => {
           console.warn('[voice-hub] Unable to save local conversation exchange.', storageError);
         });
@@ -139,7 +147,7 @@ export default function VoiceHubScreen() {
         setIsAssistantThinking(false);
       }
     },
-    [isAssistantThinking]
+    [activeConversationId, isAssistantThinking]
   );
 
   useEffect(() => {
@@ -252,9 +260,10 @@ export default function VoiceHubScreen() {
                     iconClassName="text-secondary"
                   />
                   <VoiceHubQuickAction
-                    label="Generate briefing"
-                    icon={FileText}
+                    label="View history"
+                    icon={History}
                     iconClassName="text-tertiary"
+                    onPress={() => router.push('/(tabs)/chat')}
                   />
                 </VoiceHubQuickActionsRow>
               </View>
