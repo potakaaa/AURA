@@ -62,11 +62,12 @@ export default function VoiceHubScreen() {
   const router = useRouter();
   const { width, height } = useWindowDimensions();
   const topPad = appTopBarOffsetTop(insets.top);
-  const bottomPad = VOICE_HUB_TAB_CONTENT_INSET + insets.bottom;
+  const bottomPad = Math.max(VOICE_HUB_TAB_CONTENT_INSET + insets.bottom - 52, 0);
   const activeConversationId = params.conversationId || VOICE_HUB_CONVERSATION_ID;
   const [draftMessage, setDraftMessage] = useState('');
   const [chatMessages, setChatMessages] = useState<LlmChatMessage[]>([]);
   const [isAssistantThinking, setIsAssistantThinking] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
   const lastSentTranscriptRef = useRef('');
   const lastFailedUserMessageRef = useRef<string | null>(null);
@@ -98,10 +99,17 @@ export default function VoiceHubScreen() {
       });
     };
 
-    const showSubscription = Keyboard.addListener('keyboardDidShow', scrollToComposer);
+    const showSubscription = Keyboard.addListener('keyboardDidShow', (event) => {
+      setKeyboardHeight(event.endCoordinates.height);
+      scrollToComposer();
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0);
+    });
 
     return () => {
       showSubscription.remove();
+      hideSubscription.remove();
     };
   }, []);
 
@@ -288,14 +296,14 @@ export default function VoiceHubScreen() {
 
         <KeyboardAvoidingView
           className="flex-1"
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={topPad}>
           <ScrollView
             ref={scrollViewRef}
             className="flex-1"
             contentContainerStyle={{
               flexGrow: 1,
-              paddingBottom: bottomPad,
+              paddingBottom: bottomPad + keyboardHeight,
               paddingHorizontal: 24,
             }}
             automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
