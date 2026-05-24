@@ -11,6 +11,6 @@
     "rootDir": ".",
     "composite": false
   },
-  "include": ["*.ts", "wake-word/**/*", "stt/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["*.ts", "*.d.ts", "wake-word/**/*", "stt/**/*", "tts/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"],
 }

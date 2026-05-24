@@ -18,10 +18,11 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "lint": "echo 'No lint configured'",
-    "test": "vitest run stt/expoSpeechRecognition.test.ts"
+    "test": "vitest run stt/expoSpeechRecognition.test.ts tts/expoTextToSpeech.test.ts"
   },
   "dependencies": {
     "expo-modules-core": "3.0.29",
+    "expo-speech": "~14.0.8",
     "expo-speech-recognition": "^3.1.3"
   },
   "devDependencies": {

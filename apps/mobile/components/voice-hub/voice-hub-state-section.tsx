@@ -2,10 +2,11 @@ import { Icon } from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
+import { Switch } from '@/components/ui/switch';
 import type { LlmChatMessage } from '@/lib/llm-chat';
 import { VOICE_HUB } from '@/lib/raw-colors';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Activity, Clock3, RefreshCw, Send, Waves } from 'lucide-react-native';
+import { Activity, Clock3, RefreshCw, Send, Square, Volume2, VolumeX, Waves } from 'lucide-react-native';
 import { useMemo } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 
@@ -16,10 +17,15 @@ type VoiceHubStateSectionProps = {
   chatMessages?: LlmChatMessage[];
   draftMessage?: string;
   isAssistantThinking?: boolean;
+  textToSpeechStatus?: string;
+  isTextToSpeechMuted?: boolean;
+  isSpeaking?: boolean;
   canRetryAssistantMessage?: boolean;
   onDraftMessageChange?: (message: string) => void;
   onSendDraftMessage?: () => void;
   onRetryAssistantMessage?: () => void;
+  onToggleTextToSpeechMuted?: () => void;
+  onStopSpeaking?: () => void;
 };
 
 export function VoiceHubStateSection({
@@ -29,16 +35,22 @@ export function VoiceHubStateSection({
   chatMessages = [],
   draftMessage = '',
   isAssistantThinking = false,
+  textToSpeechStatus = 'idle',
+  isTextToSpeechMuted = false,
+  isSpeaking = false,
   canRetryAssistantMessage = false,
   onDraftMessageChange,
   onSendDraftMessage,
   onRetryAssistantMessage,
+  onToggleTextToSpeechMuted,
+  onStopSpeaking,
 }: VoiceHubStateSectionProps) {
   const { width } = useWindowDimensions();
   const row = width >= 720;
   const transcript = finalTranscript || partialTranscript;
   const status = speechStatus ?? 'idle';
   const isActive = status === 'listening' || status === 'processing';
+  const readoutStatus = isTextToSpeechMuted ? 'Muted' : isSpeaking ? 'Speaking' : 'Readout ready';
   const canSendDraft = draftMessage.trim().length > 0 && !isAssistantThinking;
   const humanStatus = useMemo(
     () => status.replace(/_/g, ' ').replace(/^\w/, (char) => char.toUpperCase()),
@@ -158,6 +170,47 @@ export function VoiceHubStateSection({
         </LinearGradient>
       </View>
       <View className="border-border/30 bg-surface-container/80 w-full gap-4 rounded-3xl border p-5">
+        <View className="flex-row flex-wrap items-center justify-between gap-3">
+          <View className="min-w-0 flex-1 flex-row items-center gap-2">
+            <Icon
+              as={isTextToSpeechMuted ? VolumeX : Volume2}
+              size={16}
+              className={isSpeaking ? 'text-secondary' : 'text-on-surface-variant'}
+            />
+            <View className="min-w-0">
+              <Text
+                className="text-on-surface text-sm font-bold"
+                style={{ fontFamily: 'Manrope_700Bold' }}>
+                Aura voice
+              </Text>
+              <Text
+                className="text-on-surface-variant text-[11px]"
+                style={{ fontFamily: 'Manrope_500Medium' }}>
+                {readoutStatus} · {textToSpeechStatus.replace(/_/g, ' ')}
+              </Text>
+            </View>
+          </View>
+          <View className="flex-row items-center gap-3">
+            {isSpeaking ? (
+              <Button
+                className="h-9 w-9 rounded-full p-0"
+                variant="outline"
+                size="icon"
+                accessibilityLabel="Stop Aura voice"
+                onPress={onStopSpeaking}>
+                <Icon as={Square} size={14} className="text-on-surface" />
+              </Button>
+            ) : null}
+            <Switch
+              checked={!isTextToSpeechMuted}
+              onCheckedChange={() => {
+                onToggleTextToSpeechMuted?.();
+              }}
+              accessibilityLabel="Toggle Aura voice readout"
+            />
+          </View>
+        </View>
+
         <View className="gap-3">
           {chatMessages.length > 0 ? (
             chatMessages.map((message, index) => {

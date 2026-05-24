@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { env } from "../../config/env.js";
 import { MockLlmProvider } from "../../llm/__tests__/mock-llm-provider.js";
 import { LlmProviderError } from "../../llm/types.js";
 import { generateChatResponse } from "../llm-service.js";
@@ -15,7 +16,7 @@ test("generateChatResponse works with a mock LlmProvider", async () => {
   assert.equal(provider.lastRequest?.messages[0].role, "system");
   assert.match(provider.lastRequest?.messages[0].content ?? "", /You are AURA/);
   assert.deepEqual(provider.lastRequest?.messages.at(-1), messages[0]);
-  assert.equal(provider.lastRequest?.model, "gpt-4o-mini");
+  assert.equal(provider.lastRequest?.model, env.LLM_MODEL);
   assert.equal(provider.lastRequest?.temperature, 0.3);
 });
 
@@ -69,7 +70,7 @@ test("unknown provider errors are transformed into LlmProviderError", async () =
     generateChatResponse(messages, { provider }),
     (error) => {
       assert.ok(error instanceof LlmProviderError);
-      assert.equal(error.provider, "openai-compatible");
+      assert.equal(error.provider, env.LLM_PROVIDER);
       assert.equal(error.message, "socket disconnected");
       return true;
     },

@@ -65,7 +65,7 @@ export function errorLogger(
   logger.error("api.error", {
     method: req.method,
     path: req.originalUrl,
-    remoteAddress: req.ip,
+    remoteAddress: getRemoteAddress(req),
     error: serializeError(error),
   });
 
@@ -108,7 +108,7 @@ function toRequestLogMeta(req: Request, res: Response, durationMs: number): LogM
     path: req.originalUrl,
     status: res.statusCode,
     durationMs,
-    remoteAddress: req.ip,
+    remoteAddress: getRemoteAddress(req),
     userAgent: req.get("user-agent"),
   };
 }
@@ -117,9 +117,17 @@ function toRequestStartLogMeta(req: Request): LogMeta {
   return {
     method: req.method,
     path: req.originalUrl,
-    remoteAddress: req.ip,
+    remoteAddress: getRemoteAddress(req),
     userAgent: req.get("user-agent"),
   };
+}
+
+function getRemoteAddress(req: Request): string | undefined {
+  try {
+    return req.ip ?? req.socket?.remoteAddress;
+  } catch {
+    return req.socket?.remoteAddress;
+  }
 }
 
 function serializeMeta(meta: LogMeta | undefined): LogMeta {

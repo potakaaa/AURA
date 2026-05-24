@@ -11,6 +11,7 @@ import { AuthenticatedAppTopBar, appTopBarOffsetTop } from '@/components/common'
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { toast } from '@/components/ui/toaster';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
+import { useTextToSpeech } from '@/hooks/useTextToSpeech';
 import { LlmChatClientError, postLlmChat, type LlmChatMessage } from '@/lib/llm-chat';
 import {
   loadConversationMessages,
@@ -83,6 +84,15 @@ export default function VoiceHubScreen() {
     stopListening,
     cancelListening,
   } = useSpeechRecognition();
+  const {
+    status: textToSpeechStatus,
+    isSpeaking,
+    isMuted: isTextToSpeechMuted,
+    error: textToSpeechError,
+    speakReply,
+    stopSpeaking,
+    toggleMuted: toggleTextToSpeechMuted,
+  } = useTextToSpeech();
 
   const micDisabled = error?.code === 'permission_denied' || error?.code === 'not_available';
   const floatingTranscript =
@@ -178,6 +188,9 @@ export default function VoiceHubScreen() {
           });
         });
         setChatMessages([...nextMessages, { role: 'assistant', content: response.reply }]);
+        void speakReply(response.reply).catch((speechError) => {
+          console.warn('[voice-hub] Unable to speak assistant reply.', speechError);
+        });
       } catch (error) {
         lastFailedUserMessageRef.current = userContent;
         toast.error({
@@ -191,8 +204,14 @@ export default function VoiceHubScreen() {
         setIsAssistantThinking(false);
       }
     },
-    [activeConversationId, isAssistantThinking]
+    [activeConversationId, isAssistantThinking, speakReply]
   );
+
+  useEffect(() => {
+    return () => {
+      void stopSpeaking().catch(() => {});
+    };
+  }, [stopSpeaking]);
 
   useEffect(() => {
     const transcript = finalTranscript.trim();
@@ -231,6 +250,17 @@ export default function VoiceHubScreen() {
     }
   }, [error]);
 
+  useEffect(() => {
+    if (!textToSpeechError) {
+      return;
+    }
+
+    toast.warning({
+      title: 'Voice readout unavailable',
+      description: textToSpeechError.message,
+    });
+  }, [textToSpeechError]);
+
   const handleSendDraftMessage = useCallback(() => {
     void sendMessage(draftMessage);
   }, [draftMessage, sendMessage]);
@@ -268,6 +298,7 @@ export default function VoiceHubScreen() {
     }
 
     try {
+      await stopSpeaking();
       await startListening();
     } catch {
       if (Platform.OS === 'android') {
@@ -284,6 +315,7 @@ export default function VoiceHubScreen() {
     micDisabled,
     startListening,
     status,
+    stopSpeaking,
     stopListening,
   ]);
 
@@ -361,10 +393,15 @@ export default function VoiceHubScreen() {
                 chatMessages={chatMessages}
                 draftMessage={draftMessage}
                 isAssistantThinking={isAssistantThinking}
+                textToSpeechStatus={textToSpeechStatus}
+                isTextToSpeechMuted={isTextToSpeechMuted}
+                isSpeaking={isSpeaking}
                 canRetryAssistantMessage={Boolean(lastFailedUserMessageRef.current)}
                 onDraftMessageChange={setDraftMessage}
                 onSendDraftMessage={handleSendDraftMessage}
                 onRetryAssistantMessage={handleRetryAssistantMessage}
+                onToggleTextToSpeechMuted={toggleTextToSpeechMuted}
+                onStopSpeaking={stopSpeaking}
               />
               <View className="h-2" />
             </View>
