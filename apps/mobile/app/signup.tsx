@@ -6,6 +6,7 @@ import { AuraOrDivider } from '@/components/ui/aura-or-divider';
 import { AuraTextField } from '@/components/ui/aura-text-field';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { toast } from '@/components/ui/toaster';
 import { getAuthErrorMessage } from '@/lib/auth-errors';
 import { rgbaWhite } from '@/lib/raw-colors';
 import { supabase } from '@/lib/supabase';
@@ -25,7 +26,6 @@ export default function SignupScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSignUp() {
@@ -33,41 +33,60 @@ export default function SignupScreen() {
       return;
     }
 
-    setSubmitError(null);
-
     const trimmedDisplayName = displayName.trim();
     const trimmedEmail = email.trim().toLowerCase();
 
     if (!trimmedDisplayName || !trimmedEmail || !password || !confirmPassword) {
-      setSubmitError('Please complete all fields.');
+      toast.error({
+        title: 'Account creation failed',
+        description: 'Please complete all fields.',
+      });
       return;
     }
 
     if (!EMAIL_REGEX.test(trimmedEmail)) {
-      setSubmitError('Please enter a valid email address.');
+      toast.error({
+        title: 'Account creation failed',
+        description: 'Please enter a valid email address.',
+      });
       return;
     }
 
     if (password !== confirmPassword) {
-      setSubmitError('Passwords do not match.');
+      toast.error({
+        title: 'Account creation failed',
+        description: 'Passwords do not match.',
+      });
       return;
     }
 
     setIsSubmitting(true);
-    const { error } = await supabase.auth.signUp({
-      email: trimmedEmail,
-      password,
-      options: {
-        data: {
-          display_name: trimmedDisplayName,
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: trimmedEmail,
+        password,
+        options: {
+          data: {
+            display_name: trimmedDisplayName,
+          },
         },
-      },
-    });
-    setIsSubmitting(false);
+      });
 
-    if (error) {
-      setSubmitError(getAuthErrorMessage(error.message));
+      if (error) {
+        toast.error({
+          title: 'Account creation failed',
+          description: getAuthErrorMessage(error.message),
+        });
+        return;
+      }
+    } catch {
+      toast.error({
+        title: 'Account creation failed',
+        description: getAuthErrorMessage('network'),
+      });
       return;
+    } finally {
+      setIsSubmitting(false);
     }
 
     router.replace('/(tabs)' as Href);
@@ -118,10 +137,7 @@ export default function SignupScreen() {
             placeholder="Your name"
             className="h-14 rounded-full border-border/40 bg-card"
             value={displayName}
-            onChangeText={(value) => {
-              setDisplayName(value);
-              setSubmitError(null);
-            }}
+            onChangeText={setDisplayName}
           />
           <AuraTextField
             label="Email Address"
@@ -133,10 +149,7 @@ export default function SignupScreen() {
             placeholder="hello@aura.io"
             className="h-14 rounded-full border-border/40 bg-card"
             value={email}
-            onChangeText={(value) => {
-              setEmail(value);
-              setSubmitError(null);
-            }}
+            onChangeText={setEmail}
           />
           <AuraTextField
             label="Password"
@@ -144,13 +157,9 @@ export default function SignupScreen() {
             leadingIcon={Lock}
             placeholder="••••••••"
             secureTextEntry={!passwordVisible}
-            errorText={submitError ?? undefined}
             className="h-14 rounded-full border-border/40 bg-card"
             value={password}
-            onChangeText={(value) => {
-              setPassword(value);
-              setSubmitError(null);
-            }}
+            onChangeText={setPassword}
             trailing={
               <Pressable
                 accessibilityRole="button"
@@ -175,10 +184,7 @@ export default function SignupScreen() {
             secureTextEntry={!confirmVisible}
             className="h-14 rounded-full border-border/40 bg-card"
             value={confirmPassword}
-            onChangeText={(value) => {
-              setConfirmPassword(value);
-              setSubmitError(null);
-            }}
+            onChangeText={setConfirmPassword}
             trailing={
               <Pressable
                 accessibilityRole="button"

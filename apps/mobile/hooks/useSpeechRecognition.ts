@@ -120,6 +120,7 @@ export function useSpeechRecognition(
 
     setError(null);
     setPartialTranscript("");
+    setFinalTranscript("");
 
     await session.start({
       action: "start",

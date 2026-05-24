@@ -6,6 +6,7 @@ import { AuraOrDivider } from '@/components/ui/aura-or-divider';
 import { AuraTextField } from '@/components/ui/aura-text-field';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { toast } from '@/components/ui/toaster';
 import { getAuthErrorMessage } from '@/lib/auth-errors';
 import { rgbaWhite } from '@/lib/raw-colors';
 import { supabase } from '@/lib/supabase';
@@ -23,7 +24,6 @@ export default function LoginScreen() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSignIn() {
@@ -31,27 +31,44 @@ export default function LoginScreen() {
       return;
     }
 
-    setSubmitError(null);
     const trimmed = email.trim().toLowerCase();
     if (!trimmed || !password) {
-      setSubmitError('Please enter your email and password.');
+      toast.error({
+        title: 'Sign in failed',
+        description: 'Please enter your email and password.',
+      });
       return;
     }
     if (!EMAIL_REGEX.test(trimmed)) {
-      setSubmitError('Please enter a valid email address.');
+      toast.error({
+        title: 'Sign in failed',
+        description: 'Please enter a valid email address.',
+      });
       return;
     }
 
     setIsSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: trimmed,
-      password,
-    });
-    setIsSubmitting(false);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: trimmed,
+        password,
+      });
 
-    if (error) {
-      setSubmitError(getAuthErrorMessage(error.message));
+      if (error) {
+        toast.error({
+          title: 'Sign in failed',
+          description: getAuthErrorMessage(error.message),
+        });
+        return;
+      }
+    } catch {
+      toast.error({
+        title: 'Sign in failed',
+        description: getAuthErrorMessage('network'),
+      });
       return;
+    } finally {
+      setIsSubmitting(false);
     }
 
     router.replace('/(tabs)' as Href);
@@ -103,10 +120,7 @@ export default function LoginScreen() {
             placeholder="hello@aura.io"
             className="h-14 rounded-full border-border/40 bg-card"
             value={email}
-            onChangeText={(t) => {
-              setEmail(t);
-              setSubmitError(null);
-            }}
+            onChangeText={setEmail}
           />
           <AuraTextField
             label="Password"
@@ -114,13 +128,9 @@ export default function LoginScreen() {
             leadingIcon={Lock}
             placeholder="••••••••"
             secureTextEntry={!passwordVisible}
-            errorText={submitError ?? undefined}
             className="h-14 rounded-full border-border/40 bg-card"
             value={password}
-            onChangeText={(t) => {
-              setPassword(t);
-              setSubmitError(null);
-            }}
+            onChangeText={setPassword}
             trailing={
               <Pressable
                 accessibilityRole="button"

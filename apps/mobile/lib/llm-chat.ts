@@ -29,6 +29,16 @@ const API_BASE_URL = (
   'http://localhost:4000'
 ).replace(/\/$/, '');
 
+function logLlmChatRequest(event: string, details: Record<string, unknown>) {
+  console.info('[mobile-api] llm.chat', {
+    event,
+    timestamp: new Date().toISOString(),
+    platform: Platform.OS,
+    apiBaseUrl: API_BASE_URL,
+    ...details,
+  });
+}
+
 function normalizeMessage(message: LlmChatMessage): LlmChatMessage | null {
   const content = message.content.trim();
 
@@ -104,6 +114,15 @@ function getErrorCode(status: number, body: unknown): LlmChatErrorCode {
   return 'unknown';
 }
 
+function getResponseCode(body: unknown): string | undefined {
+  if (typeof body === 'object' && body !== null && 'code' in body) {
+    const code = (body as { code?: unknown }).code;
+    return typeof code === 'string' ? code : undefined;
+  }
+
+  return undefined;
+}
+
 export async function postLlmChat(messages: LlmChatMessage[]): Promise<LlmChatResponse> {
   const normalizedMessages = messages
     .map(normalizeMessage)
@@ -113,8 +132,17 @@ export async function postLlmChat(messages: LlmChatMessage[]): Promise<LlmChatRe
     throw new LlmChatClientError();
   }
 
+  const startedAt = Date.now();
+  const url = `${API_BASE_URL}/llm/chat`;
+
+  logLlmChatRequest('request_start', {
+    url,
+    messageCount: normalizedMessages.length,
+    messageRoles: normalizedMessages.map((message) => message.role),
+  });
+
   try {
-    const response = await fetch(`${API_BASE_URL}/llm/chat`, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -123,6 +151,15 @@ export async function postLlmChat(messages: LlmChatMessage[]): Promise<LlmChatRe
     });
 
     const body = (await response.json().catch(() => null)) as Partial<LlmChatResponse> | null;
+    const durationMs = Date.now() - startedAt;
+
+    logLlmChatRequest('response_received', {
+      url,
+      status: response.status,
+      ok: response.ok,
+      durationMs,
+      responseCode: getResponseCode(body),
+    });
 
     if (!response.ok) {
       throw new LlmChatClientError(getErrorCode(response.status, body));
@@ -139,8 +176,21 @@ export async function postLlmChat(messages: LlmChatMessage[]): Promise<LlmChatRe
     return { reply: body.reply.trim() };
   } catch (error) {
     if (error instanceof LlmChatClientError) {
+      logLlmChatRequest('request_failed', {
+        url,
+        durationMs: Date.now() - startedAt,
+        code: error.code,
+        errorName: error.name,
+      });
       throw error;
     }
+
+    logLlmChatRequest('network_failed', {
+      url,
+      durationMs: Date.now() - startedAt,
+      errorName: error instanceof Error ? error.name : 'UnknownError',
+      errorMessage: error instanceof Error ? error.message : String(error),
+    });
 
     throw new LlmChatClientError('provider_unavailable');
   }

@@ -10,15 +10,12 @@ import { useMemo } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 
 type VoiceHubStateSectionProps = {
-  micPermissionMessage?: string | null;
   speechStatus?: string;
   partialTranscript?: string;
   finalTranscript?: string;
-  speechErrorMessage?: string | null;
   chatMessages?: LlmChatMessage[];
   draftMessage?: string;
   isAssistantThinking?: boolean;
-  assistantErrorMessage?: string | null;
   canRetryAssistantMessage?: boolean;
   onDraftMessageChange?: (message: string) => void;
   onSendDraftMessage?: () => void;
@@ -26,15 +23,12 @@ type VoiceHubStateSectionProps = {
 };
 
 export function VoiceHubStateSection({
-  micPermissionMessage,
   speechStatus,
   partialTranscript,
   finalTranscript,
-  speechErrorMessage,
   chatMessages = [],
   draftMessage = '',
   isAssistantThinking = false,
-  assistantErrorMessage,
   canRetryAssistantMessage = false,
   onDraftMessageChange,
   onSendDraftMessage,
@@ -53,44 +47,6 @@ export function VoiceHubStateSection({
 
   return (
     <View className="w-full max-w-4xl gap-6 self-center">
-      {micPermissionMessage ? (
-        <View className="border-border/40 bg-surface-container/70 w-full rounded-2xl border px-4 py-3">
-          <Text
-            className="text-on-surface-variant text-xs font-medium"
-            style={{ fontFamily: 'Manrope_500Medium' }}>
-            {micPermissionMessage}
-          </Text>
-        </View>
-      ) : null}
-      {speechErrorMessage ? (
-        <View className="w-full rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3">
-          <Text
-            className="text-xs font-medium text-red-200"
-            style={{ fontFamily: 'Manrope_500Medium' }}>
-            {speechErrorMessage}
-          </Text>
-        </View>
-      ) : null}
-      {assistantErrorMessage ? (
-        <View className="w-full gap-3 rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3">
-          <Text
-            className="text-xs font-medium text-red-200"
-            style={{ fontFamily: 'Manrope_500Medium' }}>
-            {assistantErrorMessage}
-          </Text>
-          {canRetryAssistantMessage ? (
-            <Button
-              className="self-start rounded-full px-4"
-              variant="outline"
-              size="sm"
-              disabled={isAssistantThinking}
-              onPress={onRetryAssistantMessage}>
-              <Icon as={RefreshCw} size={14} className="text-on-surface" />
-              <Text style={{ fontFamily: 'Manrope_700Bold' }}>Retry</Text>
-            </Button>
-          ) : null}
-        </View>
-      ) : null}
       <View className={`gap-4 ${row ? 'flex-row' : 'flex-col'}`}>
         <View
           className={`border-border/30 bg-surface-container/80 min-h-[180px] justify-between rounded-3xl border p-6 ${row ? 'min-w-0 flex-[2]' : 'w-full'}`}>
@@ -243,6 +199,18 @@ export function VoiceHubStateSection({
             </View>
           ) : null}
         </View>
+
+        {canRetryAssistantMessage ? (
+          <Button
+            className="self-start rounded-full px-4"
+            variant="outline"
+            size="sm"
+            disabled={isAssistantThinking}
+            onPress={onRetryAssistantMessage}>
+            <Icon as={RefreshCw} size={14} className="text-on-surface" />
+            <Text style={{ fontFamily: 'Manrope_700Bold' }}>Retry last message</Text>
+          </Button>
+        ) : null}
 
         <View className="flex-row items-end gap-3">
           <Input

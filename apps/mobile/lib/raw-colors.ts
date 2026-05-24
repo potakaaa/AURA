@@ -93,6 +93,24 @@ export const BAR_SIMPLE = {
   bottomEdge: [rgbaWhite(0), rgbaWhite(0.09)] as const,
 } as const;
 
+/** Polished signed-in app chrome. */
+export const TOP_BAR = {
+  surface: `rgba(${SURFACE_DIM_RGB},0.9)`,
+  material: rgbaWhite(0.072),
+  materialOverlay: [rgbaWhite(0.16), rgbaWhite(0.035)] as const,
+  surfaceRaised: rgbaWhite(0.09),
+  surfacePressed: rgbaWhite(0.14),
+  controlBorder: rgbaWhite(0.14),
+  controlHighlight: rgbaWhite(0.28),
+  controlDivider: rgbaWhite(0.1),
+  brandHalo: [`rgba(${PRIMARY_RGB},0.42)`, `rgba(${SECONDARY_RGB},0.22)`, rgbaWhite(0)] as const,
+  brandMark: [`rgba(${PRIMARY_RGB},0.72)`, `rgba(${SECONDARY_RGB},0.36)`] as const,
+  brandMarkSheen: [rgbaWhite(0.34), rgbaWhite(0)] as const,
+  statusDot: `rgba(${SECONDARY_RGB},0.95)`,
+  statusGlow: `rgba(${SECONDARY_RGB},0.28)`,
+  bottomEdge: [rgbaWhite(0), `rgba(${PRIMARY_RGB},0.18)`, rgbaWhite(0.12)] as const,
+} as const;
+
 /** Welcome screen SVG / one-off illustration stops (not in design tokens yet). */
 export const WELCOME = {
   radialGlowStart: '#1a1230',
@@ -119,6 +137,13 @@ export const VOICE_HUB = {
   statusDotIdle: rgbaWhite(0.38),
   statusDotActive: `rgba(${SECONDARY_RGB},0.95)`,
   transcriptSurface: rgbaWhite(0.055),
+  floatingTranscriptGradient: [
+    `rgba(${PRIMARY_RGB},0.32)`,
+    `rgba(${SECONDARY_RGB},0.2)`,
+    rgbaWhite(0.09),
+  ] as const,
+  floatingTranscriptBorder: rgbaWhite(0.18),
+  floatingTranscriptHighlight: rgbaWhite(0.42),
   placeholderText: rgbaWhite(0.45),
 } as const;
 

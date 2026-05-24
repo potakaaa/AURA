@@ -1,13 +1,13 @@
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
-import { CircleAlert, CircleCheckBig, Info, X } from 'lucide-react-native';
+import { CircleAlert, CircleCheckBig, Info, TriangleAlert, X } from 'lucide-react-native';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import Animated, { FadeInUp, FadeOutDown, LinearTransition } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-type ToastVariant = 'default' | 'success' | 'error' | 'info';
+type ToastVariant = 'default' | 'success' | 'error' | 'warning' | 'info';
 
 type ToastInput = {
   title: string;
@@ -61,6 +61,7 @@ export const toast = {
   show: (input: ToastInput) => enqueue('default', input),
   success: (input: ToastInput) => enqueue('success', input),
   error: (input: ToastInput) => enqueue('error', input),
+  warning: (input: ToastInput) => enqueue('warning', input),
   info: (input: ToastInput) => enqueue('info', input),
   dismiss: (id: string) => removeToast(id),
   dismissAll: () => {
@@ -139,6 +140,17 @@ function ToastCard({ toastItem, onClose }: { toastItem: ToastRecord; onClose: ()
           titleClass: 'text-foreground',
           descriptionClass: 'text-foreground/85',
           iconWrapClass: 'bg-primary/25 border-primary/50',
+          iconClass: 'text-foreground',
+          closeClass: 'text-foreground/85',
+        };
+      case 'warning':
+        return {
+          icon: TriangleAlert,
+          borderClass: 'border-tertiary/35',
+          cardClass: 'bg-black/50 shadow-xl shadow-tertiary/45',
+          titleClass: 'text-foreground',
+          descriptionClass: 'text-foreground/85',
+          iconWrapClass: 'bg-tertiary/25 border-tertiary/50',
           iconClass: 'text-foreground',
           closeClass: 'text-foreground/85',
         };

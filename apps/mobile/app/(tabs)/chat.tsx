@@ -4,6 +4,7 @@ import { AuraCard } from '@/components/ui/aura-card';
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { toast } from '@/components/ui/toaster';
 import {
   deleteLocalConversation,
   listLocalConversationSummaries,
@@ -27,7 +28,10 @@ export default function ChatScreen() {
     try {
       setConversations(await listLocalConversationSummaries());
     } catch {
-      Alert.alert('Unable to load conversations', 'Try again in a moment.');
+      toast.error({
+        title: 'Unable to load conversations',
+        description: 'Try again in a moment.',
+      });
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -57,8 +61,12 @@ export default function ChatScreen() {
           try {
             await deleteLocalConversation(conversation.id);
             await refreshConversations();
+            toast.success({ title: 'Conversation deleted' });
           } catch {
-            Alert.alert('Unable to delete conversation', 'Try again in a moment.');
+            toast.error({
+              title: 'Unable to delete conversation',
+              description: 'Try again in a moment.',
+            });
           }
         },
       },

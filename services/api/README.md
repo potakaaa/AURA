@@ -15,6 +15,12 @@ Small Express backend scaffold for:
 pnpm --filter api dev
 ```
 
+## Logging
+
+The API writes structured JSON logs through `src/logger.ts`. Set `LOG_LEVEL` to
+`debug`, `info`, `warn`, `error`, or `silent`; it defaults to `info` outside
+tests and `silent` during tests.
+
 ## Conversation context
 
 `POST /llm/chat` currently accepts `{ "messages": [{ "role": "user", "content": "..." }] }`

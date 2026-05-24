@@ -1,4 +1,5 @@
 import {
+  VoiceHubFloatingTranscript,
   VoiceHubOrb,
   VoiceHubQuickAction,
   VoiceHubQuickActionsRow,
@@ -8,6 +9,7 @@ import {
 } from '@/components/voice-hub';
 import { AuthenticatedAppTopBar, appTopBarOffsetTop } from '@/components/common';
 import { AuraScreen } from '@/components/ui/aura-screen';
+import { toast } from '@/components/ui/toaster';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { LlmChatClientError, postLlmChat, type LlmChatMessage } from '@/lib/llm-chat';
 import {
@@ -19,13 +21,33 @@ import { THEME } from '@/lib/theme';
 import { GradientText } from '@/components/welcome/gradient-text';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Calendar, History, Mail } from 'lucide-react-native';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform, ScrollView, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const BG = THEME.dark.surfaceDim;
 const SYSTEM_PROMPT =
   'You are Aura, a concise voice-first personal assistant. Answer clearly and keep replies useful for a mobile chat.';
+
+function getSpeechErrorMessage(code: string, fallback?: string) {
+  if (code === 'permission_denied') {
+    return 'Microphone access is required for voice capture. Enable it in Settings to continue.';
+  }
+
+  if (code === 'not_available') {
+    return 'Speech recognition is unavailable on this device.';
+  }
+
+  if (code === 'no_speech') {
+    return 'No speech was detected. Try speaking closer to your microphone.';
+  }
+
+  return fallback || 'Speech recognition failed. Please try again.';
+}
+
+function isSpeechWarning(code: string) {
+  return code === 'permission_denied' || code === 'not_available' || code === 'no_speech';
+}
 
 export default function VoiceHubScreen() {
   const insets = useSafeAreaInsets();
@@ -35,13 +57,12 @@ export default function VoiceHubScreen() {
   const topPad = appTopBarOffsetTop(insets.top);
   const bottomPad = VOICE_HUB_TAB_CONTENT_INSET + insets.bottom;
   const activeConversationId = params.conversationId || VOICE_HUB_CONVERSATION_ID;
-  const [micPermissionMessage, setMicPermissionMessage] = useState<string | null>(null);
   const [draftMessage, setDraftMessage] = useState('');
   const [chatMessages, setChatMessages] = useState<LlmChatMessage[]>([]);
   const [isAssistantThinking, setIsAssistantThinking] = useState(false);
-  const [assistantErrorMessage, setAssistantErrorMessage] = useState<string | null>(null);
   const lastSentTranscriptRef = useRef('');
   const lastFailedUserMessageRef = useRef<string | null>(null);
+  const lastSpeechErrorKeyRef = useRef<string | null>(null);
   const chatMessagesRef = useRef<LlmChatMessage[]>([]);
   const {
     status,
@@ -54,27 +75,9 @@ export default function VoiceHubScreen() {
     cancelListening,
   } = useSpeechRecognition();
 
-  const speechErrorMessage = useMemo(() => {
-    if (!error) {
-      return null;
-    }
-
-    if (error.code === 'permission_denied') {
-      return 'Microphone access is required for voice capture. Enable it in Settings to continue.';
-    }
-
-    if (error.code === 'not_available') {
-      return 'Speech recognition is unavailable on this device.';
-    }
-
-    if (error.code === 'no_speech') {
-      return 'No speech was detected. Try speaking closer to your microphone.';
-    }
-
-    return error.message || 'Speech recognition failed. Please try again.';
-  }, [error]);
-
   const micDisabled = error?.code === 'permission_denied' || error?.code === 'not_available';
+  const floatingTranscript =
+    partialTranscript || (isListening || status === 'processing' ? finalTranscript : '');
 
   useEffect(() => {
     chatMessagesRef.current = chatMessages;
@@ -93,6 +96,12 @@ export default function VoiceHubScreen() {
         }
       } catch (error) {
         console.warn('[voice-hub] Unable to load local conversation history.', error);
+        if (isMounted) {
+          toast.warning({
+            title: 'Unable to load local history',
+            description: 'Recent Voice Hub messages may not appear right now.',
+          });
+        }
       }
     }
 
@@ -118,7 +127,6 @@ export default function VoiceHubScreen() {
 
       setChatMessages(nextMessages);
       setDraftMessage('');
-      setAssistantErrorMessage(null);
       setIsAssistantThinking(true);
       lastFailedUserMessageRef.current = null;
 
@@ -134,15 +142,21 @@ export default function VoiceHubScreen() {
           conversationId: activeConversationId,
         }).catch((storageError) => {
           console.warn('[voice-hub] Unable to save local conversation exchange.', storageError);
+          toast.warning({
+            title: 'Unable to save conversation',
+            description: 'This exchange may not appear in local history.',
+          });
         });
         setChatMessages([...nextMessages, { role: 'assistant', content: response.reply }]);
       } catch (error) {
         lastFailedUserMessageRef.current = userContent;
-        setAssistantErrorMessage(
-          error instanceof LlmChatClientError
-            ? error.message
-            : 'Aura could not get a response right now. Check your connection and try again.'
-        );
+        toast.error({
+          title: 'Aura could not respond',
+          description:
+            error instanceof LlmChatClientError
+              ? error.message
+              : 'Aura could not get a response right now. Check your connection and try again.',
+        });
       } finally {
         setIsAssistantThinking(false);
       }
@@ -161,6 +175,32 @@ export default function VoiceHubScreen() {
     void sendMessage(transcript);
   }, [finalTranscript, sendMessage]);
 
+  useEffect(() => {
+    if (!error) {
+      lastSpeechErrorKeyRef.current = null;
+      return;
+    }
+
+    const errorKey = `${error.code}:${error.message}`;
+    if (lastSpeechErrorKeyRef.current === errorKey) {
+      return;
+    }
+
+    lastSpeechErrorKeyRef.current = errorKey;
+    const input = {
+      title: isSpeechWarning(error.code)
+        ? 'Voice capture needs attention'
+        : 'Speech recognition failed',
+      description: getSpeechErrorMessage(error.code, error.message),
+    };
+
+    if (isSpeechWarning(error.code)) {
+      toast.warning(input);
+    } else {
+      toast.error(input);
+    }
+  }, [error]);
+
   const handleSendDraftMessage = useCallback(() => {
     void sendMessage(draftMessage);
   }, [draftMessage, sendMessage]);
@@ -176,14 +216,14 @@ export default function VoiceHubScreen() {
   }, [isAssistantThinking, sendMessage]);
 
   const handleOrbPress = useCallback(async () => {
-    setMicPermissionMessage(null);
-
     if (micDisabled) {
-      setMicPermissionMessage(
-        error?.code === 'permission_denied'
-          ? 'Microphone access is required to start voice capture. Enable it in Settings to continue.'
-          : 'Speech recognition is unavailable on this device.'
-      );
+      toast.warning({
+        title: 'Voice capture unavailable',
+        description:
+          error?.code === 'permission_denied'
+            ? 'Microphone access is required to start voice capture. Enable it in Settings to continue.'
+            : 'Speech recognition is unavailable on this device.',
+      });
       return;
     }
 
@@ -201,7 +241,10 @@ export default function VoiceHubScreen() {
       await startListening();
     } catch {
       if (Platform.OS === 'android') {
-        setMicPermissionMessage('Unable to start voice capture. Check microphone permission.');
+        toast.error({
+          title: 'Unable to start voice capture',
+          description: 'Check microphone permission.',
+        });
       }
     }
   }, [
@@ -224,7 +267,6 @@ export default function VoiceHubScreen() {
         <ScrollView
           className="flex-1"
           contentContainerStyle={{
-            paddingTop: topPad,
             paddingBottom: bottomPad,
             paddingHorizontal: 24,
           }}
@@ -232,12 +274,18 @@ export default function VoiceHubScreen() {
           showsVerticalScrollIndicator={false}>
           <View className="w-full max-w-2xl gap-8 self-center">
             <View className="items-center gap-7">
-              <VoiceHubOrb
-                onPress={handleOrbPress}
-                disabled={micDisabled}
-                isListening={isListening}
-                isProcessing={status === 'processing'}
-              />
+              <View className="relative w-full items-center pt-24">
+                <VoiceHubFloatingTranscript
+                  transcript={floatingTranscript}
+                  isListening={isListening}
+                />
+                <VoiceHubOrb
+                  onPress={handleOrbPress}
+                  disabled={micDisabled}
+                  isListening={isListening}
+                  isProcessing={status === 'processing'}
+                />
+              </View>
 
               <View className="w-full items-center gap-6">
                 <GradientText
@@ -270,15 +318,12 @@ export default function VoiceHubScreen() {
             </View>
 
             <VoiceHubStateSection
-              micPermissionMessage={micPermissionMessage}
               speechStatus={status}
               partialTranscript={partialTranscript}
               finalTranscript={finalTranscript}
-              speechErrorMessage={speechErrorMessage}
               chatMessages={chatMessages}
               draftMessage={draftMessage}
               isAssistantThinking={isAssistantThinking}
-              assistantErrorMessage={assistantErrorMessage}
               canRetryAssistantMessage={Boolean(lastFailedUserMessageRef.current)}
               onDraftMessageChange={setDraftMessage}
               onSendDraftMessage={handleSendDraftMessage}

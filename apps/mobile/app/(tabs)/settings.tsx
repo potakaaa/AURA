@@ -6,6 +6,7 @@ import { AuraThemeToggleRow } from '@/components/ui/aura-theme-toggle-row';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';
+import { toast } from '@/components/ui/toaster';
 import { persistColorScheme } from '@/lib/color-scheme';
 import { supabase } from '@/lib/supabase';
 import { clearLocalConversationData } from '@/src/db/conversation-history';
@@ -78,8 +79,22 @@ export default function SettingsScreen() {
     }
 
     setIsSigningOut(true);
-    await supabase.auth.signOut();
-    setIsSigningOut(false);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast.error({
+          title: 'Unable to log out',
+          description: 'Try again in a moment.',
+        });
+      }
+    } catch {
+      toast.error({
+        title: 'Unable to log out',
+        description: 'Try again in a moment.',
+      });
+    } finally {
+      setIsSigningOut(false);
+    }
   }
 
   async function onClearConversationData() {
@@ -99,9 +114,15 @@ export default function SettingsScreen() {
             setIsClearingConversations(true);
             try {
               await clearLocalConversationData();
-              Alert.alert('Conversation data cleared', 'Local Voice Hub messages were removed.');
+              toast.success({
+                title: 'Conversation data cleared',
+                description: 'Local Voice Hub messages were removed.',
+              });
             } catch {
-              Alert.alert('Unable to clear data', 'Try again in a moment.');
+              toast.error({
+                title: 'Unable to clear data',
+                description: 'Try again in a moment.',
+              });
             } finally {
               setIsClearingConversations(false);
             }
@@ -115,9 +136,18 @@ export default function SettingsScreen() {
     setIsInferredMemoryEnabled(nextValue);
     try {
       await setInferredPreferenceMemoryEnabled(nextValue);
+      toast.success({
+        title: 'Preference memory updated',
+        description: nextValue
+          ? 'Aura can now store inferred preferences locally.'
+          : 'Aura will only store explicit preferences.',
+      });
     } catch {
       setIsInferredMemoryEnabled(!nextValue);
-      Alert.alert('Unable to update preference memory', 'Try again in a moment.');
+      toast.error({
+        title: 'Unable to update preference memory',
+        description: 'Try again in a moment.',
+      });
     }
   }
 
@@ -129,8 +159,12 @@ export default function SettingsScreen() {
     try {
       await deletePreferenceMemory(id);
       await refreshPreferenceMemories();
+      toast.success({ title: 'Preference deleted' });
     } catch {
-      Alert.alert('Unable to delete preference', 'Try again in a moment.');
+      toast.error({
+        title: 'Unable to delete preference',
+        description: 'Try again in a moment.',
+      });
     }
   }
 
@@ -138,8 +172,12 @@ export default function SettingsScreen() {
     try {
       await clearPreferenceMemories();
       setPreferenceMemories([]);
+      toast.success({ title: 'Preference memories cleared' });
     } catch {
-      Alert.alert('Unable to clear preferences', 'Try again in a moment.');
+      toast.error({
+        title: 'Unable to clear preferences',
+        description: 'Try again in a moment.',
+      });
     }
   }
 
@@ -160,15 +198,15 @@ export default function SettingsScreen() {
             <Button variant="outline" onPress={() => router.push('/(tabs)/toast-lab' as Href)}>
               <Text>Open Toast Lab</Text>
             </Button>
-          <View className="mt-4">
-            <AuraButton
-              label="Open STT Test (Temporary)"
-              auraVariant="secondary"
-              className="h-12 rounded-full"
-              onPress={() => router.push('/dev/stt-test')}
-              accessibilityLabel="Open STT Test"
-            />
-          </View>
+            <View className="mt-4">
+              <AuraButton
+                label="Open STT Test (Temporary)"
+                auraVariant="secondary"
+                className="h-12 rounded-full"
+                onPress={() => router.push('/dev/stt-test')}
+                accessibilityLabel="Open STT Test"
+              />
+            </View>
           </AuraCard>
           <AuraCard
             className="mt-4"

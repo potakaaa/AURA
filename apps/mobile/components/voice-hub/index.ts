@@ -1,4 +1,5 @@
 export { VoiceHubRadialBackground } from './voice-hub-radial-background';
+export { VoiceHubFloatingTranscript } from './voice-hub-floating-transcript';
 export { VoiceHubOrb } from './voice-hub-orb';
 export { VoiceHubQuickAction, VoiceHubQuickActionsRow } from './voice-hub-quick-action';
 export { VoiceHubStateSection } from './voice-hub-state-section';

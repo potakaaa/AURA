@@ -18,7 +18,7 @@ export default function ToastLabScreen() {
         <View className="flex-1 gap-4 px-5 pb-6" style={{ paddingTop: appTopBarOffsetTop(insets.top) + 12 }}>
           <AuraCard
             title="Temporary Sonner-Style Toast Preview"
-            description="Use these buttons to preview success, error, info, and default toast states.">
+            description="Use these buttons to preview success, error, warning, info, and default toast states.">
             <View className="gap-3">
               <Button
                 onPress={() =>
@@ -38,6 +38,16 @@ export default function ToastLabScreen() {
                   })
                 }>
                 <Text>Show Error</Text>
+              </Button>
+              <Button
+                variant="secondary"
+                onPress={() =>
+                  notify.warning({
+                    title: 'Needs attention',
+                    description: 'Microphone access may require a Settings update.',
+                  })
+                }>
+                <Text>Show Warning</Text>
               </Button>
               <Button
                 variant="secondary"

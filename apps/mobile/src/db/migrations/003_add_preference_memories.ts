@@ -1,13 +1,24 @@
 import type { Migration } from '../types';
 
+type TableColumn = {
+  name: string;
+};
+
 export const migration003AddPreferenceMemories: Migration = {
   version: 3,
   name: '003_add_preference_memories',
   async up(db) {
-    await db.exec(`
-      ALTER TABLE preferences
-      ADD COLUMN inferred_memory_enabled INTEGER NOT NULL DEFAULT 0;
-    `);
+    const preferenceColumns = await db.getAll<TableColumn>('PRAGMA table_info(preferences);');
+    const hasInferredMemoryEnabled = preferenceColumns.some(
+      (column) => column.name === 'inferred_memory_enabled'
+    );
+
+    if (!hasInferredMemoryEnabled) {
+      await db.exec(`
+        ALTER TABLE preferences
+        ADD COLUMN inferred_memory_enabled INTEGER NOT NULL DEFAULT 0;
+      `);
+    }
 
     await db.exec(`
       CREATE TABLE IF NOT EXISTS preference_memories (
