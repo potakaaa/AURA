@@ -32,6 +32,7 @@ describe('VoiceModeStateMachine', () => {
 
     expect(snapshot.status).toBe('wake-detected');
     expect(snapshot.lastCommand).toBeNull();
+    expect(snapshot.wakeSignalId).toBe(1);
   });
 
   it('moves to processing when the wake word includes a command', () => {
@@ -42,6 +43,20 @@ describe('VoiceModeStateMachine', () => {
 
     expect(snapshot.status).toBe('processing');
     expect(snapshot.lastCommand?.text).toBe('summarize my emails');
+    expect(snapshot.wakeSignalId).toBe(1);
+  });
+
+  it('signals the wake cue only once for repeated partial wake detections', () => {
+    const machine = new VoiceModeStateMachine();
+
+    machine.startListening();
+    const first = machine.receivePartialTranscript('AURA');
+    const second = machine.receivePartialTranscript('AURA summarize');
+
+    expect(first.status).toBe('wake-detected');
+    expect(first.wakeSignalId).toBe(1);
+    expect(second.status).toBe('wake-detected');
+    expect(second.wakeSignalId).toBe(1);
   });
 
   it('captures the next final transcript after wake-only speech', () => {

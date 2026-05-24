@@ -17,7 +17,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { AppState, Platform, type AppStateStatus } from 'react-native';
+import { AppState, NativeModules, Platform, type AppStateStatus } from 'react-native';
 
 export type { VoiceModeCommand, VoiceModeStatus };
 
@@ -28,6 +28,7 @@ export interface VoiceModeContextValue {
   readonly partialTranscript: string;
   readonly lastCommand: VoiceModeCommand | null;
   readonly error: SttError | null;
+  readonly wakeSignalId: number;
   readonly start: () => Promise<void>;
   readonly stop: () => Promise<void>;
   readonly resetError: () => void;
@@ -48,12 +49,30 @@ const INITIAL_SNAPSHOT: VoiceModeSnapshot = {
   partialTranscript: '',
   lastCommand: null,
   error: null,
+  wakeSignalId: 0,
 };
 
 const VoiceModeContext = createContext<VoiceModeContextValue | null>(null);
 
 function shouldRestartAfterSnapshot(snapshot: VoiceModeSnapshot): boolean {
   return snapshot.status !== 'error' && snapshot.error === null;
+}
+
+function playWakeWordCue() {
+  try {
+    const wakeCue = NativeModules.AuraWakeCue as { play?: () => void } | undefined;
+    if (wakeCue?.play) {
+      wakeCue.play();
+      return;
+    }
+
+    const soundManager = NativeModules.SoundManager as
+      | { playTouchSound?: () => void }
+      | undefined;
+    soundManager?.playTouchSound?.();
+  } catch {
+    // Audio feedback is non-critical.
+  }
 }
 
 export function VoiceModeProvider({ children }: { children: ReactNode }) {
@@ -241,6 +260,12 @@ export function VoiceModeProvider({ children }: { children: ReactNode }) {
     };
   }, [publish, startRecognition, stopActiveSession]);
 
+  useEffect(() => {
+    if (snapshot.wakeSignalId > 0) {
+      playWakeWordCue();
+    }
+  }, [snapshot.wakeSignalId]);
+
   const value = useMemo<VoiceModeContextValue>(
     () => ({
       status: snapshot.status,
@@ -249,6 +274,7 @@ export function VoiceModeProvider({ children }: { children: ReactNode }) {
       partialTranscript: snapshot.partialTranscript,
       lastCommand: snapshot.lastCommand,
       error: snapshot.error,
+      wakeSignalId: snapshot.wakeSignalId,
       start,
       stop,
       resetError,

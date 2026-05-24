@@ -1,4 +1,4 @@
-import { parseWakeWordCommand } from './wake-word';
+import { parseWakeWordCommand, WakeWordParser } from './wake-word';
 
 export type VoiceModeStatus = 'idle' | 'listening' | 'wake-detected' | 'processing' | 'error';
 
@@ -28,6 +28,7 @@ export interface VoiceModeSnapshot {
   readonly partialTranscript: string;
   readonly lastCommand: VoiceModeCommand | null;
   readonly error: VoiceModeError | null;
+  readonly wakeSignalId: number;
 }
 
 let commandCounter = 0;
@@ -49,11 +50,15 @@ function isFatalError(error: VoiceModeError): boolean {
 }
 
 export class VoiceModeStateMachine {
+  private readonly wakeWordParser = new WakeWordParser();
+  private wakeSignalCounter = 0;
+
   private snapshot: VoiceModeSnapshot = {
     status: 'idle',
     partialTranscript: '',
     lastCommand: null,
     error: null,
+    wakeSignalId: 0,
   };
 
   public getSnapshot(): VoiceModeSnapshot {
@@ -87,14 +92,16 @@ export class VoiceModeStateMachine {
     }
 
     const parsed = parseWakeWordCommand(transcript);
+    const detectedWakeWord =
+      this.snapshot.status === 'listening' &&
+      parsed.wakeWordDetected &&
+      !parsed.suppressedByCooldown;
     this.snapshot = {
       ...this.snapshot,
-      status:
-        this.snapshot.status === 'listening' && parsed.wakeWordDetected
-          ? 'wake-detected'
-          : this.snapshot.status,
+      status: detectedWakeWord ? 'wake-detected' : this.snapshot.status,
       partialTranscript: transcript,
       error: null,
+      wakeSignalId: detectedWakeWord ? this.nextWakeSignalId() : this.snapshot.wakeSignalId,
     };
 
     return this.snapshot;
@@ -102,7 +109,8 @@ export class VoiceModeStateMachine {
 
   public receiveFinalTranscript(transcript: string): VoiceModeSnapshot {
     const normalizedTranscript = transcript.trim();
-    const command = this.extractCommand(normalizedTranscript);
+    const parsed = this.parseFinalTranscript(normalizedTranscript);
+    const command = parsed.command;
 
     if (command) {
       this.snapshot = {
@@ -111,18 +119,26 @@ export class VoiceModeStateMachine {
         partialTranscript: '',
         lastCommand: createCommand(command),
         error: null,
+        wakeSignalId:
+          parsed.wakeWordDetected && !parsed.suppressedByCooldown
+            ? this.nextWakeSignalId()
+            : this.snapshot.wakeSignalId,
       };
 
       return this.snapshot;
     }
 
     if (this.snapshot.status === 'listening') {
-      const parsed = parseWakeWordCommand(normalizedTranscript);
       this.snapshot = {
         ...this.snapshot,
-        status: parsed.wakeWordDetected ? 'wake-detected' : 'listening',
+        status:
+          parsed.wakeWordDetected && !parsed.suppressedByCooldown ? 'wake-detected' : 'listening',
         partialTranscript: '',
         error: null,
+        wakeSignalId:
+          parsed.wakeWordDetected && !parsed.suppressedByCooldown
+            ? this.nextWakeSignalId()
+            : this.snapshot.wakeSignalId,
       };
 
       return this.snapshot;
@@ -203,21 +219,49 @@ export class VoiceModeStateMachine {
     return this.snapshot;
   }
 
-  private extractCommand(normalizedTranscript: string): string | null {
+  private parseFinalTranscript(normalizedTranscript: string): {
+    wakeWordDetected: boolean;
+    suppressedByCooldown: boolean;
+    command: string | null;
+  } {
     if (!normalizedTranscript) {
-      return null;
+      return {
+        wakeWordDetected: false,
+        suppressedByCooldown: false,
+        command: null,
+      };
     }
 
     if (this.snapshot.status === 'wake-detected') {
-      const parsed = parseWakeWordCommand(normalizedTranscript);
-      return parsed.wakeWordDetected ? parsed.command : normalizedTranscript;
+      const parsed = this.wakeWordParser.parse(normalizedTranscript);
+      if (parsed.suppressedByCooldown) {
+        return parsed;
+      }
+      return {
+        wakeWordDetected: parsed.wakeWordDetected,
+        suppressedByCooldown: false,
+        command: parsed.wakeWordDetected ? parsed.command : normalizedTranscript,
+      };
     }
 
     if (this.snapshot.status !== 'listening') {
-      return null;
+      return {
+        wakeWordDetected: false,
+        suppressedByCooldown: false,
+        command: null,
+      };
     }
 
-    const parsed = parseWakeWordCommand(normalizedTranscript);
-    return parsed.wakeWordDetected ? parsed.command : null;
+    const parsed = this.wakeWordParser.parse(normalizedTranscript);
+    return {
+      wakeWordDetected: parsed.wakeWordDetected,
+      suppressedByCooldown: parsed.suppressedByCooldown,
+      command: parsed.suppressedByCooldown || !parsed.wakeWordDetected ? null : parsed.command,
+    };
+  }
+
+  private nextWakeSignalId(): number {
+    this.wakeSignalCounter += 1;
+    return this.wakeSignalCounter;
   }
 }
