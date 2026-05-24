@@ -162,6 +162,12 @@ function BackgroundWakeWordBridge() {
     }
 
     async function startBackgroundWakeWord() {
+      const microphonePermission = await backgroundWakeWord.requestMicrophonePermission();
+      if (!microphonePermission.granted) {
+        await backgroundWakeWord.stop();
+        return;
+      }
+
       await backgroundWakeWord.requestPermission();
       await backgroundWakeWord.start();
       await backgroundWakeWord.setListeningEnabled(AppState.currentState !== 'active');

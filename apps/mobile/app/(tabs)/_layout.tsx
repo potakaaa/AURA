@@ -14,8 +14,8 @@ export default function TabsLayout() {
       <Tabs.Screen name="insight" options={{ title: 'Insight' }} />
       <Tabs.Screen name="connect" options={{ title: 'Connect' }} />
       <Tabs.Screen name="index" options={{ title: 'Aura' }} />
-      <Tabs.Screen name="vault" options={{ title: 'Vault' }} />
-      <Tabs.Screen name="chat" options={{ href: null }} />
+      <Tabs.Screen name="history" options={{ title: 'History' }} />
+      <Tabs.Screen name="vault" options={{ href: null }} />
       <Tabs.Screen name="settings" options={{ href: null }} />
       <Tabs.Screen name="preview" options={{ href: null }} />
       <Tabs.Screen name="toast-lab" options={{ href: null }} />

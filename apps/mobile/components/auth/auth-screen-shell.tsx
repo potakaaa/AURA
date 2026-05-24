@@ -63,16 +63,15 @@ type AuthScreenShellProps = PropsWithChildren<{
 }>;
 
 /**
- * Dark auth layout: ambient background, keyboard-aware scroll, safe-area padding below the app top bar.
- * Render {@link AppTopBar} as a sibling above this shell (same pattern as welcome).
+ * Dark auth layout: ambient background, keyboard-aware scroll, and safe-area padding.
  */
 export function AuthScreenShell({ children, footer }: AuthScreenShellProps) {
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
 
-  const topPad = insets.top;
+  const topPad = Math.max(insets.top, 16);
   const bottomPad = Math.max(insets.bottom, 16);
-  const contentTop = topPad + APP_TOP_BAR_INNER_HEIGHT + HEADER_BOTTOM_GAP;
+  const contentTop = topPad + HEADER_BOTTOM_GAP;
 
   return (
     <View className="flex-1" style={{ backgroundColor: BG_BASE }}>

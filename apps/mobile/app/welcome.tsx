@@ -1,26 +1,13 @@
-import { AuthHeaderBrand } from '@/components/auth/auth-header-brand';
-import { APP_TOP_BAR_INNER_HEIGHT } from '@/components/common';
-import { GradientText } from '@/components/welcome/gradient-text';
-import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import {
-  PRIMARY_RGB,
-  RIPPLE,
-  rgbaBlack,
-  rgbaWhite,
-  SECONDARY_RGB,
-  SURFACE_DIM_RGB,
-  WELCOME,
-} from '@/lib/raw-colors';
+import { RIPPLE, rgbaWhite, SURFACE_DIM_RGB, WELCOME } from '@/lib/raw-colors';
 import { THEME } from '@/lib/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, type Href } from 'expo-router';
-import { type ReactNode } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
-  Image,
+  FlatList,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   type TextStyle,
   useWindowDimensions,
@@ -28,9 +15,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
-import { ChevronRight, Lock, Network, Sparkles } from 'lucide-react-native';
-
-const HERO_IMAGE = require('@/assets/images/welcome_onboarding_image.png');
+import { ChevronRight } from 'lucide-react-native';
 
 const BG_BASE = THEME.dark.surfaceDim;
 
@@ -44,41 +29,49 @@ const PRIMARY_CTA_SHADOW = Platform.select({
   android: { elevation: 8 },
   default: {},
 });
-
-const CARD_SHADOW = Platform.select({
-  ios: {
-    shadowColor: THEME.dark.onPrimaryFixed,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.35,
-    shadowRadius: 24,
-  },
-  android: { elevation: 6 },
-  default: {},
-});
-
-/** Space between the header edge and the first line of scroll content (eyebrow). */
-const HEADER_BOTTOM_GAP = 24;
-
 const ONBOARDING_TITLE_TEXT: TextStyle = {
-  fontFamily: 'Manrope_800ExtraBold',
-  fontSize: 48,
-  lineHeight: 52,
-  letterSpacing: -1.75,
+  fontFamily: 'Manrope_700Bold',
+  fontSize: 30,
+  lineHeight: 36,
+  letterSpacing: -0.6,
+  textAlign: 'center',
   includeFontPadding: false,
-  ...Platform.select({
-    ios: {
-      textShadowColor: rgbaBlack(0.55),
-      textShadowOffset: { width: 0, height: 2 },
-      textShadowRadius: 5,
-    },
-    android: {
-      textShadowColor: rgbaBlack(0.4),
-      textShadowOffset: { width: 0, height: 2 },
-      textShadowRadius: 3,
-    },
-    default: {},
-  }),
 };
+
+const ONBOARDING_BODY_TEXT: TextStyle = {
+  fontFamily: 'Manrope_500Medium',
+  fontSize: 15,
+  lineHeight: 22,
+  textAlign: 'center',
+};
+
+type OnboardingPage = {
+  key: string;
+  title: string;
+  subtitle: string;
+  variant: 'seed' | 'signal' | 'sanctuary';
+};
+
+const ONBOARDING_PAGES: OnboardingPage[] = [
+  {
+    key: 'clarity',
+    title: 'Grow your clarity every day',
+    subtitle: 'Lightweight guidance that keeps you steady, focused, and present.',
+    variant: 'seed',
+  },
+  {
+    key: 'noise',
+    title: 'Quiet the noise, keep momentum',
+    subtitle: 'Aura filters distractions so your goals stay front and center.',
+    variant: 'signal',
+  },
+  {
+    key: 'flow',
+    title: 'We plant the cues. You shape the flow.',
+    subtitle: 'Personalized guidance tuned to your rhythm and intent.',
+    variant: 'sanctuary',
+  },
+];
 
 function WelcomeRadialBackground({ width, height }: { width: number; height: number }) {
   const cx = width * 0.12;
@@ -120,22 +113,67 @@ function WelcomeRadialBackground({ width, height }: { width: number; height: num
   );
 }
 
-/** Single glass fill so icon + copy share one surface (no nested “inner box”). */
-function WelcomeFeatureGlassCard({
-  children,
-}: {
-  children: ReactNode;
-}) {
+function PlaceholderIllustration({ variant }: { variant: OnboardingPage['variant'] }) {
+  const palette = useMemo(() => {
+    if (variant === 'signal') {
+      return {
+        base: `rgba(${SURFACE_DIM_RGB},0.52)`,
+        accent: THEME.dark.secondary,
+        glow: THEME.dark.primary,
+      };
+    }
+
+    if (variant === 'sanctuary') {
+      return {
+        base: `rgba(${SURFACE_DIM_RGB},0.6)`,
+        accent: THEME.dark.primary,
+        glow: THEME.dark.secondary,
+      };
+    }
+
+    return {
+      base: `rgba(${SURFACE_DIM_RGB},0.55)`,
+      accent: THEME.dark.tertiary,
+      glow: THEME.dark.primary,
+    };
+  }, [variant]);
+
   return (
-    <View className="relative overflow-hidden rounded-[28px] border border-white/[0.1] p-7" style={CARD_SHADOW}>
-      <LinearGradient
-        colors={[`rgba(${SURFACE_DIM_RGB},0.36)`, `rgba(${SURFACE_DIM_RGB},0.22)`]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFillObject}
-        pointerEvents="none"
-      />
-      <View className="relative z-10">{children}</View>
+    <View className="items-center justify-center">
+      <View className="h-56 w-56 items-center justify-center">
+        <LinearGradient
+          colors={[palette.glow, palette.base]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            position: 'absolute',
+            height: 190,
+            width: 190,
+            borderRadius: 95,
+          }}
+        />
+        <View
+          className="items-center justify-center"
+          style={{
+            height: 150,
+            width: 150,
+            borderRadius: 40,
+            backgroundColor: palette.base,
+            borderWidth: 1,
+            borderColor: rgbaWhite(0.18),
+          }}>
+          <View
+            style={{
+              height: 70,
+              width: 70,
+              borderRadius: 35,
+              backgroundColor: palette.accent,
+              borderWidth: 1,
+              borderColor: rgbaWhite(0.2),
+            }}
+          />
+        </View>
+      </View>
     </View>
   );
 }
@@ -143,181 +181,141 @@ function WelcomeFeatureGlassCard({
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
+  const listRef = useRef<FlatList<OnboardingPage>>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  const topPad = insets.top;
+  const topPad = Math.max(insets.top, 16);
   const bottomPad = Math.max(insets.bottom, 16);
-  const contentTop = topPad + APP_TOP_BAR_INNER_HEIGHT + HEADER_BOTTOM_GAP;
+
+  const isLast = activeIndex === ONBOARDING_PAGES.length - 1;
+
+  const handleNext = useCallback(() => {
+    if (isLast) {
+      return;
+    }
+
+    const nextIndex = Math.min(activeIndex + 1, ONBOARDING_PAGES.length - 1);
+    listRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+  }, [activeIndex, isLast]);
+
+  const handleMomentumEnd = useCallback(
+    (event: { nativeEvent: { contentOffset: { x: number } } }) => {
+      const nextIndex = Math.round(event.nativeEvent.contentOffset.x / width);
+      setActiveIndex(nextIndex);
+    },
+    [width]
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: OnboardingPage }) => (
+      <View style={{ width }}>
+        <View className="flex-1 px-6" style={{ paddingTop: 24 }}>
+          <View className="items-center gap-3">
+            <Text className="text-foreground" style={ONBOARDING_TITLE_TEXT}>
+              {item.title}
+            </Text>
+            <Text className="text-muted-foreground" style={ONBOARDING_BODY_TEXT}>
+              {item.subtitle}
+            </Text>
+          </View>
+          <View className="flex-1 items-center justify-center">
+            <PlaceholderIllustration variant={item.variant} />
+          </View>
+        </View>
+      </View>
+    ),
+    [width]
+  );
 
   return (
     <View className="flex-1" style={{ backgroundColor: BG_BASE }}>
       <WelcomeRadialBackground width={width} height={height} />
+      <View className="flex-1">
+        <View style={{ paddingTop: topPad, paddingHorizontal: 24 }}>
+          <Text
+            className="text-muted-foreground text-center text-xs uppercase tracking-[0.24em]"
+            style={{ fontFamily: 'Manrope_600SemiBold' }}>
+            Aura
+          </Text>
+        </View>
 
-      <AuthHeaderBrand backgroundColor={BG_BASE} />
+        <FlatList
+          ref={listRef}
+          data={ONBOARDING_PAGES}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={handleMomentumEnd}
+          keyExtractor={(item) => item.key}
+          renderItem={renderItem}
+          getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
+          contentContainerStyle={{ flexGrow: 1 }}
+        />
 
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{
-          paddingTop: contentTop,
-          paddingBottom: bottomPad + 32,
-          paddingHorizontal: 24,
-        }}
-        showsVerticalScrollIndicator={false}>
-        <View className="gap-8">
-          <View className="gap-5">
-            <View className="border-secondary/25 bg-secondary/10 self-start rounded-full border px-3.5 py-2">
-              <View className="flex-row items-center gap-2">
-                <Sparkles size={14} color={THEME.dark.secondary} />
-                <Text
-                  className="text-secondary text-[11px] font-bold uppercase tracking-[0.22em]"
-                  style={{ fontFamily: 'Manrope_700Bold' }}>
-                  Neural Synchronized Presence
-                </Text>
-              </View>
-            </View>
-            <View className="gap-0.5">
-              <Text className="text-white" style={ONBOARDING_TITLE_TEXT}>
-                Experience
-              </Text>
-              <GradientText variant="headline" textStyle={ONBOARDING_TITLE_TEXT}>
-                Intelligence Unbound
-              </GradientText>
-            </View>
-            <Text
-              className="text-muted-foreground text-[17px] leading-[26px]"
-              style={{ fontFamily: 'Manrope_500Medium' }}>
-              Transcend traditional interaction. Aura adapts to your cognitive patterns, evolving
-              alongside your digital consciousness in an ethereal flow of insight.
-            </Text>
-            <View className="mt-1 flex-row flex-wrap gap-x-5 gap-y-2 border-t border-white/[0.06] pt-5">
-              {['Voice-first', 'Private by design', 'On-device aware'].map((label) => (
-                <View key={label} className="flex-row items-center gap-2">
-                  <View className="bg-primary h-1.5 w-1.5 rounded-full" />
-                  <Text
-                    className="text-muted-foreground text-xs font-semibold tracking-wide"
-                    style={{ fontFamily: 'Manrope_600SemiBold' }}>
-                    {label}
-                  </Text>
-                </View>
-              ))}
-            </View>
+        <View style={{ paddingHorizontal: 24, paddingBottom: bottomPad + 24 }}>
+          <View className="flex-row justify-center gap-2 pb-5">
+            {ONBOARDING_PAGES.map((page, index) => {
+              const isActive = index === activeIndex;
+              return (
+                <View
+                  key={page.key}
+                  style={{
+                    height: 6,
+                    width: isActive ? 20 : 6,
+                    borderRadius: 999,
+                    backgroundColor: isActive
+                      ? THEME.dark.primary
+                      : rgbaWhite(0.3),
+                  }}
+                />
+              );
+            })}
           </View>
 
-          <View className="flex-col gap-3 pt-1">
+          {isLast ? (
+            <View className="gap-3">
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.push('/signup' as Href)}
+                android_ripple={{ color: RIPPLE.onPrimary }}
+                className="w-full flex-row items-center justify-center gap-1 rounded-full py-[18px] active:opacity-90"
+                style={[{ backgroundColor: THEME.dark.primary }, PRIMARY_CTA_SHADOW]}>
+                <Text
+                  className="text-primary-foreground text-base font-bold"
+                  style={{ fontFamily: 'Manrope_700Bold' }}>
+                  Create account
+                </Text>
+                <ChevronRight size={20} color={THEME.dark.primaryForeground} />
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.push('/login' as Href)}
+                android_ripple={{ color: rgbaWhite(0.12) }}
+                className="w-full items-center rounded-full border border-white/[0.14] bg-white/[0.05] py-[18px] active:opacity-90">
+                <Text
+                  className="text-foreground text-base font-bold"
+                  style={{ fontFamily: 'Manrope_700Bold' }}>
+                  Log in
+                </Text>
+              </Pressable>
+            </View>
+          ) : (
             <Pressable
               accessibilityRole="button"
-              onPress={() => router.push('/login' as Href)}
+              onPress={handleNext}
               android_ripple={{ color: RIPPLE.onPrimary }}
               className="w-full flex-row items-center justify-center gap-1 rounded-full py-[18px] active:opacity-90"
               style={[{ backgroundColor: THEME.dark.primary }, PRIMARY_CTA_SHADOW]}>
               <Text
                 className="text-primary-foreground text-base font-bold"
                 style={{ fontFamily: 'Manrope_700Bold' }}>
-                Get Started
+                Next
               </Text>
-              <Icon as={ChevronRight} size={22} color={THEME.dark.primaryForeground} />
+              <ChevronRight size={20} color={THEME.dark.primaryForeground} />
             </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => router.push('/learn-more' as Href)}
-              android_ripple={{ color: rgbaWhite(0.12) }}
-              className="w-full items-center rounded-full border border-white/[0.14] bg-white/[0.05] py-[18px] active:opacity-90">
-              <Text
-                className="text-foreground text-base font-bold"
-                style={{ fontFamily: 'Manrope_700Bold' }}>
-                Learn More
-              </Text>
-            </Pressable>
-          </View>
-
-          <View
-            className="relative aspect-[16/10] w-full overflow-hidden rounded-[32px]"
-            style={CARD_SHADOW}>
-            <LinearGradient
-              colors={[
-                `rgba(${PRIMARY_RGB},0.22)`,
-                `rgba(${SECONDARY_RGB},0.12)`,
-                `rgba(${SURFACE_DIM_RGB},0.4)`,
-              ]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={StyleSheet.absoluteFillObject}
-            />
-            <View className="bg-card absolute inset-[1px] overflow-hidden rounded-[31px] border border-white/[0.1]">
-              <Image source={HERO_IMAGE} className="h-full w-full" resizeMode="cover" />
-              <LinearGradient
-                colors={[
-                  'transparent',
-                  `rgba(${SURFACE_DIM_RGB},0.55)`,
-                  `rgba(${SURFACE_DIM_RGB},0.97)`,
-                ]}
-                locations={[0.28, 0.62, 1]}
-                style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
-              />
-              <LinearGradient
-                colors={[`rgba(${SECONDARY_RGB},0.12)`, 'transparent']}
-                start={{ x: 0, y: 1 }}
-                end={{ x: 0.4, y: 0 }}
-                style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
-              />
-              <View className="absolute bottom-0 left-0 right-0 px-5 pb-6 pt-8">
-                <Text
-                  className="text-2xl font-bold text-white"
-                  style={{ fontFamily: 'Manrope_700Bold' }}>
-                  Adaptive Oracle
-                </Text>
-                <Text
-                  className="text-muted-foreground mt-1 text-sm"
-                  style={{ fontFamily: 'Manrope_500Medium' }}>
-                  Real-time neural pattern mapping
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          <View className="flex-col gap-4">
-            <WelcomeFeatureGlassCard>
-              <View className="flex-row gap-5">
-                <View className="border-secondary/20 bg-secondary/10 h-14 w-14 shrink-0 items-center justify-center rounded-2xl border">
-                  <Icon as={Network} size={26} color={THEME.dark.secondary} />
-                </View>
-                <View className="min-w-0 flex-1 gap-2.5">
-                  <Text
-                    className="text-xl font-bold text-white"
-                    style={{ fontFamily: 'Manrope_700Bold' }}>
-                    Neural Sync
-                  </Text>
-                  <Text
-                    className="text-muted-foreground text-sm leading-[22px]"
-                    style={{ fontFamily: 'Manrope_500Medium' }}>
-                    Seamless integration between your device ecosystem and our distributed
-                    intelligence core.
-                  </Text>
-                </View>
-              </View>
-            </WelcomeFeatureGlassCard>
-            <WelcomeFeatureGlassCard>
-              <View className="flex-row gap-5">
-                <View className="border-tertiary/25 bg-tertiary/10 h-14 w-14 shrink-0 items-center justify-center rounded-2xl border">
-                  <Icon as={Lock} size={26} color={THEME.dark.tertiary} />
-                </View>
-                <View className="min-w-0 flex-1 gap-2.5">
-                  <Text
-                    className="text-xl font-bold text-white"
-                    style={{ fontFamily: 'Manrope_700Bold' }}>
-                    Vault Secure
-                  </Text>
-                  <Text
-                    className="text-muted-foreground text-sm leading-[22px]"
-                    style={{ fontFamily: 'Manrope_500Medium' }}>
-                    Quantum-resistant encryption layers ensuring your cognitive data remains yours
-                    alone.
-                  </Text>
-                </View>
-              </View>
-            </WelcomeFeatureGlassCard>
-          </View>
+          )}
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 }

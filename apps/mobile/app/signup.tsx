@@ -1,4 +1,3 @@
-import { AuthHeaderBrand } from '@/components/auth/auth-header-brand';
 import { AuthScreenShell } from '@/components/auth/auth-screen-shell';
 import { AuthSocialProviderRow } from '@/components/auth/auth-social-provider-row';
 import { AuraButton } from '@/components/ui/aura-button';
@@ -94,8 +93,6 @@ export default function SignupScreen() {
 
   return (
     <View className="flex-1">
-      <AuthHeaderBrand />
-
       <AuthScreenShell
         footer={
           <View className="mt-10 w-full items-center px-2">

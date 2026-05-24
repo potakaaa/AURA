@@ -385,7 +385,7 @@ export default function VoiceHubScreen() {
                       label="View history"
                       icon={History}
                       iconClassName="text-tertiary"
-                      onPress={() => router.push('/(tabs)/chat')}
+                      onPress={() => router.push('/(tabs)/history')}
                     />
                   </VoiceHubQuickActionsRow>
                 </View>

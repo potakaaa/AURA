@@ -5,7 +5,7 @@ import { THEME } from '@/lib/theme';
 import { router } from 'expo-router';
 import { ArrowLeft, CheckCircle2, Fingerprint, Infinity, Lock, Sparkles, X } from 'lucide-react-native';
 import { Image, Pressable, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const NEURAL_SYNC_IMAGE = require('@/assets/images/learn-more/neural-sync.png');
 const AMBIENT_INTELLIGENCE_IMAGE = require('@/assets/images/learn-more/ambient-intelligence.png');
@@ -21,33 +21,21 @@ const CARD_STYLE = {
 } as const;
 
 export default function LearnMoreScreen() {
+  const insets = useSafeAreaInsets();
+
   return (
     <View className="flex-1" style={{ backgroundColor: LEARN_MORE.pageBg }}>
       <View className="absolute inset-0" style={{ backgroundColor: LEARN_MORE.pageBg }} />
       <View className="absolute -right-28 top-52 h-64 w-64 rounded-full bg-secondary/6 blur-[100px]" />
       <View className="absolute bottom-16 left-1/2 h-72 w-[92%] -translate-x-1/2 rounded-full bg-tertiary/5 blur-[120px]" />
 
-      <SafeAreaView
-        edges={['top']}
-        className="border-b border-white/5 px-4"
-        style={{ backgroundColor: LEARN_MORE.headerBg }}>
-        <View className="h-11 flex-row items-center justify-between">
-          <View className="flex-row items-center gap-2.5">
-            <Icon as={Sparkles} size={14} color={THEME.dark.primary} />
-            <Text className="text-primary text-[21px] font-extrabold tracking-tight">AURA</Text>
-          </View>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => router.back()}
-            className="h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-black/45">
-            <Icon as={X} size={12} color={THEME.dark.onSurface} />
-          </Pressable>
-        </View>
-      </SafeAreaView>
-
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ paddingHorizontal: 14, paddingTop: 34, paddingBottom: 26 }}>
+        contentContainerStyle={{
+          paddingHorizontal: 14,
+          paddingTop: Math.max(insets.top, 16) + 34,
+          paddingBottom: Math.max(insets.bottom, 16) + 26,
+        }}>
         <View className="gap-9">
           <View className="items-center gap-5 px-3">
             <View

@@ -16,7 +16,7 @@ import { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export default function ChatScreen() {
+export default function HistoryTabScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [conversations, setConversations] = useState<LocalConversationSummary[]>([]);

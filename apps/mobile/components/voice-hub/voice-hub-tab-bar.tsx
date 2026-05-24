@@ -6,7 +6,7 @@ import { THEME } from '@/lib/theme';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { Eye, Lock, Sparkles, Users } from 'lucide-react-native';
+import { Clock3, Eye, Lock, Sparkles, Users } from 'lucide-react-native';
 import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -14,7 +14,7 @@ const TABS = [
   { name: 'insight' as const, label: 'Insight', Icon: Eye },
   { name: 'connect' as const, label: 'Connect', Icon: Users },
   { name: 'index' as const, label: 'Aura', Icon: Sparkles, isAura: true },
-  { name: 'vault' as const, label: 'Vault', Icon: Lock },
+  { name: 'history' as const, label: 'History', Icon: Clock3 },
 ];
 
 /** Bottom padding for scroll/root content so it clears the floating glass tab bar. */

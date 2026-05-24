@@ -1,6 +1,7 @@
 package com.potaka.AURA
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -18,6 +19,20 @@ class AuraBackgroundWakeWordModule(private val reactContext: ReactApplicationCon
   private var permissionPromise: Promise? = null
 
   override fun getName(): String = NAME
+
+  @ReactMethod
+  fun configure(options: com.facebook.react.bridge.ReadableMap, promise: Promise) {
+    val apiBaseUrl = options.getString("apiBaseUrl")?.trim()?.trimEnd('/')
+    if (!apiBaseUrl.isNullOrBlank()) {
+      reactContext
+        .getSharedPreferences(AuraWakeWordService.PREFERENCES_NAME, Context.MODE_PRIVATE)
+        .edit()
+        .putString(AuraWakeWordService.PREF_API_BASE_URL, apiBaseUrl)
+        .apply()
+    }
+
+    promise.resolve(Arguments.createMap().apply { putBoolean("configured", true) })
+  }
 
   @ReactMethod
   fun start(promise: Promise) {

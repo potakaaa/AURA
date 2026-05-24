@@ -23,7 +23,7 @@ const DEFAULT_API_BASE_URL = Platform.select({
   default: 'http://localhost:4000',
 });
 
-const API_BASE_URL = (
+export const LLM_CHAT_API_BASE_URL = (
   process.env.EXPO_PUBLIC_API_BASE_URL ||
   DEFAULT_API_BASE_URL ||
   'http://localhost:4000'
@@ -34,7 +34,7 @@ function logLlmChatRequest(event: string, details: Record<string, unknown>) {
     event,
     timestamp: new Date().toISOString(),
     platform: Platform.OS,
-    apiBaseUrl: API_BASE_URL,
+    apiBaseUrl: LLM_CHAT_API_BASE_URL,
     ...details,
   });
 }
@@ -133,7 +133,7 @@ export async function postLlmChat(messages: LlmChatMessage[]): Promise<LlmChatRe
   }
 
   const startedAt = Date.now();
-  const url = `${API_BASE_URL}/llm/chat`;
+  const url = `${LLM_CHAT_API_BASE_URL}/llm/chat`;
 
   logLlmChatRequest('request_start', {
     url,
