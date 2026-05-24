@@ -68,12 +68,7 @@ export function AuthenticatedAppTopBar({
                 AURA
               </GradientText>
             )}
-            <View className="mt-0.5 flex-row items-center gap-2">
-              <View className="h-2 w-2 rounded-full" style={styles.statusDot} />
-              <Text className="text-muted-foreground text-[11px] font-semibold" numberOfLines={1}>
-                {title ? 'Workspace' : 'Ready for you'}
-              </Text>
-            </View>
+            
           </View>
         </View>
       }

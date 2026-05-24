@@ -22,7 +22,14 @@ import { GradientText } from '@/components/welcome/gradient-text';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Calendar, History, Mail } from 'lucide-react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, ScrollView, useWindowDimensions, View } from 'react-native';
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const BG = THEME.dark.surfaceDim;
@@ -60,6 +67,7 @@ export default function VoiceHubScreen() {
   const [draftMessage, setDraftMessage] = useState('');
   const [chatMessages, setChatMessages] = useState<LlmChatMessage[]>([]);
   const [isAssistantThinking, setIsAssistantThinking] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
   const lastSentTranscriptRef = useRef('');
   const lastFailedUserMessageRef = useRef<string | null>(null);
   const lastSpeechErrorKeyRef = useRef<string | null>(null);
@@ -82,6 +90,20 @@ export default function VoiceHubScreen() {
   useEffect(() => {
     chatMessagesRef.current = chatMessages;
   }, [chatMessages]);
+
+  useEffect(() => {
+    const scrollToComposer = () => {
+      requestAnimationFrame(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      });
+    };
+
+    const showSubscription = Keyboard.addListener('keyboardDidShow', scrollToComposer);
+
+    return () => {
+      showSubscription.remove();
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -264,74 +286,82 @@ export default function VoiceHubScreen() {
 
         <AuthenticatedAppTopBar backgroundColor={BG} />
 
-        <ScrollView
+        <KeyboardAvoidingView
           className="flex-1"
-          contentContainerStyle={{
-            paddingBottom: bottomPad,
-            paddingHorizontal: 24,
-          }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
-          <View className="w-full max-w-2xl gap-8 self-center">
-            <View className="items-center gap-7">
-              <View className="relative w-full items-center pt-24">
-                <VoiceHubFloatingTranscript
-                  transcript={floatingTranscript}
-                  isListening={isListening}
-                />
-                <VoiceHubOrb
-                  onPress={handleOrbPress}
-                  disabled={micDisabled}
-                  isListening={isListening}
-                  isProcessing={status === 'processing'}
-                />
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={topPad}>
+          <ScrollView
+            ref={scrollViewRef}
+            className="flex-1"
+            contentContainerStyle={{
+              flexGrow: 1,
+              paddingBottom: bottomPad,
+              paddingHorizontal: 24,
+            }}
+            automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}>
+            <View className="w-full max-w-2xl gap-8 self-center">
+              <View className="items-center gap-7">
+                <View className="relative w-full items-center pt-24">
+                  <VoiceHubFloatingTranscript
+                    transcript={floatingTranscript}
+                    isListening={isListening}
+                  />
+                  <VoiceHubOrb
+                    onPress={handleOrbPress}
+                    disabled={micDisabled}
+                    isListening={isListening}
+                    isProcessing={status === 'processing'}
+                  />
+                </View>
+
+                <View className="w-full items-center gap-6">
+                  <GradientText
+                    variant="surfaceHeadline"
+                    className="text-center text-[34px] font-extrabold leading-tight tracking-tight"
+                    outerClassName="self-center px-1"
+                    textStyle={{ fontFamily: 'Manrope_800ExtraBold' }}>
+                    What should Aura help with next?
+                  </GradientText>
+
+                  <VoiceHubQuickActionsRow>
+                    <VoiceHubQuickAction
+                      label="Summarize emails"
+                      icon={Mail}
+                      iconClassName="text-primary"
+                    />
+                    <VoiceHubQuickAction
+                      label="Schedule my day"
+                      icon={Calendar}
+                      iconClassName="text-secondary"
+                    />
+                    <VoiceHubQuickAction
+                      label="View history"
+                      icon={History}
+                      iconClassName="text-tertiary"
+                      onPress={() => router.push('/(tabs)/chat')}
+                    />
+                  </VoiceHubQuickActionsRow>
+                </View>
               </View>
 
-              <View className="w-full items-center gap-6">
-                <GradientText
-                  variant="surfaceHeadline"
-                  className="text-center text-[34px] font-extrabold leading-tight tracking-tight"
-                  outerClassName="self-center px-1"
-                  textStyle={{ fontFamily: 'Manrope_800ExtraBold' }}>
-                  What should Aura help with next?
-                </GradientText>
-
-                <VoiceHubQuickActionsRow>
-                  <VoiceHubQuickAction
-                    label="Summarize emails"
-                    icon={Mail}
-                    iconClassName="text-primary"
-                  />
-                  <VoiceHubQuickAction
-                    label="Schedule my day"
-                    icon={Calendar}
-                    iconClassName="text-secondary"
-                  />
-                  <VoiceHubQuickAction
-                    label="View history"
-                    icon={History}
-                    iconClassName="text-tertiary"
-                    onPress={() => router.push('/(tabs)/chat')}
-                  />
-                </VoiceHubQuickActionsRow>
-              </View>
+              <VoiceHubStateSection
+                speechStatus={status}
+                partialTranscript={partialTranscript}
+                finalTranscript={finalTranscript}
+                chatMessages={chatMessages}
+                draftMessage={draftMessage}
+                isAssistantThinking={isAssistantThinking}
+                canRetryAssistantMessage={Boolean(lastFailedUserMessageRef.current)}
+                onDraftMessageChange={setDraftMessage}
+                onSendDraftMessage={handleSendDraftMessage}
+                onRetryAssistantMessage={handleRetryAssistantMessage}
+              />
+              <View className="h-2" />
             </View>
-
-            <VoiceHubStateSection
-              speechStatus={status}
-              partialTranscript={partialTranscript}
-              finalTranscript={finalTranscript}
-              chatMessages={chatMessages}
-              draftMessage={draftMessage}
-              isAssistantThinking={isAssistantThinking}
-              canRetryAssistantMessage={Boolean(lastFailedUserMessageRef.current)}
-              onDraftMessageChange={setDraftMessage}
-              onSendDraftMessage={handleSendDraftMessage}
-              onRetryAssistantMessage={handleRetryAssistantMessage}
-            />
-            <View className="h-2" />
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </View>
     </AuraScreen>
   );

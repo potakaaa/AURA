@@ -51,17 +51,10 @@ export function AppTopBar({
   return (
     <View
       className={cn('absolute left-0 right-0 top-0 z-50 overflow-hidden px-5', className)}
-      style={[{ backgroundColor }, BAR_SHADOW, style]}>
-      <BlurView intensity={34} tint="dark" pointerEvents="none" style={StyleSheet.absoluteFill} />
-      <LinearGradient
-        pointerEvents="none"
-        colors={[...TOP_BAR.brandHalo]}
-        locations={[0, 0.52, 1]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.brandHalo}
-      />
+      style={style}>
       <View pointerEvents="none" style={styles.materialPanel}>
+        <BlurView intensity={34} tint="dark" style={StyleSheet.absoluteFill} />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor }]} />
         <LinearGradient
           colors={[...TOP_BAR.materialOverlay]}
           start={{ x: 0.5, y: 0 }}
@@ -84,26 +77,11 @@ export function AppTopBar({
           </>
         )}
       </View>
-      <LinearGradient
-        pointerEvents="none"
-        colors={[...TOP_BAR.bottomEdge]}
-        locations={[0, 0.55, 1]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.bottomEdge}
-      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  brandHalo: {
-    position: 'absolute',
-    top: -58,
-    left: -28,
-    width: 280,
-    height: 152,
-  },
   materialPanel: {
     position: 'absolute',
     left: 16,
@@ -115,6 +93,7 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: TOP_BAR.controlBorder,
     backgroundColor: TOP_BAR.material,
+    ...BAR_SHADOW,
   },
   panelHighlight: {
     position: 'absolute',
@@ -123,12 +102,5 @@ const styles = StyleSheet.create({
     top: 0,
     height: StyleSheet.hairlineWidth,
     backgroundColor: TOP_BAR.controlHighlight,
-  },
-  bottomEdge: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 1,
   },
 });
