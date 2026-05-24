@@ -10,6 +10,7 @@ import {
 } from '@expo-google-fonts/manrope';
 import { initDatabase } from '@/src/db';
 import { AuthSessionProvider, useAuthSession } from '@/hooks/use-auth-session';
+import { useBackgroundWakeWord } from '@/hooks/useBackgroundWakeWord';
 import { VoiceModeProvider } from '@/hooks/useVoiceMode';
 import { loadStoredColorScheme, type AppColorScheme } from '@/lib/color-scheme';
 import { NAV_THEME } from '@/lib/theme';
@@ -21,7 +22,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from 'react';
-import { Platform, Text, View } from 'react-native';
+import { AppState, Platform, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 void SplashScreen.preventAutoHideAsync();
@@ -135,6 +136,7 @@ export default function RootLayout() {
           <Toaster />
           <AuthSessionProvider>
             <VoiceModeProvider>
+              <BackgroundWakeWordBridge />
               <AuthNavigator />
             </VoiceModeProvider>
           </AuthSessionProvider>
@@ -143,6 +145,56 @@ export default function RootLayout() {
       </ThemeProvider>
     </SafeAreaProvider>
   );
+}
+
+function BackgroundWakeWordBridge() {
+  const { isAuthenticated, isLoading } = useAuthSession();
+  const backgroundWakeWord = useBackgroundWakeWord();
+
+  useEffect(() => {
+    if (!backgroundWakeWord.isSupported || isLoading) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      void backgroundWakeWord.stop().catch(() => {});
+      return;
+    }
+
+    async function startBackgroundWakeWord() {
+      await backgroundWakeWord.requestPermission();
+      await backgroundWakeWord.start();
+      await backgroundWakeWord.setListeningEnabled(AppState.currentState !== 'active');
+    }
+
+    void startBackgroundWakeWord().catch((error) => {
+      console.warn('[voice-mode] Unable to start Android background wake-word service.', error);
+    });
+
+    return () => {
+      void backgroundWakeWord.setListeningEnabled(false).catch(() => {});
+    };
+  }, [backgroundWakeWord, isAuthenticated, isLoading]);
+
+  useEffect(() => {
+    if (!backgroundWakeWord.isSupported || !isAuthenticated) {
+      return;
+    }
+
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      void backgroundWakeWord
+        .setListeningEnabled(nextState !== 'active')
+        .catch((error) => {
+          console.warn('[voice-mode] Unable to update Android background wake-word state.', error);
+        });
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [backgroundWakeWord, isAuthenticated]);
+
+  return null;
 }
 
 function AuthNavigator() {

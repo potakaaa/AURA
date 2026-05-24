@@ -20,6 +20,42 @@ test("generateChatResponse works with a mock LlmProvider", async () => {
   assert.equal(provider.lastRequest?.temperature, 0.3);
 });
 
+test("demo prompts bypass the LLM provider", async () => {
+  const provider = new MockLlmProvider({ content: "Provider reply" });
+
+  const response = await generateChatResponse(
+    [
+      {
+        role: "user",
+        content: "AURA, brief me for today. What should I focus on?",
+      },
+    ],
+    { provider },
+  );
+
+  assert.match(response, /Good morning, Rald/);
+  assert.match(response, /Finalize the Jogaliga handoff notes/);
+  assert.equal(provider.lastRequest, undefined);
+});
+
+test("demo prompt bypass tolerates spoken punctuation differences", async () => {
+  const provider = new MockLlmProvider({ content: "Provider reply" });
+
+  const response = await generateChatResponse(
+    [
+      {
+        role: "user",
+        content: "what did we decide in the last Joga Liga meeting",
+      },
+    ],
+    { provider },
+  );
+
+  assert.match(response, /In the last Jogaliga meeting/);
+  assert.match(response, /Document current infrastructure costs\. Pending/);
+  assert.equal(provider.lastRequest, undefined);
+});
+
 test("service depends on normalized content, not OpenAI choices", async () => {
   const provider = new MockLlmProvider({
     content: "Interface reply",
