@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "67dd6f34-2672-4345-9853-ac0064179335"
+      }
+    },
+    "android": {
+      "package": "com.potaka.aura"
+    }
+  }
+}

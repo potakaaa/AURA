@@ -29,12 +29,25 @@ type VoiceHubOrbProps = {
   onPress?: () => void;
   disabled?: boolean;
   isListening?: boolean;
+  isWakeDetected?: boolean;
   isProcessing?: boolean;
 };
 
 /** Glass-style orb: radial-style linear gradient, soft highlight, center sparkle, outer rings. */
-export function VoiceHubOrb({ onPress, disabled, isListening, isProcessing }: VoiceHubOrbProps) {
-  const statusLabel = isListening ? 'Listening' : isProcessing ? 'Processing' : 'Tap to speak';
+export function VoiceHubOrb({
+  onPress,
+  disabled,
+  isListening,
+  isWakeDetected,
+  isProcessing,
+}: VoiceHubOrbProps) {
+  const statusLabel = isWakeDetected
+    ? 'Command'
+    : isListening
+      ? 'Listening'
+      : isProcessing
+        ? 'Processing'
+        : 'Tap to speak';
 
   return (
     <Pressable

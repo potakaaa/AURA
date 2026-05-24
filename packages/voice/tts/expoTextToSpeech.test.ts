@@ -1,6 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { speechState, speakMock, stopMock, isSpeakingAsyncMock, getAvailableVoicesAsyncMock } =
+const {
+  speechState,
+  speakMock,
+  stopMock,
+  isSpeakingAsyncMock,
+  getAvailableVoicesAsyncMock,
+} =
   vi.hoisted(() => ({
     speechState: {
       options: null as null | Record<string, unknown>,

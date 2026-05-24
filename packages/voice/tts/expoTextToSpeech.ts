@@ -33,6 +33,15 @@ function getSpeechTextLimit(): number {
   return typeof Speech.maxSpeechInputLength === "number" ? Speech.maxSpeechInputLength : 0;
 }
 
+function createUnavailableError(utteranceId: string): TtsError {
+  return {
+    utteranceId,
+    code: "not_available",
+    message: "Text-to-speech is unavailable on this device.",
+    recoverable: false,
+  };
+}
+
 function normalizeSpeechError(utteranceId: string, cause: unknown): TtsError {
   const message = cause instanceof Error ? cause.message : "Text-to-speech failed.";
   const isInterrupted = /interrupted|canceled|cancelled|stopped/i.test(message);
@@ -60,7 +69,6 @@ export class ExpoTextToSpeechSession implements TtsSession {
   public async speak(request: TtsSpeakRequest): Promise<void> {
     const text = request.text.trim();
     const limit = getSpeechTextLimit();
-
     if (!text || (limit > 0 && text.length > limit)) {
       const error: TtsError = {
         utteranceId: request.utteranceId,
@@ -82,7 +90,7 @@ export class ExpoTextToSpeechSession implements TtsSession {
       language: request.locale,
       pitch: request.pitch,
       rate: request.rate,
-      voice: request.voice,
+      voice: typeof request.voice === "string" ? request.voice : undefined,
       onStart: () => {
         if (this.activeUtteranceId !== request.utteranceId) {
           return;
@@ -120,6 +128,7 @@ export class ExpoTextToSpeechSession implements TtsSession {
 
   public async stop(): Promise<void> {
     const utteranceId = this.activeUtteranceId;
+
     try {
       await Speech.stop();
       this.activeUtteranceId = null;

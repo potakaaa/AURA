@@ -28,6 +28,38 @@ type VoiceHubStateSectionProps = {
   onStopSpeaking?: () => void;
 };
 
+function getVoiceModeStatusLabel(status: string) {
+  switch (status) {
+    case 'listening':
+      return 'Waiting for AURA';
+    case 'wake-detected':
+      return 'Command ready';
+    case 'processing':
+      return 'Processing';
+    case 'error':
+      return 'Voice error';
+    case 'idle':
+    default:
+      return 'Idle';
+  }
+}
+
+function getVoiceModeDescription(status: string) {
+  switch (status) {
+    case 'listening':
+      return 'Say "AURA" followed by a command to start a hands-free request.';
+    case 'wake-detected':
+      return 'Wake word detected. Speak the command you want Aura to handle.';
+    case 'processing':
+      return 'Aura is sending the captured command and preparing a response.';
+    case 'error':
+      return 'Voice Mode needs attention before it can continue listening.';
+    case 'idle':
+    default:
+      return 'Voice Mode is paused. Tap the orb to resume hands-free listening.';
+  }
+}
+
 export function VoiceHubStateSection({
   speechStatus,
   partialTranscript,
@@ -53,9 +85,10 @@ export function VoiceHubStateSection({
   const readoutStatus = isTextToSpeechMuted ? 'Muted' : isSpeaking ? 'Speaking' : 'Readout ready';
   const canSendDraft = draftMessage.trim().length > 0 && !isAssistantThinking;
   const humanStatus = useMemo(
-    () => status.replace(/_/g, ' ').replace(/^\w/, (char) => char.toUpperCase()),
+    () => getVoiceModeStatusLabel(status),
     [status]
   );
+  const voiceModeDescription = useMemo(() => getVoiceModeDescription(status), [status]);
 
   return (
     <View className="w-full max-w-4xl gap-6 self-center">
@@ -92,8 +125,7 @@ export function VoiceHubStateSection({
           <Text
             className="text-on-surface-variant mt-4 max-w-md text-sm leading-relaxed"
             style={{ fontFamily: 'Manrope_500Medium' }}>
-            You've reached 85% of your focus goal. Your environmental noise is optimized for
-            creative flow.
+            {voiceModeDescription}
           </Text>
           <View className="mt-5 flex-row gap-3">
             <View className="bg-surface-container-high/70 flex-1 rounded-2xl px-4 py-3">

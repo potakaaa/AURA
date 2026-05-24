@@ -4,6 +4,7 @@
   "packageManager": "pnpm@10.32.1",
   "scripts": {
     "build": "turbo run build",
+    "build:eas": "cd apps/mobile && eas build --profile development --platform android",
     "test": "turbo run test",
     "lint": "turbo run lint",
     "check:no-hardcoded-colors": "node scripts/check-no-hardcoded-colors.mjs",

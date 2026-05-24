@@ -10,8 +10,8 @@ import {
 import { AuthenticatedAppTopBar, appTopBarOffsetTop } from '@/components/common';
 import { AuraScreen } from '@/components/ui/aura-screen';
 import { toast } from '@/components/ui/toaster';
-import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { useTextToSpeech } from '@/hooks/useTextToSpeech';
+import { useVoiceMode } from '@/hooks/useVoiceMode';
 import { LlmChatClientError, postLlmChat, type LlmChatMessage } from '@/lib/llm-chat';
 import {
   loadConversationMessages,
@@ -77,13 +77,15 @@ export default function VoiceHubScreen() {
   const {
     status,
     isListening,
+    wakeDetected,
     partialTranscript,
-    finalTranscript,
+    lastCommand,
     error,
-    startListening,
-    stopListening,
-    cancelListening,
-  } = useSpeechRecognition();
+    start: startVoiceMode,
+    stop: stopVoiceMode,
+    resetError: resetVoiceModeError,
+    completeProcessing: completeVoiceModeProcessing,
+  } = useVoiceMode();
   const {
     status: textToSpeechStatus,
     isSpeaking,
@@ -95,8 +97,8 @@ export default function VoiceHubScreen() {
   } = useTextToSpeech();
 
   const micDisabled = error?.code === 'permission_denied' || error?.code === 'not_available';
-  const floatingTranscript =
-    partialTranscript || (isListening || status === 'processing' ? finalTranscript : '');
+  const floatingTranscript = partialTranscript;
+  const displayedVoiceStatus = isAssistantThinking ? 'processing' : status;
 
   useEffect(() => {
     chatMessagesRef.current = chatMessages;
@@ -214,15 +216,17 @@ export default function VoiceHubScreen() {
   }, [stopSpeaking]);
 
   useEffect(() => {
-    const transcript = finalTranscript.trim();
+    const command = lastCommand?.text.trim() ?? '';
 
-    if (!transcript || transcript === lastSentTranscriptRef.current) {
+    if (!lastCommand || !command || lastCommand.id === lastSentTranscriptRef.current) {
       return;
     }
 
-    lastSentTranscriptRef.current = transcript;
-    void sendMessage(transcript);
-  }, [finalTranscript, sendMessage]);
+    lastSentTranscriptRef.current = lastCommand.id;
+    void sendMessage(command).finally(() => {
+      completeVoiceModeProcessing();
+    });
+  }, [completeVoiceModeProcessing, lastCommand, sendMessage]);
 
   useEffect(() => {
     if (!error) {
@@ -288,35 +292,35 @@ export default function VoiceHubScreen() {
     }
 
     if (isListening) {
-      await stopListening();
+      await stopVoiceMode();
       return;
     }
 
     if (status === 'processing') {
-      await cancelListening();
+      completeVoiceModeProcessing();
       return;
     }
 
     try {
       await stopSpeaking();
-      await startListening();
+      resetVoiceModeError();
+      await startVoiceMode();
     } catch {
-      if (Platform.OS === 'android') {
-        toast.error({
-          title: 'Unable to start voice capture',
-          description: 'Check microphone permission.',
-        });
-      }
+      toast.error({
+        title: 'Unable to start voice capture',
+        description: 'Check microphone permission.',
+      });
     }
   }, [
-    cancelListening,
+    completeVoiceModeProcessing,
     error?.code,
     isListening,
     micDisabled,
-    startListening,
+    resetVoiceModeError,
+    startVoiceMode,
     status,
     stopSpeaking,
-    stopListening,
+    stopVoiceMode,
   ]);
 
   return (
@@ -346,13 +350,14 @@ export default function VoiceHubScreen() {
                 <View className="relative w-full items-center pt-24">
                   <VoiceHubFloatingTranscript
                     transcript={floatingTranscript}
-                    isListening={isListening}
+                    isListening={isListening || wakeDetected}
                   />
                   <VoiceHubOrb
                     onPress={handleOrbPress}
                     disabled={micDisabled}
-                    isListening={isListening}
-                    isProcessing={status === 'processing'}
+                    isListening={isListening || wakeDetected}
+                    isWakeDetected={wakeDetected}
+                    isProcessing={status === 'processing' || isAssistantThinking}
                   />
                 </View>
 
@@ -387,9 +392,9 @@ export default function VoiceHubScreen() {
               </View>
 
               <VoiceHubStateSection
-                speechStatus={status}
+                speechStatus={displayedVoiceStatus}
                 partialTranscript={partialTranscript}
-                finalTranscript={finalTranscript}
+                finalTranscript={lastCommand?.text ?? ''}
                 chatMessages={chatMessages}
                 draftMessage={draftMessage}
                 isAssistantThinking={isAssistantThinking}

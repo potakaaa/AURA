@@ -10,6 +10,7 @@ import {
 } from '@expo-google-fonts/manrope';
 import { initDatabase } from '@/src/db';
 import { AuthSessionProvider, useAuthSession } from '@/hooks/use-auth-session';
+import { VoiceModeProvider } from '@/hooks/useVoiceMode';
 import { loadStoredColorScheme, type AppColorScheme } from '@/lib/color-scheme';
 import { NAV_THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
@@ -133,7 +134,9 @@ export default function RootLayout() {
           <StatusBar style={resolvedColorScheme === 'dark' ? 'light' : 'dark'} />
           <Toaster />
           <AuthSessionProvider>
-            <AuthNavigator />
+            <VoiceModeProvider>
+              <AuthNavigator />
+            </VoiceModeProvider>
           </AuthSessionProvider>
           <PortalHost />
         </SafeAreaView>
