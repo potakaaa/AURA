@@ -39,6 +39,30 @@ describe('parseWakeWordCommand', () => {
     });
   });
 
+  it.each([
+    ['or a summarize my emails', 'summarize my emails'],
+    ['or rat find the latest document', 'find the latest document'],
+    ['hey, or uh schedule my day', 'schedule my day'],
+    ['our a what is next', 'what is next'],
+    ['ora start focus mode', 'start focus mode'],
+  ])('accepts common AURA misrecognition "%s"', (transcript, command) => {
+    expect(parseWakeWordCommand(transcript)).toMatchObject({
+      wakeWordDetected: true,
+      command,
+      transcriptWithoutWakeWord: command,
+      suppressedByCooldown: false,
+    });
+  });
+
+  it('only matches ambiguous wake-word aliases at the start of the utterance', () => {
+    expect(parseWakeWordCommand('send the report or a summary')).toMatchObject({
+      wakeWordDetected: false,
+      command: null,
+      transcriptWithoutWakeWord: 'send the report or a summary',
+      suppressedByCooldown: false,
+    });
+  });
+
   it('does not match embedded words', () => {
     expect(parseWakeWordCommand('the aural setting is too bright')).toMatchObject({
       wakeWordDetected: false,

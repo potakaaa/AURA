@@ -1,5 +1,4 @@
 import {
-  VoiceHubFloatingTranscript,
   VoiceHubOrb,
   VoiceHubQuickAction,
   VoiceHubQuickActionsRow,
@@ -348,16 +347,13 @@ export default function VoiceHubScreen() {
             <View className="w-full max-w-2xl gap-8 self-center">
               <View className="items-center gap-7">
                 <View className="relative w-full items-center pt-24">
-                  <VoiceHubFloatingTranscript
-                    transcript={floatingTranscript}
-                    isListening={isListening || wakeDetected}
-                  />
                   <VoiceHubOrb
                     onPress={handleOrbPress}
                     disabled={micDisabled}
                     isListening={isListening || wakeDetected}
                     isWakeDetected={wakeDetected}
                     isProcessing={status === 'processing' || isAssistantThinking}
+                    transcript={floatingTranscript}
                   />
                 </View>
 

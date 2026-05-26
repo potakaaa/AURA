@@ -5,6 +5,7 @@ import { THEME } from '@/lib/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Mic, Sparkles } from 'lucide-react-native';
 import { Platform, Pressable, View } from 'react-native';
+import { VoiceHubFloatingTranscript } from './voice-hub-floating-transcript';
 
 const ORB_SIZE = 256;
 const ORB_RADIUS = ORB_SIZE / 2;
@@ -31,6 +32,7 @@ type VoiceHubOrbProps = {
   isListening?: boolean;
   isWakeDetected?: boolean;
   isProcessing?: boolean;
+  transcript?: string;
 };
 
 /** Glass-style orb: radial-style linear gradient, soft highlight, center sparkle, outer rings. */
@@ -40,6 +42,7 @@ export function VoiceHubOrb({
   isListening,
   isWakeDetected,
   isProcessing,
+  transcript,
 }: VoiceHubOrbProps) {
   const statusLabel = isWakeDetected
     ? 'Command'
@@ -114,7 +117,7 @@ export function VoiceHubOrb({
               bottom: 0,
             }}
           />
-          <View className="items-center gap-3">
+          <View className="items-center gap-2">
             <View
               className="h-16 w-16 items-center justify-center rounded-full border"
               style={{
@@ -132,6 +135,10 @@ export function VoiceHubOrb({
               style={{ fontFamily: 'Manrope_700Bold' }}>
               {statusLabel}
             </Text>
+            <VoiceHubFloatingTranscript
+              transcript={transcript}
+              isListening={isListening || isWakeDetected}
+            />
           </View>
         </LinearGradient>
       </View>

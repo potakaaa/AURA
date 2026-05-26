@@ -120,7 +120,9 @@ export class VoiceModeStateMachine {
         lastCommand: createCommand(command),
         error: null,
         wakeSignalId:
-          parsed.wakeWordDetected && !parsed.suppressedByCooldown
+          this.snapshot.status === 'listening' &&
+          parsed.wakeWordDetected &&
+          !parsed.suppressedByCooldown
             ? this.nextWakeSignalId()
             : this.snapshot.wakeSignalId,
       };
@@ -149,6 +151,32 @@ export class VoiceModeStateMachine {
       status: 'wake-detected',
       partialTranscript: '',
       error: null,
+    };
+
+    return this.snapshot;
+  }
+
+  public promotePartialTranscriptToCommand(): VoiceModeSnapshot {
+    const normalizedTranscript = this.snapshot.partialTranscript.trim();
+    const parsed = this.parseFinalTranscript(normalizedTranscript);
+    const command = parsed.command;
+
+    if (!command) {
+      return this.snapshot;
+    }
+
+    this.snapshot = {
+      ...this.snapshot,
+      status: 'processing',
+      partialTranscript: '',
+      lastCommand: createCommand(command),
+      error: null,
+      wakeSignalId:
+        this.snapshot.status === 'listening' &&
+        parsed.wakeWordDetected &&
+        !parsed.suppressedByCooldown
+          ? this.nextWakeSignalId()
+          : this.snapshot.wakeSignalId,
     };
 
     return this.snapshot;

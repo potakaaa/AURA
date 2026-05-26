@@ -13,6 +13,8 @@ export type WakeWordParseResult =
     };
 
 const WAKE_WORD_PATTERN = /\baura\b/i;
+const WAKE_WORD_ALIAS_PATTERN =
+  /^(?:hey[\s,.:;!?-]+|ok(?:ay)?[\s,.:;!?-]+)?(?:or\s+a|or\s+uh|our\s+a|ora|or\s+rat)\b/i;
 const COMMAND_PREFIX_PATTERN = /^[\s,.:;!?-]+/;
 const COMMAND_SUFFIX_PATTERN = /[\s,.:;!?-]+$/;
 const DEFAULT_WAKE_WORD_COOLDOWN_MS = 2_500;
@@ -42,7 +44,9 @@ function removeWakeWord(transcript: string, matchIndex: number, matchLength: num
 
 export function parseWakeWordCommand(transcript: string): WakeWordParseResult {
   const normalizedTranscript = normalizeTranscript(transcript);
-  const match = WAKE_WORD_PATTERN.exec(normalizedTranscript);
+  const match =
+    WAKE_WORD_PATTERN.exec(normalizedTranscript) ??
+    WAKE_WORD_ALIAS_PATTERN.exec(normalizedTranscript);
 
   if (!match) {
     return {

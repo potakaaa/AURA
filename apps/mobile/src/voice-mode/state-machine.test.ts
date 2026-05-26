@@ -71,6 +71,21 @@ describe('VoiceModeStateMachine', () => {
     expect(snapshot.lastCommand?.text).toBe('schedule my day');
   });
 
+  it('can promote a partial wake command when no final transcript arrives', () => {
+    const machine = new VoiceModeStateMachine();
+
+    machine.startListening();
+    machine.receivePartialTranscript('AURA find the latest document about our backend setup');
+    const snapshot = machine.promotePartialTranscriptToCommand();
+
+    expect(snapshot.status).toBe('processing');
+    expect(snapshot.partialTranscript).toBe('');
+    expect(snapshot.wakeSignalId).toBe(1);
+    expect(snapshot.lastCommand?.text).toBe(
+      'find the latest document about our backend setup'
+    );
+  });
+
   it('restarts listening after recoverable errors and recognition end', () => {
     const machine = new VoiceModeStateMachine();
 

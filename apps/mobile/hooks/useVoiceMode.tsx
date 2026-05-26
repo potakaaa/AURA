@@ -36,6 +36,7 @@ export interface VoiceModeContextValue {
 }
 
 const RESTART_DELAY_MS = 250;
+const PARTIAL_COMMAND_DISPATCH_DELAY_MS = 1_200;
 const START_OPTIONS = {
   locale: 'en-US',
   interimResults: true,
@@ -81,6 +82,7 @@ export function VoiceModeProvider({ children }: { children: ReactNode }) {
   const sessionRef = useRef<ExpoSpeechRecognitionSession | null>(null);
   const sessionIdRef = useRef<string | null>(null);
   const restartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const partialCommandTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isStartingRef = useRef(false);
   const shouldRunRef = useRef(false);
   const isAppActiveRef = useRef(AppState.currentState === 'active');
@@ -98,9 +100,24 @@ export function VoiceModeProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const clearPartialCommandTimer = useCallback(() => {
+    if (partialCommandTimerRef.current) {
+      clearTimeout(partialCommandTimerRef.current);
+      partialCommandTimerRef.current = null;
+    }
+  }, []);
+
   const canRun = useCallback(() => {
     return shouldRunRef.current && isAppActiveRef.current && isAuthenticatedRef.current;
   }, []);
+
+  const schedulePartialCommandDispatch = useCallback(() => {
+    clearPartialCommandTimer();
+    partialCommandTimerRef.current = setTimeout(() => {
+      partialCommandTimerRef.current = null;
+      publish(machineRef.current.promotePartialTranscriptToCommand());
+    }, PARTIAL_COMMAND_DISPATCH_DELAY_MS);
+  }, [clearPartialCommandTimer, publish]);
 
   const startRecognition = useCallback(async () => {
     if (!canRun() || isStartingRef.current || sessionIdRef.current) {
@@ -148,6 +165,7 @@ export function VoiceModeProvider({ children }: { children: ReactNode }) {
 
   const stopActiveSession = useCallback(async () => {
     clearRestartTimer();
+    clearPartialCommandTimer();
     const sessionId = sessionIdRef.current;
     sessionIdRef.current = null;
     isStartingRef.current = false;
@@ -161,13 +179,22 @@ export function VoiceModeProvider({ children }: { children: ReactNode }) {
     } catch {
       // Stopping voice mode should not surface a user-facing error.
     }
-  }, [clearRestartTimer]);
+  }, [clearPartialCommandTimer, clearRestartTimer]);
 
   useEffect(() => {
     sessionRef.current = new ExpoSpeechRecognitionSession({
       onStatusChange: (nextStatus: SttSessionStatus) => {
         if (nextStatus === 'stopped' || nextStatus === 'canceled' || nextStatus === 'idle') {
           sessionIdRef.current = null;
+          clearPartialCommandTimer();
+          if (nextStatus !== 'canceled') {
+            const promotedSnapshot = machineRef.current.promotePartialTranscriptToCommand();
+            if (promotedSnapshot.status === 'processing') {
+              publish(promotedSnapshot);
+              return;
+            }
+          }
+
           const nextSnapshot = machineRef.current.handleRecognitionEnd();
           publish(nextSnapshot);
           if (shouldRestartAfterSnapshot(nextSnapshot)) {
@@ -176,13 +203,19 @@ export function VoiceModeProvider({ children }: { children: ReactNode }) {
         }
       },
       onPartialTranscript: (result) => {
-        publish(machineRef.current.receivePartialTranscript(result.transcript));
+        const nextSnapshot = machineRef.current.receivePartialTranscript(result.transcript);
+        publish(nextSnapshot);
+        if (nextSnapshot.status === 'listening' || nextSnapshot.status === 'wake-detected') {
+          schedulePartialCommandDispatch();
+        }
       },
       onFinalTranscript: (result) => {
+        clearPartialCommandTimer();
         publish(machineRef.current.receiveFinalTranscript(result.transcript));
       },
       onError: (nextError) => {
         sessionIdRef.current = null;
+        clearPartialCommandTimer();
         const nextSnapshot = machineRef.current.handleError(nextError);
         publish(nextSnapshot);
         if (shouldRestartAfterSnapshot(nextSnapshot)) {
@@ -193,10 +226,17 @@ export function VoiceModeProvider({ children }: { children: ReactNode }) {
 
     return () => {
       clearRestartTimer();
+      clearPartialCommandTimer();
       sessionRef.current?.dispose();
       sessionRef.current = null;
     };
-  }, [clearRestartTimer, publish, scheduleRestart]);
+  }, [
+    clearPartialCommandTimer,
+    clearRestartTimer,
+    publish,
+    schedulePartialCommandDispatch,
+    scheduleRestart,
+  ]);
 
   const start = useCallback(async () => {
     shouldRunRef.current = true;
@@ -215,12 +255,13 @@ export function VoiceModeProvider({ children }: { children: ReactNode }) {
   }, [publish]);
 
   const completeProcessing = useCallback(() => {
+    clearPartialCommandTimer();
     const nextSnapshot = machineRef.current.completeProcessing();
     publish(nextSnapshot);
     if (shouldRestartAfterSnapshot(nextSnapshot)) {
       scheduleRestart();
     }
-  }, [publish, scheduleRestart]);
+  }, [clearPartialCommandTimer, publish, scheduleRestart]);
 
   useEffect(() => {
     isAuthenticatedRef.current = isAuthenticated;

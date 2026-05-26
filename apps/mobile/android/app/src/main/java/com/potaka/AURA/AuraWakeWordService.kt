@@ -202,23 +202,25 @@ class AuraWakeWordService : Service(), RecognitionListener, TextToSpeech.OnInitL
       playWakeCue()
     }
 
+    val command = parsed.command
     if (!isFinal) {
+      if (command.isNullOrBlank()) {
+        isAwaitingCommand = true
+        updateNotification("AURA heard you", "Listening for your command.")
+      } else {
+        schedulePartialCommandDispatch(command)
+      }
       return
     }
 
-    val command = parsed.command
     if (command.isNullOrBlank()) {
       isAwaitingCommand = true
       updateNotification("AURA heard you", "Listening for your command.")
       return
     }
 
-    if (isFinal) {
-      isAwaitingCommand = false
-      dispatchCommand(command)
-    } else {
-      schedulePartialCommandDispatch(command)
-    }
+    isAwaitingCommand = false
+    dispatchCommand(command)
   }
 
   private fun schedulePartialCommandDispatch(command: String) {
@@ -261,7 +263,7 @@ class AuraWakeWordService : Service(), RecognitionListener, TextToSpeech.OnInitL
   }
 
   private fun parseWakeWordCommand(transcript: String): WakeWordParseResult {
-    val match = WAKE_WORD_REGEX.find(transcript)
+    val match = WAKE_WORD_REGEX.find(transcript) ?: WAKE_WORD_ALIAS_REGEX.find(transcript)
       ?: return WakeWordParseResult(wakeWordDetected = false, command = null)
     val command = transcript
       .substring(match.range.last + 1)
@@ -476,6 +478,10 @@ class AuraWakeWordService : Service(), RecognitionListener, TextToSpeech.OnInitL
     private const val SYSTEM_PROMPT =
       "You are Aura, a concise voice-first personal assistant. Answer clearly and keep replies useful for a mobile chat."
     private val WAKE_WORD_REGEX = Regex("\\baura\\b", RegexOption.IGNORE_CASE)
+    private val WAKE_WORD_ALIAS_REGEX = Regex(
+      "^(?:hey[\\s,.:;!?-]+|ok(?:ay)?[\\s,.:;!?-]+)?(?:or\\s+a|or\\s+uh|our\\s+a|ora|or\\s+rat)\\b",
+      RegexOption.IGNORE_CASE,
+    )
 
     @Volatile
     var isRunning: Boolean = false
